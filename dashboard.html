@@ -33,6 +33,9 @@
   .price { font-weight:700; color:var(--acc); }
   .acts { display:flex; flex-wrap:wrap; gap:6px; }
   .err { color:var(--bad); font-size:13px; min-height:18px; margin-bottom:8px; }
+  .pay { margin:8px 0 10px; padding:10px; border:1px dashed var(--line); border-radius:12px; }
+  .payrow { display:flex; gap:6px; } .payrow input { margin:0; font-size:14px; padding:9px 10px; min-width:0; }
+  .paystat { font-size:13px; font-weight:700; margin:8px 0; }
   .empty { text-align:center; color:var(--muted); padding:40px 10px; }
   #login { max-width:380px; margin:12vh auto 0; }
 </style>
@@ -81,12 +84,24 @@ async function api(path, opt = {}) {
   if (!r.ok) throw new Error("HTTP " + r.status);
   return opt.method && opt.method !== "GET" ? null : r.json();
 }
+function payState(o) {
+  if (o.paid_amount == null) return ["⏳ មិនទាន់ផ្ទៀងផ្ទាត់ទឹកប្រាក់", "var(--muted)"];
+  const df = o.paid_amount - (o.price || 0);
+  if (df >= 0) return [df > 0 ? `✅ បង់គ្រប់ (លើស ${money(df)})` : "✅ បង់គ្រប់", "var(--ok)"];
+  return [`⚠️ បង់មិនទាន់គ្រប់ · ខ្វះ ${money(-df)}`, "var(--bad)"];
+}
+function payPanel(o) {
+  if (o.pay_method !== "qr") return "";
+  const [t, c] = payState(o), short = o.paid_amount != null && o.paid_amount < (o.price || 0);
+  return `<div class="pay"><div class="payrow"><input data-payer value="${esc(o.payer_name || "")}" placeholder="ឈ្មោះអ្នកបង់ (លើបង្កាន់ដៃ)"><input data-paid type="number" inputmode="numeric" value="${o.paid_amount == null ? "" : o.paid_amount}" placeholder="ទឹកប្រាក់ ៛"><button class="sm" data-savepay="1" type="button">រក្សា</button></div>
+    <div class="paystat" style="color:${c}">${t}</div>${short ? `<button class="sm" data-sms="1" type="button" style="border-color:var(--bad);color:var(--bad)">📩 ប្រាប់ភ្ញៀវថាបង់មិនទាន់គ្រប់</button>` : ""}</div>`;
+}
 const money = (n) => Number(n || 0).toLocaleString("en-US") + " ៛";
 const when = (s) => new Date(s).toLocaleString("en-GB", { timeZone: "Asia/Phnom_Penh", day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" });
 const dayKey = (s) => new Date(s).toLocaleDateString("en-CA", { timeZone: "Asia/Phnom_Penh" });
 
 async function load() {
-  if (document.activeElement && document.activeElement.matches && document.activeElement.matches("[data-note]")) return;
+  if (document.activeElement && document.activeElement.matches && document.activeElement.matches("#list input")) return;
   try { orders = await api("orders?select=*&order=created_at.desc&limit=300", { headers: { Prefer: "" } }); draw(); $("lerr").textContent = ""; }
   catch (e) { if (e.message === "login" || /401|403/.test(e.message)) logout(); else $("list").innerHTML = `<div class="empty">ទាញទិន្នន័យមិនបាន (${esc(e.message)})</div>`; }
 }
@@ -102,11 +117,11 @@ function draw() {
   $("list").innerHTML = rows.length ? rows.map((o) => `<div class="order ${esc(o.status)}" data-id="${o.id}">
     <div class="top"><div class="name">${esc(o.product)}${o.size ? " · " + esc(o.size) : ""}</div><div class="time">${when(o.created_at)}</div></div>
     <div class="meta"><span class="price">${money(o.price)}</span> · #${esc(o.product_no)}${o.pay_method ? " · " + (o.pay_method === "qr" ? "💳 បង់ឥឡូវ" : "🚚 បង់ពេលទទួល") : ""}<br>
-      ${o.customer_name ? "👤 " + esc(o.customer_name) + "<br>" : ""}📞 <a href="tel:${esc(String(o.phone).replace(/[^\d+]/g, ""))}">${esc(o.phone)}</a><br>
+      📞 <a href="tel:${esc(String(o.phone).replace(/[^\d+]/g, ""))}">${esc(o.phone)}</a><br>
       ${o.location ? "📍 " + esc(o.location) + "<br>" : ""}
       ${/^https?:\/\//.test(o.map_link || "") ? `🗺 <a href="${esc(o.map_link)}" target="_blank" rel="noopener">បើក Google Map</a>` : ""}</div>
-    <div style="display:flex;gap:6px;margin-bottom:8px"><input data-note value="${esc(o.tracking_note || "")}" placeholder="ដឹកដល់ណាហើយ? ឧ. ចេញពីភ្នំពេញ" style="margin:0;font-size:14px;padding:9px 12px"><button class="sm" data-savenote="1" type="button">រក្សា</button></div>
-    <div class="acts">${Object.entries(ST).filter(([k]) => k !== o.status).map(([k, v]) => `<button class="sm" data-s="${k}" type="button">${v}</button>`).join("")}<button class="sm" data-del="1" type="button" style="color:var(--bad)">🗑</button></div>
+    ${payPanel(o)}
+    <div class="acts">${o.receipt_url ? `<button class="sm" data-rc="${esc(o.receipt_url)}" type="button" style="border-color:var(--ok);color:var(--ok)">🧾 មើលបង្កាន់ដៃ</button>` : ""}${Object.entries(ST).filter(([k]) => k !== o.status).map(([k, v]) => `<button class="sm" data-s="${k}" type="button">${v}</button>`).join("")}<button class="sm" data-del="1" type="button" style="color:var(--bad)">🗑</button></div>
   </div>`).join("") : `<div class="empty">មិនទាន់មានការបញ្ជាទិញ</div>`;
 }
 $("chips").onclick = (e) => { const b = e.target.closest("[data-f]"); if (b) { flt = b.dataset.f; draw(); } };
@@ -119,6 +134,25 @@ $("list").onclick = async (e) => {
       const v = card.querySelector("[data-note]").value.trim();
       await api(`orders?id=eq.${id}`, { method: "PATCH", body: JSON.stringify({ tracking_note: v || null }) });
       orders.find((o) => String(o.id) === id).tracking_note = v; b.textContent = "✓"; setTimeout(() => { b.textContent = "រក្សា"; }, 1200); return;
+    }
+    if (b.dataset.savepay) {
+      const o = orders.find((x) => String(x.id) === id), payer = card.querySelector("[data-payer]").value.trim(), v = card.querySelector("[data-paid]").value.trim();
+      const paid = v === "" ? null : Math.max(0, parseInt(v, 10) || 0);
+      await api(`orders?id=eq.${id}`, { method: "PATCH", body: JSON.stringify({ payer_name: payer || null, paid_amount: paid }) });
+      o.payer_name = payer || null; o.paid_amount = paid; draw(); return;
+    }
+    if (b.dataset.sms) {
+      const o = orders.find((x) => String(x.id) === id), short = (o.price || 0) - (o.paid_amount || 0);
+      const msg = `សួស្តី${o.payer_name ? " " + o.payer_name : ""}! ការទិញ ${o.product}${o.size ? " ទំហំ " + o.size : ""} តម្លៃ ${money(o.price)}។ យើងទទួលបាន ${money(o.paid_amount)} ប៉ុណ្ណោះ បង់មិនទាន់គ្រប់ ខ្វះ ${money(short)}។ សូមបង់បន្ថែម ហើយផ្ញើបង្កាន់ដៃមកវិញ។ អរគុណ!`;
+      try { navigator.clipboard.writeText(msg).catch(() => {}); } catch (x) {}
+      const a = document.createElement("a"); a.href = `sms:${String(o.phone).replace(/[^\d+]/g, "")}${/iPhone|iPad/.test(navigator.userAgent) ? "&" : "?"}body=${encodeURIComponent(msg)}`; a.click(); return;
+    }
+    if (b.dataset.rc) {
+      const t = await token();
+      const r = await fetch(`${SB_URL}/storage/v1/object/sign/receipts/${b.dataset.rc}`, { method: "POST", headers: { apikey: SB_KEY, Authorization: "Bearer " + t, "Content-Type": "application/json" }, body: JSON.stringify({ expiresIn: 300 }) });
+      const j = await r.json();
+      if (!r.ok || !j.signedURL) throw new Error("មើលមិនបាន");
+      window.open(`${SB_URL}/storage/v1${j.signedURL}`, "_blank", "noopener"); return;
     }
     if (b.dataset.s) { await api(`orders?id=eq.${id}`, { method: "PATCH", body: JSON.stringify({ status: b.dataset.s }) }); orders.find((o) => String(o.id) === id).status = b.dataset.s; }
     else if (b.dataset.del) {
