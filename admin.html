@@ -315,6 +315,7 @@ const SETTINGS = {        // ការកំណត់រចនា និងហ�
   showFlash: true,
   saleCount: 16,
   saleHours: 4,
+  payAccount: "",
   statsUrl: "",             // URL របស់ Worker ស្ថិតិ (ទទេ = មិនប្រើ)
   showPromo: true,          // បង្ហាញផ្ទាំងផ្សព្វផ្សាយធំ
   banners: [                // ផ្ទាំងផ្សព្វផ្សាយធំ 3 · target៖ all / sale / top / bottom / dress / set / acc ឬ តំណ https://...
@@ -375,7 +376,7 @@ async function syncFromRemote() {
   try {
     const d = await sbPull();
     if (d) {
-      localStorage.setItem("adminData", JSON.stringify({ edits: d.edits, hidden: d.hidden, sale: d.sale, stock: d.stock, settings: d.settings, added: d.added }));
+      localStorage.setItem("adminData", JSON.stringify({ edits: d.edits, hidden: d.hidden, sale: d.sale, stock: d.stock, settings: d.settings, added: d.added, deleted: d.deleted }));
       localStorage.setItem("adminImages", JSON.stringify(d.imgs || {}));
     } else { loadAdminData(); sbPush(); }
   } catch (e) {}
@@ -383,7 +384,7 @@ async function syncFromRemote() {
 const ORIG_PRODUCTS = PRODUCTS.map((p) => ({ ...p }));
 let adminOn = false;
 try { adminOn = localStorage.getItem("adminOn") === "1"; } catch (e) {}
-let adminData = { edits: {}, hidden: [...HIDDEN], sale: { ...MANUAL_SALE }, stock: { ...STOCK }, settings: {}, added: [] };
+let adminData = { edits: {}, hidden: [...HIDDEN], sale: { ...MANUAL_SALE }, stock: { ...STOCK }, settings: {}, added: [], deleted: [] };
 let adminImages = {};   // រូបដែលម្ចាស់ហាងដាក់ { លេខទំនិញ: dataURL } (លើឧបករណ៍នេះ)
 const photoOf = (n) => (adminOn && adminImages[n]) ? adminImages[n] : `Example${n}.jpg`;
 function loadAdminData() {
@@ -391,7 +392,7 @@ function loadAdminData() {
   PRODUCTS.forEach((p, k) => Object.assign(p, ORIG_PRODUCTS[k]));
   try {
     const saved = JSON.parse(localStorage.getItem("adminData") || "null");
-    if (saved) adminData = { edits: saved.edits || {}, hidden: saved.hidden || [], sale: saved.sale || {}, stock: saved.stock || { ...STOCK }, settings: saved.settings || {}, added: saved.added || [] };
+    if (saved) adminData = { edits: saved.edits || {}, hidden: saved.hidden || [], sale: saved.sale || {}, stock: saved.stock || { ...STOCK }, settings: saved.settings || {}, added: saved.added || [], deleted: saved.deleted || [] };
   } catch (e) {}
   try { adminImages = JSON.parse(localStorage.getItem("adminImages") || "{}") || {}; } catch (e) { adminImages = {}; }
   Object.entries(adminData.edits).forEach(([k, v]) => { if (PRODUCTS[k]) Object.assign(PRODUCTS[k], v); });
@@ -513,10 +514,11 @@ function downloadPhoto(n) {
 
 let adFilter = "all";
 function adminRows(q) {
-  const hidden = new Set(adminData.hidden);
+  const hidden = new Set(adminData.hidden), gone = new Set(adminData.deleted || []);
   const needle = (q || "").trim().toLowerCase();
   const out = PRODUCTS.map((p, k) => {
     const n = k + 1;
+    if (gone.has(n)) return "";
     const h = hidden.has(n), onSale = Number(adminData.sale[n]) > 0, out = adminData.stock[n] !== undefined && adminData.stock[n] !== "" && Number(adminData.stock[n]) === 0;
     if (adFilter === "sale" && !onSale) return "";
     if (adFilter === "hidden" && !h) return "";
@@ -527,7 +529,7 @@ function adminRows(q) {
         <div class="ad-thumbwrap"><img class="ad-thumb" src="${photoOf(n)}" alt="" decoding="async" onerror="this.style.display='none'" /></div>
         <label class="ad-photo-btn">📷 ប្តូររូប<input type="file" accept="image/*" data-img="${n}" hidden></label>
         ${adminImages[n] ? `<button type="button" class="ad-delimg" data-delimg="${n}">🗑 លុបរូប</button>` : ""}
-        ${n === PRODUCTS.length && n > ORIG_PRODUCTS.length ? `<button type="button" class="ad-del" data-del="${n}">🗑 លុប</button>` : ""}
+        <button type="button" class="ad-del" data-del="${n}">🗑 លុបប្រអប់</button>
       </div>
       <div class="ad-main">
         <div class="ad-top"><span class="ad-num">${String(n).padStart(2, "0")}</span>
@@ -726,6 +728,8 @@ function openAdminPanel() {
           ${[1, 2, 3, 4, 6, 8, 12, 24].map((h) => `<option value="${h}"${settings.saleHours === h ? " selected" : ""}>${h} ម៉ោង</option>`).join("")}
         </select></label>
       <div class="ad-hint">ម៉ោងគិតតាមម៉ោងកម្ពុជា ចាប់ពី 00:00</div>
+      <label class="ad-field">គណនីទទួលប្រាក់ (ឈ្មោះ + លេខ ACLEDA)<input class="ad-input" data-s="payAccount" value="${esc(settings.payAccount)}" placeholder="ឧ. ACLEDA 0000 0000 0000 · SOK DARA" /></label>
+      <div class="ad-hint">ដាក់រូប QR ឈ្មោះ KHQR.jpg ទៅជាមួយ index.html ដើម្បីបង្ហាញលើទំព័របង់ប្រាក់។</div>
       <label class="ad-field">URL Worker ស្ថិតិ (ទទេ = រាប់លើឧបករណ៍នេះប៉ុណ្ណោះ)<input class="ad-input" data-s="statsUrl" value="${esc(settings.statsUrl)}" placeholder="https://stats.xxx.workers.dev" /></label>
     </div>`;
   const list = document.getElementById("ad-list");
@@ -800,13 +804,20 @@ function openAdminPanel() {
     const del = e.target.closest(".ad-del");
     if (del) {
       const n = Number(del.dataset.del);
-      if (n !== PRODUCTS.length || n <= ORIG_PRODUCTS.length) return;
-      if (!confirm("លុបទំនិញនេះ?")) return;
-      PRODUCTS.pop();
+      if (del.dataset.sure !== "1") {            // ចុចពីរដង
+        del.dataset.sure = "1"; del.textContent = "ចុចម្តងទៀត";
+        del.style.background = "#B8213F"; del.style.color = "#fff";
+        setTimeout(() => { if (del.isConnected) { del.dataset.sure = ""; del.textContent = "🗑 លុបប្រអប់"; del.style.background = ""; del.style.color = ""; } }, 3000);
+        return;
+      }
       delete adminImages[n]; delete adminData.stock[n]; delete adminData.sale[n];
       adminData.hidden = adminData.hidden.filter((x) => x !== n);
+      if (n === PRODUCTS.length && n > ORIG_PRODUCTS.length) PRODUCTS.pop();      // ទំនិញថ្មីចុងក្រោយ → លុបពិត
+      else adminData.deleted = [...new Set([...(adminData.deleted || []), n])];  // ផ្សេងទៀត → លាក់ជាអចិន្ត្រៃយ៍
       saveImages(); saveAdmin(); refreshSite(); stats();
+      const keep = list.scrollTop;
       list.innerHTML = adminRows(document.getElementById("ad-search").value);
+      list.scrollTop = keep;
       return;
     }
     const btn = e.target.closest(".ad-q");

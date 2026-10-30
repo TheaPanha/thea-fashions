@@ -522,6 +522,25 @@
   }
   .sheet-confirm:disabled { opacity: 0.45; box-shadow: none; cursor: not-allowed; }
   .sheet-confirm:not(:disabled):active { transform: scale(0.98); }
+  .pay-opts { display: flex; flex-direction: column; gap: 8px; margin: 12px 0; }
+  .pay-opt { padding: 13px; border: 1.5px solid var(--border); border-radius: 12px; background: #fff; color: var(--ink); font-family: inherit; font-size: 15px; font-weight: 600; text-align: left; cursor: pointer; }
+  .pay-opt.on { border-color: var(--clay); background: rgba(var(--clay-rgb),0.08); }
+  #pay-qr { text-align: center; margin-bottom: 14px; }
+  #pay-img { max-width: 300px; width: 80%; border-radius: 12px; margin-bottom: 8px; background: #fff; }
+  #pay-acc { font-weight: 700; font-size: 17px; margin-bottom: 8px; word-break: break-all; }
+  .of-input {
+    width: 100%; padding: 12px 14px; margin-bottom: 12px; border: 1.5px solid var(--border); border-radius: 12px;
+    background: #fff; color: var(--ink); font-family: inherit; font-size: 16px; box-sizing: border-box;
+  }
+  .of-input:focus { outline: none; border-color: var(--clay); }
+  .of-row { display: flex; gap: 8px; margin-bottom: 8px; }
+  .of-btn {
+    flex: 1; padding: 10px 8px; border: 1.5px solid var(--border); border-radius: 12px; background: #fff;
+    color: var(--ink); font-family: inherit; font-size: 13px; font-weight: 600; cursor: pointer;
+  }
+  .of-btn:active { transform: scale(0.97); }
+  .of-hint { min-height: 16px; margin-bottom: 12px; font-size: 12px; color: var(--muted); line-height: 1.5; }
+  .sheet { max-height: 92vh; overflow-y: auto; }
   .sheet-cancel {
     width: 100%; margin-top: 8px; padding: 12px; border: none; background: none;
     color: var(--muted); font-family: inherit; font-size: 14px; cursor: pointer;
@@ -1156,6 +1175,27 @@
     <div class="lb-cap"><div><b id="lb-name"></b><span id="lb-price"></span></div><small id="lb-count"></small></div>
   </div>
 
+  <div class="sheet-backdrop" id="paysheet">
+    <div class="sheet" role="dialog" aria-modal="true">
+      <div class="sheet-handle"></div>
+      <h3 style="margin:6px 0 2px">ទូទាត់ប្រាក់</h3>
+      <p class="sheet-price" id="pay-total"></p>
+      <div class="pay-opts" id="pay-opts">
+        <button type="button" class="pay-opt" data-m="qr">💳 បង់ឥឡូវ (ACLEDA / KHQR)</button>
+        <button type="button" class="pay-opt" data-m="cod">🚚 បង់ពេលទទួលអីវ៉ាន់</button>
+      </div>
+      <div id="pay-qr">
+        <img id="pay-img" src="KHQR.jpg" alt="" onerror="this.style.display='none'" />
+        <div id="pay-acc"></div>
+        <button type="button" class="of-btn" id="pay-copy" style="width:100%">ចម្លងលេខគណនី</button>
+        <div class="of-hint" style="margin-top:8px">បង់រួច សូមផ្ញើរូបបង្កាន់ដៃមកតាម Telegram ដើម្បីបញ្ជាក់</div>
+      </div>
+      <div id="pay-cod" class="of-hint" style="display:none">អីវ៉ាន់ដឹកដល់ដៃអ្នក ហើយបង់ប្រាក់ជូនអ្នកដឹកពេលទទួល។</div>
+      <button class="sheet-confirm" id="pay-go" type="button">បញ្ជាក់ការទិញ</button>
+      <button class="sheet-cancel" id="pay-back" type="button">ថយក្រោយ</button>
+    </div>
+  </div>
+
   <div class="sheet-backdrop" id="sheet">
     <div class="sheet" role="dialog" aria-modal="true">
       <div class="sheet-handle"></div>
@@ -1163,8 +1203,17 @@
         <img class="sheet-thumb" id="sheet-img" src="" alt="" onerror="this.style.visibility='hidden'" />
         <div><h3 id="sheet-name"></h3><p class="sheet-price" id="sheet-price"></p></div>
       </div>
-      <div class="sheet-label">ជ្រើសរើសទំហំ</div>
-      <div class="sizes" id="sizes"></div>
+      <div id="size-block"><div class="sheet-label">ជ្រើសរើសទំហំ</div>
+      <div class="sizes" id="sizes"></div></div>
+      <div class="sheet-label">លេខទូរស័ព្ទ</div>
+      <input class="of-input" id="of-phone" type="tel" inputmode="tel" placeholder="ឧ. 012 345 678" autocomplete="tel" />
+      <div class="sheet-label">ទីតាំងដឹកជញ្ជូន</div>
+      <input class="of-input" id="of-loc" type="text" placeholder="វាយឈ្មោះទីតាំង ឬបិទភ្ជាប់តំណ Google Map" autocomplete="street-address" />
+      <div class="of-row">
+        <button type="button" class="of-btn" id="of-gps">📍 ប្រើទីតាំងខ្ញុំ</button>
+        <button type="button" class="of-btn" id="of-map">🔍 ស្វែងរកលើ Google Map</button>
+      </div>
+      <div class="of-hint" id="of-hint"></div>
       <button class="sheet-confirm" id="sheet-confirm" type="button" disabled>សូមជ្រើសរើសទំហំសិន</button>
       <button class="sheet-cancel" id="sheet-cancel" type="button">បោះបង់</button>
     </div>
@@ -1262,11 +1311,12 @@ const SETTINGS = {        // ការកំណត់រចនា និងហ�
   telegram: "theapanha04042004",
   messenger: "https://www.facebook.com/share/1MQPrStX8p/?mibextid=wwXIfr",
   accent: "#C2566E",
-  announce: "ទំនិញបញ្ចុះតម្លៃថ្មី · ឆាតកម្មង់បានភ្លាមៗ តាម Telegram និង Messenger",
+  announce: "ទំនិញបញ្ចុះតម្លៃថ្មី · ទិញបានភ្លាមៗ តាម Telegram និង Messenger",
   showMarquee: false,
   showFlash: true,
   saleCount: 16,
   saleHours: 4,
+  payAccount: "",          // គណនីទទួលប្រាក់ (ACLEDA) · ដាក់រូប KHQR ឈ្មោះ KHQR.jpg
   statsUrl: "",             // URL របស់ Worker ស្ថិតិ (ទទេ = មិនប្រើ)
   showPromo: true,          // បង្ហាញផ្ទាំងផ្សព្វផ្សាយធំ
   banners: [                // ផ្ទាំងផ្សព្វផ្សាយធំ 3 · target៖ all / sale / top / bottom / dress / set / acc ឬ តំណ https://...
@@ -1281,7 +1331,7 @@ const SETTINGS = {        // ការកំណត់រចនា និងហ�
 const ORIG_PRODUCTS = PRODUCTS.map((p) => ({ ...p }));
 let adminOn = false;
 try { adminOn = localStorage.getItem("adminOn") === "1"; } catch (e) {}
-let adminData = { edits: {}, hidden: [...HIDDEN], sale: { ...MANUAL_SALE }, stock: { ...STOCK }, settings: {}, added: [] };
+let adminData = { edits: {}, hidden: [...HIDDEN], sale: { ...MANUAL_SALE }, stock: { ...STOCK }, settings: {}, added: [], deleted: [] };
 let shared = false;                                   // ទិន្នន័យចែករំលែកពី Supabase
 const useData = () => adminOn || shared;
 let adminImages = {};   // រូបដែលម្ចាស់ហាងដាក់ { លេខទំនិញ: dataURL } (លើឧបករណ៍នេះ)
@@ -1290,7 +1340,7 @@ function loadAdminData() {
   PRODUCTS.length = ORIG_PRODUCTS.length;      // លុបទំនិញថ្មីដែលបានបន្ថែមពីមុន (ការពារស្ទួន)
   try {
     const saved = JSON.parse(localStorage.getItem("adminData") || "null");
-    if (saved) adminData = { edits: saved.edits || {}, hidden: saved.hidden || [], sale: saved.sale || {}, stock: saved.stock || { ...STOCK }, settings: saved.settings || {}, added: saved.added || [] };
+    if (saved) adminData = { edits: saved.edits || {}, hidden: saved.hidden || [], sale: saved.sale || {}, stock: saved.stock || { ...STOCK }, settings: saved.settings || {}, added: saved.added || [], deleted: saved.deleted || [] };
   } catch (e) {}
   try { adminImages = JSON.parse(localStorage.getItem("adminImages") || "{}") || {}; } catch (e) { adminImages = {}; }
   Object.entries(adminData.edits).forEach(([k, v]) => { if (PRODUCTS[k]) Object.assign(PRODUCTS[k], v); });
@@ -1301,11 +1351,15 @@ let settings = { ...SETTINGS, ...(useData() ? adminData.settings : {}) };
 const rebuildSettings = () => { settings = { ...SETTINGS, ...(useData() ? adminData.settings : {}) }; };
 const SB_URL = "https://jbdxyxypgmdldxktixyd.supabase.co";   // ← ដាក់ Project URL
 const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpiZHh5eHlwZ21kbGR4a3RpeHlkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMzMjAzNzYsImV4cCI6MjEwODg5NjM3Nn0.3vvF45w20T_giyk66jXKqEoAd9bylA7Py4O89JAtfE0";                // ← ដាក់ anon public key
+function saveOrderRemote(o) {
+  if (!/^https:\/\/[a-z0-9]+\.supabase\.co$/.test(SB_URL) || SB_KEY.startsWith("YOUR")) return;
+  try { fetch(`${SB_URL}/rest/v1/orders`, { method: "POST", keepalive: true, headers: { apikey: SB_KEY, Authorization: "Bearer " + SB_KEY, "Content-Type": "application/json", Prefer: "return=minimal" }, body: JSON.stringify(o) }).catch(() => {}); } catch (e) {}
+}
 function applyShared(d) {
   if (!d) return;
   PRODUCTS.length = ORIG_PRODUCTS.length;
   PRODUCTS.forEach((p, k) => Object.assign(p, ORIG_PRODUCTS[k]));
-  adminData = { edits: d.edits || {}, hidden: d.hidden || [], sale: d.sale || {}, stock: d.stock || { ...STOCK }, settings: d.settings || {}, added: d.added || [] };
+  adminData = { edits: d.edits || {}, hidden: d.hidden || [], sale: d.sale || {}, stock: d.stock || { ...STOCK }, settings: d.settings || {}, added: d.added || [], deleted: d.deleted || [] };
   adminImages = d.imgs || {};
   Object.entries(adminData.edits).forEach(([k, v]) => { if (PRODUCTS[k]) Object.assign(PRODUCTS[k], v); });
   adminData.added.forEach((a) => PRODUCTS.push({ name: a.name, place: a.place, price: a.price }));
@@ -1313,7 +1367,7 @@ function applyShared(d) {
 }
 try { applyShared(JSON.parse(localStorage.getItem("sharedCache") || "null")); } catch (e) {}
 const esc = (v) => String(v).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
-const hiddenSet = () => new Set(useData() ? adminData.hidden : HIDDEN);
+const hiddenSet = () => new Set(useData() ? [...adminData.hidden, ...(adminData.deleted || [])] : HIDDEN);
 const manualSale = () => (useData() ? adminData.sale : MANUAL_SALE);
 
 const formatRiel = (n) => n.toLocaleString("en-US") + " ៛";
@@ -1445,9 +1499,10 @@ function sizesOf(place) {
   return [];
 }
 
-async function sendOrder(item, i, size, btn) {
+async function sendOrder(item, i, size, btn, contact, payText) {
   const sizeText = size ? ` ទំហំ ${size}` : "";
-  const msg = `សួស្តី! ខ្ញុំចង់កម្មង់ ${item.name}${sizeText} តម្លៃ ${formatRiel(finalPrice(item))}${saleOf(item) ? ` (បញ្ចុះ ${saveText(item)})` : ""}`;
+  const msg = `សួស្តី! ខ្ញុំចង់កម្មង់ ${item.name}${sizeText} តម្លៃ ${formatRiel(finalPrice(item))}${saleOf(item) ? ` (បញ្ចុះ ${saveText(item)})` : ""}`
+    + (contact ? `\n📞 លេខទូរស័ព្ទ៖ ${contact.phone}` + (contact.isLink ? "" : `\n📍 ទីតាំង៖ ${contact.loc}`) + `\n🗺 Google Map៖ ${contact.link}` : "") + (payText ? `\n${payText}` : "");
 
   // 1) ផ្ញើរូប + សារ តាមបញ្ជី Share (ជ្រើស Telegram)
   {
@@ -1465,7 +1520,7 @@ async function sendOrder(item, i, size, btn) {
   }
 
   // 2) បម្រុង៖ ចម្លងសារ ហើយបើក Telegram ផ្ទាល់
-  try { navigator.clipboard.writeText(msg); } catch (err) {}
+  try { navigator.clipboard.writeText(msg).catch(() => {}); } catch (err) {}
   const url = `https://t.me/${settings.telegram.replace(/^@/, "")}?text=${encodeURIComponent(msg)}`;
   window.open(url, "_blank");
   const orig = btn.innerHTML;
@@ -1480,9 +1535,41 @@ const sheetConfirm = document.getElementById("sheet-confirm");
 let sheetCtx = null;
 let chosenSize = "";
 
+const ofPhone = document.getElementById("of-phone"), ofLoc = document.getElementById("of-loc"), ofHint = document.getElementById("of-hint");
+const isUrl = (v) => /^https?:\/\//i.test(v.trim());
+const mapLinkOf = (v) => isUrl(v) ? v.trim() : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(v.trim())}`;
+let needSize = false;
+function updateConfirm() {
+  const phoneOk = ofPhone.value.replace(/\D/g, "").length >= 8, locOk = ofLoc.value.trim().length >= 2;
+  let t = "", ok = false;
+  if (needSize && !chosenSize) t = "សូមជ្រើសរើសទំហំសិន";
+  else if (!phoneOk) t = "សូមបំពេញលេខទូរស័ព្ទ";
+  else if (!locOk) t = "សូមបំពេញទីតាំង";
+  else { ok = true; t = chosenSize ? `បន្តទៅបង់ប្រាក់ · ទំហំ ${chosenSize}` : "បន្តទៅបង់ប្រាក់"; }
+  sheetConfirm.disabled = !ok; sheetConfirm.textContent = t;
+}
+ofPhone.addEventListener("input", updateConfirm);
+ofLoc.addEventListener("input", () => { ofHint.textContent = ""; updateConfirm(); });
+document.getElementById("of-gps").addEventListener("click", () => {
+  if (!navigator.geolocation) { ofHint.textContent = "ឧបករណ៍នេះមិនគាំទ្រទីតាំង សូមវាយដោយដៃ"; return; }
+  ofHint.textContent = "កំពុងរកទីតាំង...";
+  navigator.geolocation.getCurrentPosition((pos) => {
+    ofLoc.value = `https://www.google.com/maps?q=${pos.coords.latitude.toFixed(6)},${pos.coords.longitude.toFixed(6)}`;
+    ofHint.textContent = "✓ បានភ្ជាប់ទីតាំងរបស់អ្នកលើ Google Map";
+    updateConfirm();
+  }, () => { ofHint.textContent = "មិនអាចទទួលទីតាំងបាន សូមអនុញ្ញាតទីតាំង ឬវាយដោយដៃ"; }, { enableHighAccuracy: true, timeout: 12000 });
+});
+document.getElementById("of-map").addEventListener("click", () => {
+  const q = isUrl(ofLoc.value) ? "" : ofLoc.value.trim();
+  window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(q || "ទីតាំងរបស់ខ្ញុំ")}`, "_blank", "noopener");
+  ofHint.textContent = "ជ្រើសទីតាំងលើ Google Map → ចុច Share → Copy link រួចមកបិទភ្ជាប់ក្នុងប្រអប់ខាងលើ";
+});
 function openSizeSheet(item, i, sizes, btn) {
   sheetCtx = { item, i, btn };
-  chosenSize = "";
+  chosenSize = ""; needSize = sizes.length > 0;
+  try { const c = JSON.parse(localStorage.getItem("orderContact") || "{}"); ofPhone.value = c.phone || ""; ofLoc.value = c.loc || ""; } catch (e) {}
+  ofHint.textContent = "";
+  document.getElementById("size-block").style.display = needSize ? "" : "none";
   document.getElementById("sheet-name").textContent = item.name;
   const si = document.getElementById("sheet-img"); si.style.visibility = ""; si.src = photoOf(i + 1);
   const sp = document.getElementById("sheet-price");
@@ -1498,25 +1585,54 @@ function openSizeSheet(item, i, sizes, btn) {
     b.addEventListener("click", () => {
       chosenSize = sz;
       sizesBox.querySelectorAll(".size-chip").forEach((x) => x.classList.toggle("active", x === b));
-      sheetConfirm.disabled = false;
-      sheetConfirm.textContent = `បន្តទៅកម្មង់ · ទំហំ ${sz}`;
+      updateConfirm();
     });
     sizesBox.appendChild(b);
   });
-  sheetConfirm.disabled = true;
-  sheetConfirm.textContent = "សូមជ្រើសរើសទំហំសិន";
+  updateConfirm();
   sheet.classList.add("open");
 }
 function closeSizeSheet() { sheet.classList.remove("open"); }
 document.getElementById("sheet-cancel").addEventListener("click", closeSizeSheet);
 sheet.addEventListener("click", (e) => { if (e.target === sheet) closeSizeSheet(); });
+let pending = null, payMethod = "cod";
+const paySheet = document.getElementById("paysheet");
+function setPay(m) {
+  payMethod = m;
+  document.querySelectorAll(".pay-opt").forEach((b) => b.classList.toggle("on", b.dataset.m === m));
+  document.getElementById("pay-qr").style.display = m === "qr" ? "" : "none";
+  document.getElementById("pay-cod").style.display = m === "cod" ? "" : "none";
+}
 sheetConfirm.addEventListener("click", () => {
-  if (!sheetCtx || !chosenSize) return;
+  if (!sheetCtx || sheetConfirm.disabled) return;
   const { item, i, btn } = sheetCtx;
+  const loc = ofLoc.value.trim(), phone = ofPhone.value.trim();
+  try { localStorage.setItem("orderContact", JSON.stringify({ phone, loc })); } catch (e) {}
+  pending = { item, i, btn, size: chosenSize, contact: { phone, loc, isLink: isUrl(loc), link: mapLinkOf(loc) } };
   closeSizeSheet();
-  sendOrder(item, i, chosenSize, btn);
+  const acc = String(settings.payAccount || "").trim();
+  document.querySelector('.pay-opt[data-m="qr"]').style.display = acc ? "" : "none";
+  document.getElementById("pay-acc").textContent = acc;
+  document.getElementById("pay-img").style.display = "";
+  document.getElementById("pay-total").textContent = `${item.name}${chosenSize ? " · " + chosenSize : ""} · ${formatRiel(finalPrice(item))}`;
+  setPay(acc ? "qr" : "cod");
+  paySheet.classList.add("open");
 });
-document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeSizeSheet(); });
+document.querySelectorAll(".pay-opt").forEach((b) => b.addEventListener("click", () => setPay(b.dataset.m)));
+document.getElementById("pay-copy").addEventListener("click", (e) => {
+  try { navigator.clipboard.writeText(String(settings.payAccount || "")).catch(() => {}); } catch (err) {}
+  e.target.textContent = "ចម្លងហើយ ✓"; setTimeout(() => { e.target.textContent = "ចម្លងលេខគណនី"; }, 1500);
+});
+document.getElementById("pay-back").addEventListener("click", () => { paySheet.classList.remove("open"); sheet.classList.add("open"); });
+paySheet.addEventListener("click", (e) => { if (e.target === paySheet) paySheet.classList.remove("open"); });
+document.getElementById("pay-go").addEventListener("click", () => {
+  if (!pending) return;
+  const { item, i, btn, size, contact } = pending; pending = null;
+  paySheet.classList.remove("open");
+  saveOrderRemote({ product_no: i + 1, product: item.name, size: size || null, price: finalPrice(item), phone: contact.phone, location: contact.isLink ? null : contact.loc, map_link: contact.link, pay_method: payMethod });
+  sendOrder(item, i, size, btn, contact, payMethod === "qr" ? "💳 ទូទាត់៖ បង់តាម ACLEDA/KHQR (សូមមើលរូបបង្កាន់ដៃ)" : "🚚 ទូទាត់៖ បង់ពេលទទួលអីវ៉ាន់");
+});
+document.addEventListener("keydown", (e) => { if (e.key === "Escape") { closeSizeSheet(); paySheet.classList.remove("open"); } });
 
 // ---------- ជួរទំនិញបញ្ចុះតម្លៃ រត់ស្វ័យប្រវត្តិ ----------
 let autoRaf = null;
@@ -1696,7 +1812,7 @@ function fillGrid(grid, list, instant) {
         </div>
         <button class="buy-btn"${stock === 0 ? " disabled" : ""}>
           <i class="fa-solid ${stock === 0 ? "fa-ban" : "fa-comment-dots"}"></i>
-          <span class="label">${stock === 0 ? "អស់ស្តុក" : "ឆាតកម្មង់"}</span>
+          <span class="label">${stock === 0 ? "អស់ស្តុក" : "ទិញ"}</span>
         </button>
       </div>
     `;
@@ -1713,8 +1829,7 @@ function fillGrid(grid, list, instant) {
       track("order", i + 1);
       ripple(buyBtn, e);
       const sizes = sizesOf(item.place);
-      if (sizes.length) openSizeSheet(item, i, sizes, buyBtn);
-      else sendOrder(item, i, "", buyBtn);
+      openSizeSheet(item, i, sizes, buyBtn);
     });
 
     grid.appendChild(card);

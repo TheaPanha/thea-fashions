@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="km">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex, nofollow" />
+<title>ការបញ្ជាទិញ · Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Khmer:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root { --bg:#F6F1E7; --card:#fff; --ink:#241B12; --muted:#7A6E60; --line:#E6DCC8; --acc:#B5543A; --ok:#3F7D5C; --warn:#C98A1B; --bad:#B8213F; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#17120D; --card:#241D16; --ink:#F3EBDD; --muted:#A59A8A; --line:#3A3025; } }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font-family:"Noto Sans Khmer",system-ui,sans-serif; padding:env(safe-area-inset-top,0) 0 env(safe-area-inset-bottom,0); }
+  .wrap { max-width:720px; margin:0 auto; padding:14px; }
+  h1 { font-size:20px; margin:4px 0 12px; display:flex; align-items:center; gap:8px; }
+  h1 .sp { flex:1; }
+  input { width:100%; padding:13px 14px; margin-bottom:10px; border:1.5px solid var(--line); border-radius:12px; background:var(--card); color:var(--ink); font:inherit; font-size:16px; }
+  button { font:inherit; cursor:pointer; }
+  .btn { padding:12px 16px; border:none; border-radius:12px; background:var(--acc); color:#fff; font-weight:700; width:100%; }
+  .sm { padding:7px 12px; border:1.5px solid var(--line); border-radius:999px; background:var(--card); color:var(--ink); font-size:13px; font-weight:500; width:auto; }
+  .sm.on { background:var(--ink); color:var(--bg); border-color:var(--ink); }
+  .stats { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:12px; }
+  .stat { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:10px 12px; }
+  .stat b { display:block; font-size:18px; } .stat span { font-size:12px; color:var(--muted); }
+  .chips { display:flex; gap:6px; overflow-x:auto; padding-bottom:6px; margin-bottom:8px; }
+  .chips .sm { white-space:nowrap; }
+  .order { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:14px; margin-bottom:10px; border-left:5px solid var(--warn); }
+  .order.contacted { border-left-color:#2E6DB4; } .order.done { border-left-color:var(--ok); } .order.cancel { border-left-color:var(--bad); opacity:.65; }
+  .top { display:flex; justify-content:space-between; gap:8px; align-items:start; }
+  .name { font-weight:700; font-size:16px; } .time { font-size:12px; color:var(--muted); white-space:nowrap; }
+  .meta { margin:6px 0 10px; font-size:14px; line-height:1.7; word-break:break-word; }
+  .meta a { color:var(--acc); font-weight:700; text-decoration:none; }
+  .price { font-weight:700; color:var(--acc); }
+  .acts { display:flex; flex-wrap:wrap; gap:6px; }
+  .err { color:var(--bad); font-size:13px; min-height:18px; margin-bottom:8px; }
+  .empty { text-align:center; color:var(--muted); padding:40px 10px; }
+  #login { max-width:380px; margin:12vh auto 0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div id="login">
+    <h1>🔐 Dashboard</h1>
+    <input id="em" type="email" placeholder="អ៊ីមែល" autocomplete="username" />
+    <input id="pw" type="password" placeholder="ពាក្យសម្ងាត់" autocomplete="current-password" />
+    <div class="err" id="lerr"></div>
+    <button class="btn" id="go" type="button">ចូល</button>
+  </div>
+  <div id="app" style="display:none">
+    <h1>📦 ការបញ្ជាទិញ <span class="sp"></span><button class="sm" id="rf" type="button">↻</button><button class="sm" id="lo" type="button">ចេញ</button></h1>
+    <div class="stats" id="stats"></div>
+    <div class="chips" id="chips"></div>
+    <div id="list"></div>
+  </div>
+</div>
+<script>
+const SB_URL = "https://jbdxyxypgmdldxktixyd.supabase.co";
+const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpiZHh5eHlwZ21kbGR4a3RpeHlkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMzMjAzNzYsImV4cCI6MjEwODg5NjM3Nn0.3vvF45w20T_giyk66jXKqEoAd9bylA7Py4O89JAtfE0";
+const $ = (id) => document.getElementById(id);
+const esc = (v) => String(v == null ? "" : v).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
+const ST = { new: "ថ្មី", contacted: "ទាក់ទងហើយ", done: "រួចរាល់", cancel: "បោះបង់" };
+let sess = null, orders = [], flt = "all", timer;
+try { sess = JSON.parse(localStorage.getItem("sbSess") || "null"); } catch (e) {}
+try { $("em").value = localStorage.getItem("adminEmail") || ""; } catch (e) {}
+
+async function auth(body, grant) {
+  const r = await fetch(`${SB_URL}/auth/v1/token?grant_type=${grant}`, { method: "POST", headers: { apikey: SB_KEY, "Content-Type": "application/json" }, body: JSON.stringify(body) });
+  const j = await r.json();
+  if (!r.ok || !j.access_token) throw new Error(j.error_description || j.msg || "auth");
+  sess = { at: j.access_token, rt: j.refresh_token, exp: Date.now() + (j.expires_in - 60) * 1000 };
+  try { localStorage.setItem("sbSess", JSON.stringify(sess)); } catch (e) {}
+}
+async function token() {
+  if (!sess) throw new Error("login");
+  if (Date.now() > sess.exp) await auth({ refresh_token: sess.rt }, "refresh_token");
+  return sess.at;
+}
+async function api(path, opt = {}) {
+  const t = await token();
+  const r = await fetch(`${SB_URL}/rest/v1/${path}`, { ...opt, headers: { apikey: SB_KEY, Authorization: "Bearer " + t, "Content-Type": "application/json", Prefer: "return=minimal", ...(opt.headers || {}) } });
+  if (!r.ok) throw new Error("HTTP " + r.status);
+  return opt.method && opt.method !== "GET" ? null : r.json();
+}
+const money = (n) => Number(n || 0).toLocaleString("en-US") + " ៛";
+const when = (s) => new Date(s).toLocaleString("en-GB", { timeZone: "Asia/Phnom_Penh", day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" });
+const dayKey = (s) => new Date(s).toLocaleDateString("en-CA", { timeZone: "Asia/Phnom_Penh" });
+
+async function load() {
+  try { orders = await api("orders?select=*&order=created_at.desc&limit=300", { headers: { Prefer: "" } }); draw(); $("lerr").textContent = ""; }
+  catch (e) { if (e.message === "login" || /401|403/.test(e.message)) logout(); else $("list").innerHTML = `<div class="empty">ទាញទិន្នន័យមិនបាន (${esc(e.message)})</div>`; }
+}
+function draw() {
+  const today = dayKey(new Date()), live = orders.filter((o) => o.status !== "cancel");
+  const td = live.filter((o) => dayKey(o.created_at) === today);
+  $("stats").innerHTML = `<div class="stat"><b>${orders.filter((o) => o.status === "new").length}</b><span>ថ្មី</span></div>
+    <div class="stat"><b>${td.length}</b><span>ថ្ងៃនេះ</span></div>
+    <div class="stat"><b>${money(td.reduce((s, o) => s + (o.price || 0), 0))}</b><span>សរុបថ្ងៃនេះ</span></div>`;
+  $("chips").innerHTML = [["all", "ទាំងអស់", orders.length], ...Object.entries(ST).map(([k, v]) => [k, v, orders.filter((o) => o.status === k).length])]
+    .map(([k, v, c]) => `<button class="sm${flt === k ? " on" : ""}" data-f="${k}" type="button">${v} (${c})</button>`).join("");
+  const rows = orders.filter((o) => flt === "all" || o.status === flt);
+  $("list").innerHTML = rows.length ? rows.map((o) => `<div class="order ${esc(o.status)}" data-id="${o.id}">
+    <div class="top"><div class="name">${esc(o.product)}${o.size ? " · " + esc(o.size) : ""}</div><div class="time">${when(o.created_at)}</div></div>
+    <div class="meta"><span class="price">${money(o.price)}</span> · #${esc(o.product_no)}${o.pay_method ? " · " + (o.pay_method === "qr" ? "💳 បង់ឥឡូវ" : "🚚 បង់ពេលទទួល") : ""}<br>
+      📞 <a href="tel:${esc(String(o.phone).replace(/[^\d+]/g, ""))}">${esc(o.phone)}</a><br>
+      ${o.location ? "📍 " + esc(o.location) + "<br>" : ""}
+      ${/^https?:\/\//.test(o.map_link || "") ? `🗺 <a href="${esc(o.map_link)}" target="_blank" rel="noopener">បើក Google Map</a>` : ""}</div>
+    <div class="acts">${Object.entries(ST).filter(([k]) => k !== o.status).map(([k, v]) => `<button class="sm" data-s="${k}" type="button">${v}</button>`).join("")}<button class="sm" data-del="1" type="button" style="color:var(--bad)">🗑</button></div>
+  </div>`).join("") : `<div class="empty">មិនទាន់មានការបញ្ជាទិញ</div>`;
+}
+$("chips").onclick = (e) => { const b = e.target.closest("[data-f]"); if (b) { flt = b.dataset.f; draw(); } };
+$("list").onclick = async (e) => {
+  const b = e.target.closest("button"), card = e.target.closest(".order");
+  if (!b || !card) return;
+  const id = card.dataset.id;
+  try {
+    if (b.dataset.s) { await api(`orders?id=eq.${id}`, { method: "PATCH", body: JSON.stringify({ status: b.dataset.s }) }); orders.find((o) => String(o.id) === id).status = b.dataset.s; }
+    else if (b.dataset.del) {
+      if (b.dataset.sure !== "1") { b.dataset.sure = "1"; b.textContent = "ចុចម្តងទៀត"; setTimeout(() => { if (b.isConnected) { b.dataset.sure = ""; b.textContent = "🗑"; } }, 3000); return; }
+      await api(`orders?id=eq.${id}`, { method: "DELETE" }); orders = orders.filter((o) => String(o.id) !== id);
+    }
+    draw();
+  } catch (err) { alert("មិនបាន៖ " + err.message); }
+};
+function show() { $("login").style.display = "none"; $("app").style.display = ""; load(); clearInterval(timer); timer = setInterval(load, 30000); }
+function logout() { clearInterval(timer); sess = null; try { localStorage.removeItem("sbSess"); } catch (e) {} $("app").style.display = "none"; $("login").style.display = ""; }
+$("go").onclick = async () => {
+  $("lerr").textContent = "";
+  try { await auth({ email: $("em").value.trim(), password: $("pw").value }, "password"); try { localStorage.setItem("adminEmail", $("em").value.trim()); } catch (e) {} $("pw").value = ""; show(); }
+  catch (e) { $("lerr").textContent = "អ៊ីមែល ឬពាក្យសម្ងាត់មិនត្រឹមត្រូវ"; }
+};
+$("pw").addEventListener("keydown", (e) => { if (e.key === "Enter") $("go").click(); });
+$("rf").onclick = load; $("lo").onclick = logout;
+if (sess) show();
+</script>
+</body>
+</html>
