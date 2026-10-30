@@ -1622,9 +1622,13 @@ function shrink(file, max = 1200) {
   });
 }
 async function uploadReceipt(file) {
-  const blob = await shrink(file), path = `${Date.now()}-${Math.random().toString(36).slice(2, 10)}.jpg`;
-  const r = await fetch(`${SB_URL}/storage/v1/object/receipts/${path}`, { method: "POST", headers: { apikey: SB_KEY, Authorization: "Bearer " + SB_KEY, "Content-Type": "image/jpeg" }, body: blob });
-  if (!r.ok) throw new Error("upload " + r.status);
+  let blob; try { blob = await shrink(file); } catch (e) { blob = file; }      // បើបង្រួមមិនបាន ប្រើរូបដើម
+  const path = `${Date.now()}-${Math.random().toString(36).slice(2, 10)}.jpg`;
+  const r = await fetch(`${SB_URL}/storage/v1/object/receipts/${path}`, { method: "POST", headers: { apikey: SB_KEY, Authorization: "Bearer " + SB_KEY, "Content-Type": blob.type || "image/jpeg" }, body: blob });
+  if (!r.ok) {
+    let m = ""; try { const j = await r.json(); m = j.message || j.error || ""; } catch (e) {}
+    throw new Error(`${r.status} ${m}`.trim());
+  }
   return path;
 }
 sheetConfirm.addEventListener("click", () => {
@@ -1658,7 +1662,7 @@ payGo.addEventListener("click", async () => {
   if (payMethod === "qr" && sbReady()) {
     payGo.disabled = true; payGo.textContent = "កំពុងផ្ញើបង្កាន់ដៃ...";
     try { rpath = await uploadReceipt(receiptFile); }
-    catch (err) { rcName.style.color = "#B8213F"; rcName.textContent = "ផ្ញើបង្កាន់ដៃមិនបាន សូមព្យាយាមម្តងទៀត"; updatePay(); return; }
+    catch (err) { rcName.style.color = "#B8213F"; rcName.textContent = "ផ្ញើបង្កាន់ដៃមិនបាន (" + (err && err.message || "network") + ") សូមព្យាយាមម្តងទៀត"; updatePay(); return; }
   }
   const { item, i, btn, size, contact } = pending; pending = null;
   paySheet.classList.remove("open");
