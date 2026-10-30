@@ -522,6 +522,13 @@
   }
   .sheet-confirm:disabled { opacity: 0.45; box-shadow: none; cursor: not-allowed; }
   .sheet-confirm:not(:disabled):active { transform: scale(0.98); }
+  .mo-prog { display: flex; gap: 4px; margin: 10px 0; }
+  .mo-prog span { flex: 1; font-size: 11px; text-align: center; color: var(--muted); line-height: 1.3; }
+  .mo-prog span i { display: block; height: 6px; border-radius: 3px; background: var(--border); margin-bottom: 5px; }
+  .mo-prog span.on { color: var(--ink); font-weight: 700; } .mo-prog span.on i { background: #3F7D5C; }
+  .tk-box { border: 1px solid var(--border); border-radius: 14px; padding: 12px; margin-bottom: 12px; background: #fff; font-size: 14px; line-height: 1.7; }
+  .code-box { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 6px 0 12px; padding: 12px; border: 1.5px dashed var(--clay); border-radius: 14px; }
+  .code-box b { font-size: 22px; letter-spacing: 1.5px; }
   .pay-opts { display: flex; flex-direction: column; gap: 8px; margin: 12px 0; }
   .pay-opt { padding: 13px; border: 1.5px solid var(--border); border-radius: 12px; background: #fff; color: var(--ink); font-family: inherit; font-size: 15px; font-weight: 600; text-align: left; cursor: pointer; }
   .pay-opt.on { border-color: var(--clay); background: rgba(var(--clay-rgb),0.08); }
@@ -1101,6 +1108,7 @@
       <input id="search" type="search" placeholder="ស្វែងរកខោអាវ..." autocomplete="off" enterkeyhint="search" />
     </div>
     <div class="top-actions">
+      <a id="tb-track" href="#" aria-label="តាមដានការកម្មង់"><i class="fa-solid fa-truck-fast"></i></a>
       <a id="tb-call" href="tel:0968782682" aria-label="ហៅទូរស័ព្ទ"><i class="fa-solid fa-phone"></i></a>
       <a id="tb-tg" href="https://t.me/theapanha04042004" target="_blank" rel="noopener" aria-label="Telegram"><i class="fa-brands fa-telegram"></i></a>
       <a id="tb-msg" href="https://www.facebook.com/share/1MQPrStX8p/?mibextid=wwXIfr" target="_blank" rel="noopener" aria-label="Messenger"><i class="fa-brands fa-facebook-messenger"></i></a>
@@ -1180,8 +1188,28 @@
       <div class="sheet-handle"></div>
       <div style="font-size:44px;margin-top:6px">✅</div>
       <h3 style="margin:6px 0 6px">បានទទួលការកម្មង់ហើយ</h3>
+      <div id="done-codewrap" style="display:none">
+        <div class="of-hint" style="margin-bottom:0">លេខសម្គាល់ការកម្មង់របស់អ្នក</div>
+        <div class="code-box"><b id="done-code"></b><button type="button" class="of-btn" id="done-copy" style="flex:none;padding:8px 12px">ចម្លង</button></div>
+        <p class="of-hint">សូមរក្សាទុកលេខនេះ ដើម្បីតាមដានទំនិញ ឬប្រាប់ក្រុមហ៊ុនដឹកជញ្ជូន</p>
+      </div>
       <p class="of-hint" style="margin-bottom:14px">សូមអរគុណ! យើងនឹងទំនាក់ទំនងអ្នកតាមលេខទូរស័ព្ទ ដើម្បីបញ្ជាក់ និងដឹកជញ្ជូនទំនិញ។</p>
-      <button class="sheet-confirm" id="done-ok" type="button">យល់ព្រម</button>
+      <button class="sheet-confirm" id="done-track" type="button" style="display:none">🔎 តាមដានការកម្មង់</button>
+      <button class="sheet-cancel" id="done-ok" type="button">បិទ</button>
+    </div>
+  </div>
+
+  <div class="sheet-backdrop" id="tracksheet">
+    <div class="sheet" role="dialog" aria-modal="true">
+      <div class="sheet-handle"></div>
+      <h3 style="margin:6px 0 2px">តាមដានការកម្មង់</h3>
+      <p class="of-hint">វាយលេខសម្គាល់ និងលេខទូរស័ព្ទដែលបានកម្មង់</p>
+      <input class="of-input" id="tk-code" type="text" placeholder="លេខសម្គាល់ ឧ. TF-7K3Q9A" autocapitalize="characters" autocomplete="off" />
+      <input class="of-input" id="tk-phone" type="tel" inputmode="tel" placeholder="លេខទូរស័ព្ទ" autocomplete="tel" />
+      <div class="of-hint" id="tk-err" style="color:#B8213F"></div>
+      <div id="tk-res"></div>
+      <button class="sheet-confirm" id="tk-go" type="button">ពិនិត្យ</button>
+      <button class="sheet-cancel" id="tk-close" type="button">បិទ</button>
     </div>
   </div>
 
@@ -1512,7 +1540,16 @@ function sizesOf(place) {
   return [];
 }
 
-function orderDone(btn) {
+const newCode = () => { const A = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789", a = new Uint32Array(6); crypto.getRandomValues(a); return "TF-" + Array.from(a, (n) => A[n % A.length]).join(""); };
+let lastOrder = null;
+function copyText(t, el) {
+  try { navigator.clipboard.writeText(t).catch(() => {}); } catch (e) {}
+  if (el) { const o = el.textContent; el.textContent = "ចម្លងហើយ ✓"; setTimeout(() => { el.textContent = o; }, 1500); }
+}
+function orderDone(btn, code, phone) {
+  const cw = document.getElementById("done-codewrap"), tb = document.getElementById("done-track");
+  cw.style.display = code ? "" : "none"; tb.style.display = code ? "" : "none";
+  if (code) { document.getElementById("done-code").textContent = code; lastOrder = { code, phone }; try { localStorage.setItem("lastOrder", JSON.stringify(lastOrder)); } catch (e) {} }
   document.getElementById("donesheet").classList.add("open");
   if (!btn) return;
   const orig = btn.innerHTML;
@@ -1654,6 +1691,41 @@ document.getElementById("pay-copy").addEventListener("click", (e) => {
 });
 document.getElementById("done-ok").addEventListener("click", () => document.getElementById("donesheet").classList.remove("open"));
 document.getElementById("donesheet").addEventListener("click", (e) => { if (e.target.id === "donesheet") e.target.classList.remove("open"); });
+const $t = (id) => document.getElementById(id);
+const STEPS = [["new", "បានទទួលការកម្មង់"], ["contacted", "កំពុងរៀបចំ"], ["shipping", "កំពុងដឹកជញ្ជូន"], ["done", "ដឹកដល់ហើយ"]];
+function openTrack(code, phone) {
+  $t("tk-code").value = code || ""; $t("tk-phone").value = phone || ""; $t("tk-err").textContent = ""; $t("tk-res").innerHTML = "";
+  $t("tracksheet").classList.add("open");
+  if (code && phone) $t("tk-go").click();
+}
+$t("tb-track").addEventListener("click", (e) => {
+  e.preventDefault();
+  let l = lastOrder; try { l = l || JSON.parse(localStorage.getItem("lastOrder") || "null"); } catch (x) {}
+  document.getElementById("tracksheet").dataset.fresh = "1";
+  openTrack(l && l.code, l && l.phone);
+});
+$t("done-track").onclick = () => { $t("donesheet").classList.remove("open"); openTrack(lastOrder.code, lastOrder.phone); };
+$t("done-copy").onclick = (e) => copyText($t("done-code").textContent, e.currentTarget);
+$t("tk-close").onclick = () => $t("tracksheet").classList.remove("open");
+$t("tracksheet").addEventListener("click", (e) => { if (e.target.id === "tracksheet") e.target.classList.remove("open"); const c = e.target.closest("[data-copy]"); if (c) copyText(c.dataset.copy, c); });
+$t("tk-go").onclick = async () => {
+  const code = $t("tk-code").value.trim(), phone = $t("tk-phone").value.trim(), er = $t("tk-err"), res = $t("tk-res");
+  er.textContent = ""; res.innerHTML = "";
+  if (!code || phone.replace(/\D/g, "").length < 8) { er.textContent = "សូមវាយលេខសម្គាល់ និងលេខទូរស័ព្ទឱ្យគ្រប់"; return; }
+  $t("tk-go").disabled = true;
+  try {
+    const r = await fetch(`${SB_URL}/rest/v1/rpc/track_order`, { method: "POST", headers: { apikey: SB_KEY, Authorization: "Bearer " + SB_KEY, "Content-Type": "application/json" }, body: JSON.stringify({ p_code: code, p_phone: phone }) });
+    if (!r.ok) throw new Error(r.status);
+    const rows = await r.json();
+    if (!rows.length) { er.textContent = "រកមិនឃើញ សូមពិនិត្យលេខសម្គាល់ និងលេខទូរស័ព្ទម្តងទៀត"; return; }
+    const o = rows[0], k = STEPS.findIndex((s) => s[0] === o.status);
+    const prog = o.status === "cancel" ? `<div style="color:#B8213F;font-weight:700">❌ បានបោះបង់</div>` : `<div class="mo-prog">${STEPS.map((s, n) => `<span class="${n <= k ? "on" : ""}"><i></i>${s[1]}</span>`).join("")}</div>`;
+    res.innerHTML = `<div class="tk-box"><b>${esc(o.product)}${o.size ? " · " + esc(o.size) : ""}</b>${prog}
+      ${o.tracking_note ? `📍 ${esc(o.tracking_note)}<br>` : ""}
+      ${o.courier_no ? `🚚 ${esc(o.courier || "ក្រុមហ៊ុនដឹកជញ្ជូន")}៖ <b>${esc(o.courier_no)}</b> <button type="button" class="of-btn" data-copy="${esc(o.courier_no)}" style="flex:none;padding:4px 10px;margin-left:6px">ចម្លង</button><div class="of-hint">ចម្លងលេខនេះទៅឱ្យក្រុមហ៊ុនដឹកជញ្ជូន ដើម្បីមើលទំនិញដល់ណាហើយ</div>` : `<div class="of-hint">មិនទាន់មានលេខតាមដានពីក្រុមហ៊ុនដឹកជញ្ជូនទេ</div>`}</div>`;
+  } catch (e) { er.textContent = "ពិនិត្យមិនបាន សូមព្យាយាមម្តងទៀត"; }
+  finally { $t("tk-go").disabled = false; }
+};
 document.getElementById("pay-back").addEventListener("click", () => { paySheet.classList.remove("open"); sheet.classList.add("open"); });
 paySheet.addEventListener("click", (e) => { if (e.target === paySheet) paySheet.classList.remove("open"); });
 payGo.addEventListener("click", async () => {
@@ -1666,8 +1738,9 @@ payGo.addEventListener("click", async () => {
   }
   const { item, i, btn, size, contact } = pending; pending = null;
   paySheet.classList.remove("open");
-  saveOrderRemote({ product_no: i + 1, product: item.name, size: size || null, price: finalPrice(item), phone: contact.phone, location: contact.isLink ? null : contact.loc, map_link: contact.link, pay_method: payMethod, receipt_url: rpath });
-  orderDone(btn);
+  const code = sbReady() ? newCode() : null;
+  saveOrderRemote({ product_no: i + 1, product: item.name, size: size || null, price: finalPrice(item), phone: contact.phone, location: contact.isLink ? null : contact.loc, map_link: contact.link, pay_method: payMethod, receipt_url: rpath, order_code: code });
+  orderDone(btn, code, contact.phone);
 });
 document.addEventListener("keydown", (e) => { if (e.key === "Escape") { closeSizeSheet(); paySheet.classList.remove("open"); } });
 

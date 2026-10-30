@@ -129,11 +129,14 @@ function draw() {
   const rows = orders.filter((o) => flt === "all" || o.status === flt);
   $("list").innerHTML = rows.length ? rows.map((o) => `<div class="order ${esc(o.status)}" data-id="${o.id}">
     <div class="top"><div class="name">${esc(o.product)}${o.size ? " · " + esc(o.size) : ""}</div><div class="time">${when(o.created_at)}</div></div>
-    <div class="meta"><span class="price">${money(o.price)}</span> · #${esc(o.product_no)}${o.pay_method ? " · " + (o.pay_method === "qr" ? "💳 បង់ឥឡូវ" : "🚚 បង់ពេលទទួល") : ""}<br>
+    <div class="meta"><span class="price">${money(o.price)}</span> · #${esc(o.product_no)}${o.order_code ? " · 🔖 <b>" + esc(o.order_code) + "</b>" : ""}${o.pay_method ? " · " + (o.pay_method === "qr" ? "💳 បង់ឥឡូវ" : "🚚 បង់ពេលទទួល") : ""}<br>
       📞 <a href="tel:${esc(String(o.phone).replace(/[^\d+]/g, ""))}">${esc(o.phone)}</a><br>
       ${o.location ? "📍 " + esc(o.location) + "<br>" : ""}
       ${/^https?:\/\//.test(o.map_link || "") ? `🗺 <a href="${esc(o.map_link)}" target="_blank" rel="noopener">បើក Google Map</a>` : ""}</div>
     ${payPanel(o)}
+    <div class="pay"><div class="paystat" style="color:var(--ink);margin-top:0">🚚 ការដឹកជញ្ជូន</div>
+      <div class="payrow"><input data-courier value="${esc(o.courier || "")}" placeholder="ក្រុមហ៊ុនដឹក"><input data-trackno value="${esc(o.courier_no || "")}" placeholder="លេខតាមដាន"></div>
+      <div class="payrow" style="margin-top:6px"><input data-note value="${esc(o.tracking_note || "")}" placeholder="ដឹកដល់ណាហើយ? ឧ. ចេញពីភ្នំពេញ"><button class="sm" data-savetrack="1" type="button">រក្សា</button></div></div>
     <div class="acts">${o.receipt_url ? `<button class="sm" data-rc="${esc(o.receipt_url)}" type="button" style="border-color:var(--ok);color:var(--ok)">🧾 មើលបង្កាន់ដៃ</button>` : ""}${Object.entries(ST).filter(([k]) => k !== o.status).map(([k, v]) => `<button class="sm" data-s="${k}" type="button">${v}</button>`).join("")}<button class="sm" data-del="1" type="button" style="color:var(--bad)">🗑</button></div>
   </div>`).join("") : `<div class="empty">មិនទាន់មានការបញ្ជាទិញ</div>`;
 }
@@ -147,6 +150,12 @@ $("list").onclick = async (e) => {
       const v = card.querySelector("[data-note]").value.trim();
       await api(`orders?id=eq.${id}`, { method: "PATCH", body: JSON.stringify({ tracking_note: v || null }) });
       orders.find((o) => String(o.id) === id).tracking_note = v; b.textContent = "✓"; setTimeout(() => { b.textContent = "រក្សា"; }, 1200); return;
+    }
+    if (b.dataset.savetrack) {
+      const o = orders.find((x) => String(x.id) === id), g = (s) => card.querySelector(s).value.trim() || null;
+      const body = { courier: g("[data-courier]"), courier_no: g("[data-trackno]"), tracking_note: g("[data-note]") };
+      await api(`orders?id=eq.${id}`, { method: "PATCH", body: JSON.stringify(body) });
+      Object.assign(o, body); b.textContent = "✓"; setTimeout(() => { b.textContent = "រក្សា"; }, 1200); return;
     }
     if (b.dataset.savepay) {
       const o = orders.find((x) => String(x.id) === id), payer = card.querySelector("[data-payer]").value.trim(), v = card.querySelector("[data-paid]").value.trim();
