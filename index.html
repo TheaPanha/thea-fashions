@@ -522,6 +522,14 @@
   }
   .sheet-confirm:disabled { opacity: 0.45; box-shadow: none; cursor: not-allowed; }
   .sheet-confirm:not(:disabled):active { transform: scale(0.98); }
+  .mo { border: 1px solid var(--border); border-radius: 14px; padding: 12px; margin-bottom: 10px; background: #fff; }
+  .mo-s { font-size: 12px; color: var(--muted); margin: 2px 0 10px; }
+  .mo-prog { display: flex; gap: 4px; }
+  .mo-prog span { flex: 1; font-size: 11px; text-align: center; color: var(--muted); line-height: 1.3; }
+  .mo-prog span i { display: block; height: 6px; border-radius: 3px; background: var(--border); margin-bottom: 5px; }
+  .mo-prog span.on { color: var(--ink); font-weight: 700; } .mo-prog span.on i { background: #3F7D5C; }
+  .mo-note { margin-top: 8px; font-size: 13px; background: rgba(63,125,92,0.1); padding: 8px 10px; border-radius: 10px; }
+  .mo-cancel { color: #B8213F; font-weight: 700; font-size: 13px; }
   .pay-opts { display: flex; flex-direction: column; gap: 8px; margin: 12px 0; }
   .pay-opt { padding: 13px; border: 1.5px solid var(--border); border-radius: 12px; background: #fff; color: var(--ink); font-family: inherit; font-size: 15px; font-weight: 600; text-align: left; cursor: pointer; }
   .pay-opt.on { border-color: var(--clay); background: rgba(var(--clay-rgb),0.08); }
@@ -1101,6 +1109,7 @@
       <input id="search" type="search" placeholder="ស្វែងរកខោអាវ..." autocomplete="off" enterkeyhint="search" />
     </div>
     <div class="top-actions">
+      <a id="tb-acc" href="#" aria-label="គណនី"><i class="fa-solid fa-user"></i></a>
       <a id="tb-call" href="tel:0968782682" aria-label="ហៅទូរស័ព្ទ"><i class="fa-solid fa-phone"></i></a>
       <a id="tb-tg" href="https://t.me/theapanha04042004" target="_blank" rel="noopener" aria-label="Telegram"><i class="fa-brands fa-telegram"></i></a>
       <a id="tb-msg" href="https://www.facebook.com/share/1MQPrStX8p/?mibextid=wwXIfr" target="_blank" rel="noopener" aria-label="Messenger"><i class="fa-brands fa-facebook-messenger"></i></a>
@@ -1173,6 +1182,32 @@
     <img id="lightbox-img" src="" alt="" />
     <button class="lb-nav next" id="lb-next" aria-label="បន្ទាប់"><i class="fa-solid fa-chevron-right"></i></button>
     <div class="lb-cap"><div><b id="lb-name"></b><span id="lb-price"></span></div><small id="lb-count"></small></div>
+  </div>
+
+  <div class="sheet-backdrop" id="authsheet">
+    <div class="sheet" role="dialog" aria-modal="true">
+      <div class="sheet-handle"></div>
+      <h3 id="au-title" style="margin:6px 0 2px">ចូលគណនី</h3>
+      <p class="of-hint" id="au-sub"></p>
+      <input class="of-input" id="au-name" type="text" placeholder="ឈ្មោះរបស់អ្នក" autocomplete="name" style="display:none" />
+      <input class="of-input" id="au-email" type="email" placeholder="អ៊ីមែល" autocomplete="username" />
+      <input class="of-input" id="au-pw" type="password" placeholder="ពាក្យសម្ងាត់ (យ៉ាងតិច ៦ តួ)" autocomplete="current-password" />
+      <div class="of-hint" id="au-err"></div>
+      <button class="sheet-confirm" id="au-go" type="button">ចូល</button>
+      <button class="sheet-cancel" id="au-switch" type="button"></button>
+      <button class="sheet-cancel" id="au-close" type="button">បិទ</button>
+    </div>
+  </div>
+
+  <div class="sheet-backdrop" id="mysheet">
+    <div class="sheet" role="dialog" aria-modal="true">
+      <div class="sheet-handle"></div>
+      <h3 style="margin:6px 0 2px">ការកម្មង់របស់ខ្ញុំ</h3>
+      <p class="of-hint" id="my-name"></p>
+      <div id="my-list"></div>
+      <button class="sheet-cancel" id="my-out" type="button">ចេញពីគណនី</button>
+      <button class="sheet-cancel" id="my-close" type="button">បិទ</button>
+    </div>
   </div>
 
   <div class="sheet-backdrop" id="paysheet">
@@ -1351,9 +1386,13 @@ let settings = { ...SETTINGS, ...(useData() ? adminData.settings : {}) };
 const rebuildSettings = () => { settings = { ...SETTINGS, ...(useData() ? adminData.settings : {}) }; };
 const SB_URL = "https://jbdxyxypgmdldxktixyd.supabase.co";   // ← ដាក់ Project URL
 const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpiZHh5eHlwZ21kbGR4a3RpeHlkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMzMjAzNzYsImV4cCI6MjEwODg5NjM3Nn0.3vvF45w20T_giyk66jXKqEoAd9bylA7Py4O89JAtfE0";                // ← ដាក់ anon public key
-function saveOrderRemote(o) {
-  if (!/^https:\/\/[a-z0-9]+\.supabase\.co$/.test(SB_URL) || SB_KEY.startsWith("YOUR")) return;
-  try { fetch(`${SB_URL}/rest/v1/orders`, { method: "POST", keepalive: true, headers: { apikey: SB_KEY, Authorization: "Bearer " + SB_KEY, "Content-Type": "application/json", Prefer: "return=minimal" }, body: JSON.stringify(o) }).catch(() => {}); } catch (e) {}
+const sbReady = () => /^https:\/\/[a-z0-9]+\.supabase\.co$/.test(SB_URL) && !SB_KEY.startsWith("YOUR");
+async function saveOrderRemote(o) {
+  if (!sbReady()) return;
+  try {
+    const t = await cToken();
+    await fetch(`${SB_URL}/rest/v1/orders`, { method: "POST", keepalive: true, headers: { apikey: SB_KEY, Authorization: "Bearer " + t, "Content-Type": "application/json", Prefer: "return=minimal" }, body: JSON.stringify({ ...o, customer_name: (CU.sess && CU.sess.name) || null }) });
+  } catch (e) {}
 }
 function applyShared(d) {
   if (!d) return;
@@ -1502,7 +1541,7 @@ function sizesOf(place) {
 async function sendOrder(item, i, size, btn, contact, payText) {
   const sizeText = size ? ` ទំហំ ${size}` : "";
   const msg = `សួស្តី! ខ្ញុំចង់កម្មង់ ${item.name}${sizeText} តម្លៃ ${formatRiel(finalPrice(item))}${saleOf(item) ? ` (បញ្ចុះ ${saveText(item)})` : ""}`
-    + (contact ? `\n📞 លេខទូរស័ព្ទ៖ ${contact.phone}` + (contact.isLink ? "" : `\n📍 ទីតាំង៖ ${contact.loc}`) + `\n🗺 Google Map៖ ${contact.link}` : "") + (payText ? `\n${payText}` : "");
+    + (contact ? (contact.name ? `\n👤 ឈ្មោះ៖ ${contact.name}` : "") + `\n📞 លេខទូរស័ព្ទ៖ ${contact.phone}` + (contact.isLink ? "" : `\n📍 ទីតាំង៖ ${contact.loc}`) + `\n🗺 Google Map៖ ${contact.link}` : "") + (payText ? `\n${payText}` : "");
 
   // 1) ផ្ញើរូប + សារ តាមបញ្ជី Share (ជ្រើស Telegram)
   {
@@ -1608,7 +1647,7 @@ sheetConfirm.addEventListener("click", () => {
   const { item, i, btn } = sheetCtx;
   const loc = ofLoc.value.trim(), phone = ofPhone.value.trim();
   try { localStorage.setItem("orderContact", JSON.stringify({ phone, loc })); } catch (e) {}
-  pending = { item, i, btn, size: chosenSize, contact: { phone, loc, isLink: isUrl(loc), link: mapLinkOf(loc) } };
+  pending = { item, i, btn, size: chosenSize, contact: { phone, loc, isLink: isUrl(loc), link: mapLinkOf(loc), name: CU.sess ? CU.sess.name : "" } };
   closeSizeSheet();
   const acc = String(settings.payAccount || "").trim();
   document.querySelector('.pay-opt[data-m="qr"]').style.display = acc ? "" : "none";
@@ -1633,6 +1672,92 @@ document.getElementById("pay-go").addEventListener("click", () => {
   sendOrder(item, i, size, btn, contact, payMethod === "qr" ? "💳 ទូទាត់៖ បង់តាម ACLEDA/KHQR (សូមមើលរូបបង្កាន់ដៃ)" : "🚚 ទូទាត់៖ បង់ពេលទទួលអីវ៉ាន់");
 });
 document.addEventListener("keydown", (e) => { if (e.key === "Escape") { closeSizeSheet(); paySheet.classList.remove("open"); } });
+
+// ================= គណនីអតិថិជន =================
+const CU = { sess: null };
+try { CU.sess = JSON.parse(localStorage.getItem("custSess") || "null"); } catch (e) {}
+const $a = (id) => document.getElementById(id);
+const jwtData = (t) => { try { return JSON.parse(decodeURIComponent(escape(atob(t.split(".")[1].replace(/-/g, "+").replace(/_/g, "/"))))); } catch (e) { return {}; } };
+function setSess(j) {
+  const p = jwtData(j.access_token);
+  CU.sess = { at: j.access_token, rt: j.refresh_token, exp: Date.now() + (j.expires_in - 60) * 1000, email: p.email, name: (p.user_metadata && p.user_metadata.name) || String(p.email || "").split("@")[0] };
+  try { localStorage.setItem("custSess", JSON.stringify(CU.sess)); } catch (e) {}
+}
+async function cReq(path, body) {
+  const r = await fetch(`${SB_URL}/auth/v1/${path}`, { method: "POST", headers: { apikey: SB_KEY, "Content-Type": "application/json" }, body: JSON.stringify(body) });
+  const j = await r.json();
+  if (!r.ok) throw new Error(j.error_description || j.msg || j.message || "error");
+  return j;
+}
+async function cToken() {
+  if (!CU.sess) throw new Error("login");
+  if (Date.now() > CU.sess.exp) {
+    try { setSess(await cReq("token?grant_type=refresh_token", { refresh_token: CU.sess.rt })); }
+    catch (e) { CU.sess = null; try { localStorage.removeItem("custSess"); } catch (x) {} throw e; }
+  }
+  return CU.sess.at;
+}
+let auMode = "login", afterAuth = null, myT;
+function openAuth(mode, sub) {
+  auMode = mode;
+  $a("au-title").textContent = mode === "login" ? "ចូលគណនី" : "បង្កើតគណនី";
+  $a("au-name").style.display = mode === "login" ? "none" : "";
+  $a("au-go").textContent = mode === "login" ? "ចូល" : "បង្កើតគណនី";
+  $a("au-switch").textContent = mode === "login" ? "មិនទាន់មានគណនី? បង្កើតគណនី" : "មានគណនីហើយ? ចូល";
+  if (sub !== undefined) $a("au-sub").textContent = sub;
+  $a("au-err").textContent = "";
+  $a("authsheet").classList.add("open");
+}
+$a("au-switch").onclick = () => openAuth(auMode === "login" ? "signup" : "login");
+$a("au-close").onclick = () => { $a("authsheet").classList.remove("open"); afterAuth = null; };
+$a("au-go").onclick = async () => {
+  const email = $a("au-email").value.trim(), pw = $a("au-pw").value, name = $a("au-name").value.trim(), er = $a("au-err");
+  er.style.color = "#B8213F"; er.textContent = "";
+  if (!email || pw.length < 6) { er.textContent = "សូមបំពេញអ៊ីមែល និងពាក្យសម្ងាត់ (យ៉ាងតិច ៦ តួ)"; return; }
+  if (auMode === "signup" && !name) { er.textContent = "សូមបំពេញឈ្មោះ"; return; }
+  $a("au-go").disabled = true;
+  try {
+    let j;
+    if (auMode === "signup") {
+      j = await cReq("signup", { email, password: pw, data: { name } });
+      if (!j.access_token) { er.style.color = "#2E7D52"; er.textContent = "បានបង្កើតគណនី! សូមបើកអ៊ីមែលដើម្បីបញ្ជាក់ រួចចូលម្តងទៀត។"; return; }
+    } else j = await cReq("token?grant_type=password", { email, password: pw });
+    setSess(j);
+    $a("authsheet").classList.remove("open"); $a("au-pw").value = "";
+    const f = afterAuth; afterAuth = null; if (f) f();
+  } catch (e) {
+    er.textContent = /invalid login/i.test(e.message) ? "អ៊ីមែល ឬពាក្យសម្ងាត់មិនត្រឹមត្រូវ" : /already/i.test(e.message) ? "អ៊ីមែលនេះមានគណនីរួចហើយ សូមចូល" : e.message;
+  } finally { $a("au-go").disabled = false; }
+};
+$a("au-pw").addEventListener("keydown", (e) => { if (e.key === "Enter") $a("au-go").click(); });
+const STEPS = [["new", "បានទទួលការកម្មង់"], ["contacted", "កំពុងរៀបចំ"], ["shipping", "កំពុងដឹកជញ្ជូន"], ["done", "ដឹកដល់ហើយ"]];
+async function loadMine() {
+  const box = $a("my-list");
+  try {
+    const t = await cToken();
+    const r = await fetch(`${SB_URL}/rest/v1/orders?select=*&order=created_at.desc&limit=30`, { headers: { apikey: SB_KEY, Authorization: "Bearer " + t }, cache: "no-store" });
+    if (!r.ok) throw new Error(r.status);
+    const rows = await r.json();
+    box.innerHTML = rows.length ? rows.map((o) => {
+      const k = STEPS.findIndex((s) => s[0] === o.status);
+      const prog = o.status === "cancel" ? `<div class="mo-cancel">❌ បានបោះបង់</div>` : `<div class="mo-prog">${STEPS.map((s, n) => `<span class="${n <= k ? "on" : ""}"><i></i>${s[1]}</span>`).join("")}</div>`;
+      const d = new Date(o.created_at).toLocaleDateString("en-GB", { timeZone: "Asia/Phnom_Penh", day: "2-digit", month: "short" });
+      return `<div class="mo"><b>${esc(o.product)}${o.size ? " · " + esc(o.size) : ""}</b><div class="mo-s">${formatRiel(o.price)} · ${d}</div>${prog}${o.tracking_note ? `<div class="mo-note">📍 ${esc(o.tracking_note)}</div>` : ""}</div>`;
+    }).join("") : `<div class="of-hint">មិនទាន់មានការកម្មង់</div>`;
+  } catch (e) { box.innerHTML = `<div class="of-hint">ទាញទិន្នន័យមិនបាន សូមចូលម្តងទៀត</div>`; }
+}
+function closeMine() { $a("mysheet").classList.remove("open"); clearInterval(myT); }
+$a("tb-acc").addEventListener("click", (e) => {
+  e.preventDefault();
+  if (!sbReady()) return;
+  if (!CU.sess) { openAuth("login", ""); return; }
+  $a("my-name").textContent = `${CU.sess.name} · ${CU.sess.email}`;
+  $a("mysheet").classList.add("open"); loadMine(); clearInterval(myT); myT = setInterval(loadMine, 30000);
+});
+$a("my-close").onclick = closeMine;
+$a("my-out").onclick = () => { CU.sess = null; try { localStorage.removeItem("custSess"); } catch (e) {} closeMine(); };
+if (!sbReady()) $a("tb-acc").style.display = "none";
+
 
 // ---------- ជួរទំនិញបញ្ចុះតម្លៃ រត់ស្វ័យប្រវត្តិ ----------
 let autoRaf = null;
@@ -1829,7 +1954,9 @@ function fillGrid(grid, list, instant) {
       track("order", i + 1);
       ripple(buyBtn, e);
       const sizes = sizesOf(item.place);
-      openSizeSheet(item, i, sizes, buyBtn);
+      const go = () => openSizeSheet(item, i, sizes, buyBtn);
+      if (sbReady() && !CU.sess) { afterAuth = go; openAuth("login", "ត្រូវមានគណនីដើម្បីបន្តការទិញ"); return; }
+      go();
     });
 
     grid.appendChild(card);

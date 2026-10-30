@@ -25,7 +25,7 @@
   .chips { display:flex; gap:6px; overflow-x:auto; padding-bottom:6px; margin-bottom:8px; }
   .chips .sm { white-space:nowrap; }
   .order { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:14px; margin-bottom:10px; border-left:5px solid var(--warn); }
-  .order.contacted { border-left-color:#2E6DB4; } .order.done { border-left-color:var(--ok); } .order.cancel { border-left-color:var(--bad); opacity:.65; }
+  .order.contacted { border-left-color:#2E6DB4; } .order.shipping { border-left-color:#7A4EC2; } .order.done { border-left-color:var(--ok); } .order.cancel { border-left-color:var(--bad); opacity:.65; }
   .top { display:flex; justify-content:space-between; gap:8px; align-items:start; }
   .name { font-weight:700; font-size:16px; } .time { font-size:12px; color:var(--muted); white-space:nowrap; }
   .meta { margin:6px 0 10px; font-size:14px; line-height:1.7; word-break:break-word; }
@@ -58,7 +58,7 @@ const SB_URL = "https://jbdxyxypgmdldxktixyd.supabase.co";
 const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpiZHh5eHlwZ21kbGR4a3RpeHlkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMzMjAzNzYsImV4cCI6MjEwODg5NjM3Nn0.3vvF45w20T_giyk66jXKqEoAd9bylA7Py4O89JAtfE0";
 const $ = (id) => document.getElementById(id);
 const esc = (v) => String(v == null ? "" : v).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
-const ST = { new: "ថ្មី", contacted: "ទាក់ទងហើយ", done: "រួចរាល់", cancel: "បោះបង់" };
+const ST = { new: "ថ្មី", contacted: "កំពុងរៀបចំ", shipping: "កំពុងដឹកជញ្ជូន", done: "ដឹកដល់ហើយ", cancel: "បោះបង់" };
 let sess = null, orders = [], flt = "all", timer;
 try { sess = JSON.parse(localStorage.getItem("sbSess") || "null"); } catch (e) {}
 try { $("em").value = localStorage.getItem("adminEmail") || ""; } catch (e) {}
@@ -86,6 +86,7 @@ const when = (s) => new Date(s).toLocaleString("en-GB", { timeZone: "Asia/Phnom_
 const dayKey = (s) => new Date(s).toLocaleDateString("en-CA", { timeZone: "Asia/Phnom_Penh" });
 
 async function load() {
+  if (document.activeElement && document.activeElement.matches && document.activeElement.matches("[data-note]")) return;
   try { orders = await api("orders?select=*&order=created_at.desc&limit=300", { headers: { Prefer: "" } }); draw(); $("lerr").textContent = ""; }
   catch (e) { if (e.message === "login" || /401|403/.test(e.message)) logout(); else $("list").innerHTML = `<div class="empty">ទាញទិន្នន័យមិនបាន (${esc(e.message)})</div>`; }
 }
@@ -101,9 +102,10 @@ function draw() {
   $("list").innerHTML = rows.length ? rows.map((o) => `<div class="order ${esc(o.status)}" data-id="${o.id}">
     <div class="top"><div class="name">${esc(o.product)}${o.size ? " · " + esc(o.size) : ""}</div><div class="time">${when(o.created_at)}</div></div>
     <div class="meta"><span class="price">${money(o.price)}</span> · #${esc(o.product_no)}${o.pay_method ? " · " + (o.pay_method === "qr" ? "💳 បង់ឥឡូវ" : "🚚 បង់ពេលទទួល") : ""}<br>
-      📞 <a href="tel:${esc(String(o.phone).replace(/[^\d+]/g, ""))}">${esc(o.phone)}</a><br>
+      ${o.customer_name ? "👤 " + esc(o.customer_name) + "<br>" : ""}📞 <a href="tel:${esc(String(o.phone).replace(/[^\d+]/g, ""))}">${esc(o.phone)}</a><br>
       ${o.location ? "📍 " + esc(o.location) + "<br>" : ""}
       ${/^https?:\/\//.test(o.map_link || "") ? `🗺 <a href="${esc(o.map_link)}" target="_blank" rel="noopener">បើក Google Map</a>` : ""}</div>
+    <div style="display:flex;gap:6px;margin-bottom:8px"><input data-note value="${esc(o.tracking_note || "")}" placeholder="ដឹកដល់ណាហើយ? ឧ. ចេញពីភ្នំពេញ" style="margin:0;font-size:14px;padding:9px 12px"><button class="sm" data-savenote="1" type="button">រក្សា</button></div>
     <div class="acts">${Object.entries(ST).filter(([k]) => k !== o.status).map(([k, v]) => `<button class="sm" data-s="${k}" type="button">${v}</button>`).join("")}<button class="sm" data-del="1" type="button" style="color:var(--bad)">🗑</button></div>
   </div>`).join("") : `<div class="empty">មិនទាន់មានការបញ្ជាទិញ</div>`;
 }
@@ -113,6 +115,11 @@ $("list").onclick = async (e) => {
   if (!b || !card) return;
   const id = card.dataset.id;
   try {
+    if (b.dataset.savenote) {
+      const v = card.querySelector("[data-note]").value.trim();
+      await api(`orders?id=eq.${id}`, { method: "PATCH", body: JSON.stringify({ tracking_note: v || null }) });
+      orders.find((o) => String(o.id) === id).tracking_note = v; b.textContent = "✓"; setTimeout(() => { b.textContent = "រក្សា"; }, 1200); return;
+    }
     if (b.dataset.s) { await api(`orders?id=eq.${id}`, { method: "PATCH", body: JSON.stringify({ status: b.dataset.s }) }); orders.find((o) => String(o.id) === id).status = b.dataset.s; }
     else if (b.dataset.del) {
       if (b.dataset.sure !== "1") { b.dataset.sure = "1"; b.textContent = "ចុចម្តងទៀត"; setTimeout(() => { if (b.isConnected) { b.dataset.sure = ""; b.textContent = "🗑"; } }, 3000); return; }
