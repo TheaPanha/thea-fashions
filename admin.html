@@ -204,6 +204,47 @@
     .ad-thumbwrap { width: 58px; height: 78px; }
     .ad-photo-btn, .ad-dl, .ad-del, .ad-delimg { width: 58px; font-size: 10px; }
   }
+
+  /* ===== Admin UI v2 ===== */
+  body { background: linear-gradient(180deg, #FBF6EF, #F3EAE0) fixed; }
+  #admin-app > .ad-top { position: sticky; top: 0; z-index: 25; display: flex; align-items: center; gap: 10px; padding: calc(10px + env(safe-area-inset-top)) 14px 10px; background: linear-gradient(135deg, #2A1F18, #4A3228); color: #fff; box-shadow: 0 4px 18px rgba(0,0,0,.18); margin: 0; }
+  .ad-logo { width: 32px; height: 32px; border-radius: 50%; background: var(--clay); color: #fff; display: grid; place-items: center; font: 700 17px Georgia, serif; flex: none; }
+  #admin-app > .ad-top h1 { font-size: 16px; margin: 0; flex: 1; white-space: nowrap; }
+  #admin-app > .ad-top .ad-saved { margin: 0; font-size: 11px; padding: 3px 8px; border-radius: 999px; }
+  .ad-site, .ad-out { font: 600 12px inherit; color: #fff; text-decoration: none; padding: 7px 10px; border-radius: 10px; background: rgba(255,255,255,.14); border: none; cursor: pointer; white-space: nowrap; }
+  .ad-out { background: rgba(184,33,63,.55); }
+  .ad-wrap { padding: 14px 14px 110px; }
+  .ad-tabs { position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; margin: 0; display: flex; gap: 2px; overflow: visible; padding: 6px 6px calc(6px + env(safe-area-inset-bottom)); background: rgba(255,252,246,.94); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-top: 1px solid var(--border); box-shadow: 0 -6px 24px rgba(0,0,0,.06); }
+  .ad-tab { position: relative; flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 6px 2px; font-size: 10.5px; font-weight: 600; color: var(--muted); border: none; border-bottom: none; background: none; border-radius: 12px; white-space: nowrap; }
+  .ad-tab .ic { font-size: 19px; line-height: 1.2; }
+  .ad-tab.active { color: var(--clay-dark); background: rgba(var(--clay-rgb), .12); border-bottom: none; }
+  .bd { position: absolute; top: 2px; right: 10%; min-width: 17px; height: 17px; padding: 0 4px; border-radius: 9px; background: #B8213F; color: #fff; font: 700 10px/17px inherit; text-align: center; }
+  .ad-panel { animation: adIn .18s ease; } @keyframes adIn { from { opacity: 0; transform: translateY(6px); } }
+  .ad-row { background: var(--card); border: 1px solid var(--border) !important; border-radius: 16px; padding: 12px; margin-bottom: 10px; box-shadow: 0 1px 3px rgba(60,30,20,.05); }
+  .ad-input:focus { outline: none; border-color: var(--clay); box-shadow: 0 0 0 3px rgba(var(--clay-rgb), .15); }
+  .ad-row .ad-top { position: static; background: transparent; color: var(--ink); padding: 0 0 4px; box-shadow: none; }
+  .ad-row .ad-num { color: var(--clay-dark); font-weight: 700; }
+  /* orders */
+  .od-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px; }
+  .od-stat { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 11px 12px; box-shadow: 0 1px 3px rgba(60,30,20,.05); }
+  .od-stat b { display: block; font-size: 17px; } .od-stat span { font-size: 11.5px; color: var(--muted); }
+  .od-chips { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 4px; scrollbar-width: none; }
+  .od-chips::-webkit-scrollbar { display: none; }
+  .od-sm { padding: 7px 12px; border: 1.5px solid var(--border); border-radius: 999px; background: var(--card); color: var(--ink); font: 500 13px inherit; cursor: pointer; white-space: nowrap; }
+  .od-sm.on { background: var(--ink); color: #fff; border-color: var(--ink); }
+  .od-card { background: var(--card); border: 1px solid var(--border); border-left: 5px solid #C98A1B; border-radius: 16px; padding: 14px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(60,30,20,.06); }
+  .od-card.contacted { border-left-color: #2E6DB4; } .od-card.shipping { border-left-color: #7A4EC2; } .od-card.done { border-left-color: #3F7D5C; } .od-card.cancel { border-left-color: #B8213F; opacity: .65; }
+  .od-top { display: flex; justify-content: space-between; gap: 8px; } .od-name { font-weight: 700; font-size: 15.5px; } .od-time { font-size: 12px; color: var(--muted); white-space: nowrap; }
+  .od-meta { margin: 6px 0 10px; font-size: 14px; line-height: 1.75; word-break: break-word; } .od-meta a { color: var(--clay-dark); font-weight: 700; text-decoration: none; }
+  .od-price { font-weight: 700; color: var(--clay-dark); }
+  .od-box { margin: 8px 0 10px; padding: 10px; border: 1px dashed var(--border); border-radius: 12px; background: rgba(255,255,255,.5); }
+  .od-row { display: flex; gap: 6px; } .od-row input { margin: 0; min-width: 0; font-size: 14px; padding: 9px 10px; width: 100%; border: 1.5px solid var(--border); border-radius: 10px; background: #fff; }
+  .od-stat2 { font-size: 13px; font-weight: 700; margin: 8px 0 0; }
+  .od-acts { display: flex; flex-wrap: wrap; gap: 6px; }
+  .od-empty { text-align: center; color: var(--muted); padding: 40px 10px; }
+  #rcv { position: fixed; inset: 0; z-index: 99; background: rgba(0,0,0,.9); align-items: center; justify-content: center; flex-direction: column; padding: 16px; gap: 12px; }
+  #rcv-x { position: absolute; top: calc(env(safe-area-inset-top) + 12px); right: 12px; padding: 8px 14px; border: none; border-radius: 999px; background: #fff; font: 600 13px inherit; }
+  #rcv-msg, #rcv-open { color: #fff; font-size: 14px; } #rcv-img { display: none; max-width: 100%; max-height: 78vh; border-radius: 12px; background: #fff; } #rcv-open { display: none; }
 </style>
 </head>
 <body>
@@ -219,8 +260,9 @@
   </div>
 
   <div id="admin-app" style="display:none">
-    <div class="ad-top"><h1>Admin</h1><span class="ad-saved" id="ad-saved">រក្សាទុករួច ✓</span><a class="ad-site" href="index.html">មើលគេហទំព័រ</a></div>
+    <div class="ad-top"><span class="ad-logo">T</span><h1>Thea Fashion</h1><span class="ad-saved" id="ad-saved">✓</span><a class="ad-site" href="index.html" aria-label="មើលគេហទំព័រ">🌐</a><button class="ad-out" id="ad-logout" type="button">ចេញ</button></div>
     <div class="ad-wrap"><div id="ad-body"></div></div>
+    <div id="rcv" style="display:none"><button id="rcv-x" type="button">✕ បិទ</button><div id="rcv-msg"></div><img id="rcv-img" alt="" /><a id="rcv-open" target="_blank" rel="noopener">បើកក្នុងផ្ទាំងថ្មី ↗</a></div>
   </div>
 
 <script>
@@ -624,30 +666,132 @@ function wireStats(box) {
   if (c) c.addEventListener("click", () => { if (confirm("លុបស្ថិតិលើឧបករណ៍នេះ?")) { try { localStorage.removeItem("stats"); } catch (e) {} renderStats(); } });
 }
 
+
+// ================= ការកម្មង់ (បញ្ចូលពី dashboard) =================
+(function () {
+  const $ = (id) => document.getElementById(id);
+  const e2 = (v) => String(v == null ? "" : v).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
+  const ST = { new: "ថ្មី", contacted: "កំពុងរៀបចំ", shipping: "កំពុងដឹកជញ្ជូន", done: "ដឹកដល់ហើយ", cancel: "បោះបង់" };
+  const money = (n) => Number(n || 0).toLocaleString("en-US") + " ៛";
+  const when = (s) => new Date(s).toLocaleString("en-GB", { timeZone: "Asia/Phnom_Penh", day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" });
+  const dayKey = (s) => new Date(s).toLocaleDateString("en-CA", { timeZone: "Asia/Phnom_Penh" });
+  let orders = [], flt = "all", timer, ready = false;
+  function parseAmount(v) {
+    let s = String(v || "").replace(/[០-៩]/g, (c) => "០១២៣៤៥៦៧៨៩".indexOf(c)).replace(/[^\d.,]/g, "").replace(/,/g, "");
+    if (/\.\d{1,2}$/.test(s)) s = s.replace(/\.\d{1,2}$/, "");
+    s = s.replace(/\./g, "");
+    return s === "" ? null : parseInt(s, 10);
+  }
+  async function api(path, opt = {}) {
+    const t = await sbToken();
+    const r = await fetch(`${SB_URL}/rest/v1/${path}`, { ...opt, headers: { apikey: SB_KEY, Authorization: "Bearer " + t, "Content-Type": "application/json", Prefer: "return=minimal", ...(opt.headers || {}) } });
+    if (!r.ok) throw new Error("HTTP " + r.status);
+    return opt.method && opt.method !== "GET" ? null : r.json();
+  }
+  function payState(o) {
+    if (o.paid_amount == null) return ["⏳ មិនទាន់ផ្ទៀងផ្ទាត់ទឹកប្រាក់", "var(--muted)"];
+    const df = o.paid_amount - (o.price || 0);
+    if (df >= 0) return [df > 0 ? `✅ បង់គ្រប់ (លើស ${money(df)})` : "✅ បង់គ្រប់", "#3F7D5C"];
+    return [`⚠️ បង់មិនទាន់គ្រប់ · ខ្វះ ${money(-df)}`, "#B8213F"];
+  }
+  function payBox(o) {
+    if (o.pay_method !== "qr") return "";
+    const [t, c] = payState(o), short = o.paid_amount != null && o.paid_amount < (o.price || 0);
+    return `<div class="od-box"><div class="od-row"><input data-payer value="${e2(o.payer_name)}" placeholder="ឈ្មោះអ្នកបង់ (លើបង្កាន់ដៃ)"><input data-paid type="text" inputmode="decimal" value="${o.paid_amount == null ? "" : o.paid_amount}" placeholder="ទឹកប្រាក់ ៛"><button class="od-sm" data-savepay="1" type="button">រក្សា</button></div>
+      <div class="od-stat2" style="color:${c}">${t}</div>${short ? `<button class="od-sm" data-sms="1" type="button" style="margin-top:8px;border-color:#B8213F;color:#B8213F">📩 ប្រាប់ភ្ញៀវថាបង់មិនទាន់គ្រប់</button>` : ""}</div>`;
+  }
+  function draw() {
+    const today = dayKey(new Date()), live = orders.filter((o) => o.status !== "cancel"), td = live.filter((o) => dayKey(o.created_at) === today);
+    const nNew = orders.filter((o) => o.status === "new").length, bd = $("od-badge");
+    if (bd) { bd.hidden = !nNew; bd.textContent = nNew; }
+    $("od-stats").innerHTML = `<div class="od-stat"><b>${nNew}</b><span>ថ្មី</span></div><div class="od-stat"><b>${td.length}</b><span>ថ្ងៃនេះ</span></div><div class="od-stat"><b>${money(td.reduce((s, o) => s + (o.price || 0), 0))}</b><span>សរុបថ្ងៃនេះ</span></div>`;
+    $("od-chips").innerHTML = [["all", "ទាំងអស់", orders.length], ...Object.entries(ST).map(([k, v]) => [k, v, orders.filter((o) => o.status === k).length])].map(([k, v, c]) => `<button class="od-sm${flt === k ? " on" : ""}" data-f="${k}" type="button">${v} (${c})</button>`).join("");
+    const rows = orders.filter((o) => flt === "all" || o.status === flt);
+    $("od-list").innerHTML = rows.length ? rows.map((o) => `<div class="od-card ${e2(o.status)}" data-id="${o.id}">
+      <div class="od-top"><div class="od-name">${e2(o.product)}${o.size ? " · " + e2(o.size) : ""}</div><div class="od-time">${when(o.created_at)}</div></div>
+      <div class="od-meta"><span class="od-price">${money(o.price)}</span> · #${e2(o.product_no)}${o.order_code ? " · 🔖 <b>" + e2(o.order_code) + "</b>" : ""}${o.pay_method ? " · " + (o.pay_method === "qr" ? "💳 បង់ឥឡូវ" : "🚚 បង់ពេលទទួល") : ""}<br>
+        📞 <a href="tel:${e2(String(o.phone).replace(/[^\d+]/g, ""))}">${e2(o.phone)}</a><br>${o.location ? "📍 " + e2(o.location) + "<br>" : ""}${/^https?:\/\//.test(o.map_link || "") ? `🗺 <a href="${e2(o.map_link)}" target="_blank" rel="noopener">បើក Google Map</a>` : ""}</div>
+      ${payBox(o)}
+      <div class="od-box"><div class="od-row"><input data-courier value="${e2(o.courier)}" placeholder="ក្រុមហ៊ុនដឹក"><input data-trackno value="${e2(o.courier_no)}" placeholder="លេខតាមដាន"></div>
+        <div class="od-row" style="margin-top:6px"><input data-note value="${e2(o.tracking_note)}" placeholder="ដឹកដល់ណាហើយ?"><button class="od-sm" data-savetrack="1" type="button">រក្សា</button></div></div>
+      <div class="od-acts">${o.receipt_url ? `<button class="od-sm" data-rc="${e2(o.receipt_url)}" type="button" style="border-color:#3F7D5C;color:#3F7D5C">🧾 មើលបង្កាន់ដៃ</button>` : ""}${Object.entries(ST).filter(([k]) => k !== o.status).map(([k, v]) => `<button class="od-sm" data-s="${k}" type="button">${v}</button>`).join("")}<button class="od-sm" data-del="1" type="button" style="color:#B8213F">🗑</button></div>
+    </div>`).join("") : `<div class="od-empty">មិនទាន់មានការបញ្ជាទិញ</div>`;
+  }
+  window.odLoad = async function () {
+    if (!ready) return;
+    const ae = document.activeElement;
+    if (ae && ae.matches && ae.matches("#od-list input")) return;
+    try { orders = await api("orders?select=*&order=created_at.desc&limit=300", { headers: { Prefer: "" } }); draw(); }
+    catch (e) { $("od-list").innerHTML = `<div class="od-empty">ទាញទិន្នន័យមិនបាន (${e2(e.message)})</div>`; }
+  };
+  window.odInit = function () {
+    const root = $("od-root"); if (!root) return;
+    if (!sbOn()) { root.innerHTML = `<div class="od-empty">មិនទាន់ភ្ជាប់ Supabase</div>`; return; }
+    root.innerHTML = `<div class="od-stats" id="od-stats"></div><div class="od-chips" id="od-chips"></div><div id="od-list"><div class="od-empty">កំពុងទាញ...</div></div>`;
+    ready = true; odLoad(); clearInterval(timer); timer = setInterval(() => { if (!document.hidden) odLoad(); }, 30000);
+    $("od-chips").onclick = (e) => { const b = e.target.closest("[data-f]"); if (b) { flt = b.dataset.f; draw(); } };
+    $("rcv-x").onclick = () => { $("rcv").style.display = "none"; $("rcv-img").removeAttribute("src"); };
+    $("od-list").onclick = async (e) => {
+      const b = e.target.closest("button"), card = e.target.closest(".od-card");
+      if (!b || !card) return;
+      const id = card.dataset.id, o = orders.find((x) => String(x.id) === id), g = (s) => card.querySelector(s).value.trim();
+      try {
+        if (b.dataset.rc) {
+          const v = $("rcv"), im = $("rcv-img"), msg = $("rcv-msg"), op = $("rcv-open");
+          v.style.display = "flex"; im.style.display = "none"; op.style.display = "none"; msg.textContent = "កំពុងផ្ទុករូប...";
+          const t = await sbToken();
+          const r = await fetch(`${SB_URL}/storage/v1/object/sign/receipts/${b.dataset.rc}`, { method: "POST", headers: { apikey: SB_KEY, Authorization: "Bearer " + t, "Content-Type": "application/json" }, body: JSON.stringify({ expiresIn: 300 }) });
+          const j = await r.json().catch(() => ({}));
+          if (!r.ok || !j.signedURL) { msg.textContent = `មើលមិនបាន៖ ${r.status} ${j.message || j.error || ""}`; return; }
+          const u = `${SB_URL}/storage/v1${j.signedURL}`;
+          im.onload = () => { msg.textContent = ""; im.style.display = "block"; op.href = u; op.style.display = "block"; };
+          im.onerror = () => { msg.textContent = "បើករូបមិនបាន"; };
+          im.src = u; return;
+        }
+        if (b.dataset.savetrack) {
+          const body = { courier: g("[data-courier]") || null, courier_no: g("[data-trackno]") || null, tracking_note: g("[data-note]") || null };
+          await api(`orders?id=eq.${id}`, { method: "PATCH", body: JSON.stringify(body) }); Object.assign(o, body);
+          b.textContent = "✓"; setTimeout(() => { b.textContent = "រក្សា"; }, 1200); return;
+        }
+        if (b.dataset.savepay) {
+          const payer = g("[data-payer]"), paid = parseAmount(g("[data-paid]"));
+          await api(`orders?id=eq.${id}`, { method: "PATCH", body: JSON.stringify({ payer_name: payer || null, paid_amount: paid }) });
+          o.payer_name = payer || null; o.paid_amount = paid; draw(); return;
+        }
+        if (b.dataset.sms) {
+          const short = (o.price || 0) - (o.paid_amount || 0);
+          const msg = `សួស្តី${o.payer_name ? " " + o.payer_name : ""}! ការទិញ ${o.product}${o.size ? " ទំហំ " + o.size : ""} តម្លៃ ${money(o.price)}។ យើងទទួលបាន ${money(o.paid_amount)} ប៉ុណ្ណោះ បង់មិនទាន់គ្រប់ ខ្វះ ${money(short)}។ សូមបង់បន្ថែម ហើយផ្ញើបង្កាន់ដៃមកវិញ។ អរគុណ!`;
+          try { navigator.clipboard.writeText(msg).catch(() => {}); } catch (x) {}
+          const a = document.createElement("a"); a.href = `sms:${String(o.phone).replace(/[^\d+]/g, "")}${/iPhone|iPad/.test(navigator.userAgent) ? "&" : "?"}body=${encodeURIComponent(msg)}`; a.click(); return;
+        }
+        if (b.dataset.s) { await api(`orders?id=eq.${id}`, { method: "PATCH", body: JSON.stringify({ status: b.dataset.s }) }); o.status = b.dataset.s; draw(); return; }
+        if (b.dataset.del) {
+          if (b.dataset.sure !== "1") { b.dataset.sure = "1"; b.textContent = "ចុចម្តងទៀត"; setTimeout(() => { if (b.isConnected) { b.dataset.sure = ""; b.textContent = "🗑"; } }, 3000); return; }
+          await api(`orders?id=eq.${id}`, { method: "DELETE" }); orders = orders.filter((x) => String(x.id) !== id); draw();
+        }
+      } catch (err) { alert("មិនបាន៖ " + err.message); }
+    };
+  };
+})();
+
 function openAdminPanel() {
+  setTimeout(odInit, 0);
   adminLogin.style.display = "none";
   adminSheet.style.display = "";
   const body = document.getElementById("ad-body");
   body.innerHTML = `
-    <div class="ad-stats" id="ad-stats"></div>
-    <div class="ad-actions">
-      <button class="ad-btn danger" id="ad-logout" type="button">ចាកចេញ</button>
-    </div>
-    <div class="ad-note">ការកែនៅទីនេះមើលឃើញតែលើឧបករណ៍នេះប៉ុណ្ណោះ អតិថិជនមិនឃើញទេ។</div>
-    <details class="ad-pw"><summary>ប្តូរពាក្យសម្ងាត់</summary>
-      <input class="ad-input" id="ad-newpw" type="text" placeholder="ពាក្យសម្ងាត់ថ្មី" />
-      <button class="ad-btn" id="ad-mkhash" type="button">បង្កើតកូដ hash</button>
-      <textarea class="ad-hash" id="ad-hash" readonly style="display:none;height:60px"></textarea>
-    </details>
+    <div class="ad-stats" id="ad-stats" style="display:none"></div>
     <div class="ad-tabs" id="ad-tabs">
-      <button class="ad-tab active" data-tab="products" type="button">ទំនិញ</button>
-      <button class="ad-tab" data-tab="design" type="button">រចនា</button>
-      <button class="ad-tab" data-tab="shop" type="button">ហាង</button>
-      <button class="ad-tab" data-tab="promo" type="button">ផ្សព្វផ្សាយ</button>
-      <button class="ad-tab" data-tab="stats" type="button">ស្ថិតិ</button>
+      <button class="ad-tab active" data-tab="orders" type="button"><span class="ic">📦</span>ការកម្មង់<b class="bd" id="od-badge" hidden></b></button>
+      <button class="ad-tab" data-tab="products" type="button"><span class="ic">🛍️</span>ទំនិញ</button>
+      <button class="ad-tab" data-tab="design" type="button"><span class="ic">🎨</span>រចនា</button>
+      <button class="ad-tab" data-tab="shop" type="button"><span class="ic">🏪</span>ហាង</button>
+      <button class="ad-tab" data-tab="promo" type="button"><span class="ic">📣</span>ផ្សព្វផ្សាយ</button>
+      <button class="ad-tab" data-tab="stats" type="button"><span class="ic">📊</span>ស្ថិតិ</button>
     </div>
+    <div class="ad-panel" data-tab="orders"><div id="od-root"></div></div>
 
-    <div class="ad-panel" data-tab="products">
+    <div class="ad-panel" data-tab="products" style="display:none">
       <button class="ad-btn ad-addbtn" id="ad-add-open" type="button">＋ ផុសទំនិញថ្មី</button>
       <div class="ad-addform" id="ad-addform" style="display:none">
         <label class="ad-photo-pick" id="ad-photo-pick">
@@ -846,6 +990,8 @@ function openAdminPanel() {
     body.querySelectorAll(".ad-tab").forEach((x) => x.classList.toggle("active", x === t));
     body.querySelectorAll(".ad-panel").forEach((pn) => (pn.style.display = pn.dataset.tab === t.dataset.tab ? "" : "none"));
     if (t.dataset.tab === "stats") renderStats();
+    if (t.dataset.tab === "orders") odLoad();
+    const st = document.getElementById("ad-stats"); if (st) st.style.display = t.dataset.tab === "products" ? "" : "none";
   }));
 
   // ផុសទំនិញថ្មី
@@ -920,15 +1066,6 @@ function openAdminPanel() {
   document.getElementById("ad-logout").addEventListener("click", () => {
     try { localStorage.removeItem("adminOn"); localStorage.removeItem("sbSess"); } catch (e) {}
     location.reload();
-  });
-  document.getElementById("ad-mkhash").addEventListener("click", async () => {
-    const v = document.getElementById("ad-newpw").value;
-    const out = document.getElementById("ad-hash");
-    if (!v) return;
-    try {
-      out.value = `const ADMIN_HASH = "${await sha256(v)}";`;
-      out.style.display = "block"; out.select();
-    } catch (e) { out.value = "ត្រូវការ https"; out.style.display = "block"; }
   });
   // ផ្ទាំងផ្សព្វផ្សាយ
   const promoPanel = body.querySelector('.ad-panel[data-tab="promo"]');
