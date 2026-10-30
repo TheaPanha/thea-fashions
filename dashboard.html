@@ -56,6 +56,12 @@
     <div id="list"></div>
   </div>
 </div>
+<div id="rcv" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:99;align-items:center;justify-content:center;flex-direction:column;padding:16px;gap:12px">
+  <button class="sm" id="rcv-x" type="button" style="position:absolute;top:calc(env(safe-area-inset-top,0px) + 12px);right:12px">✕ បិទ</button>
+  <div id="rcv-msg" style="color:#fff;font-size:14px"></div>
+  <img id="rcv-img" alt="" style="display:none;max-width:100%;max-height:78vh;border-radius:12px;background:#fff" />
+  <a id="rcv-open" target="_blank" rel="noopener" style="display:none;color:#fff;font-size:14px">បើកក្នុងផ្ទាំងថ្មី ↗</a>
+</div>
 <script>
 const SB_URL = "https://jbdxyxypgmdldxktixyd.supabase.co";
 const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpiZHh5eHlwZ21kbGR4a3RpeHlkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMzMjAzNzYsImV4cCI6MjEwODg5NjM3Nn0.3vvF45w20T_giyk66jXKqEoAd9bylA7Py4O89JAtfE0";
@@ -155,11 +161,19 @@ $("list").onclick = async (e) => {
       const a = document.createElement("a"); a.href = `sms:${String(o.phone).replace(/[^\d+]/g, "")}${/iPhone|iPad/.test(navigator.userAgent) ? "&" : "?"}body=${encodeURIComponent(msg)}`; a.click(); return;
     }
     if (b.dataset.rc) {
-      const t = await token();
-      const r = await fetch(`${SB_URL}/storage/v1/object/sign/receipts/${b.dataset.rc}`, { method: "POST", headers: { apikey: SB_KEY, Authorization: "Bearer " + t, "Content-Type": "application/json" }, body: JSON.stringify({ expiresIn: 300 }) });
-      const j = await r.json();
-      if (!r.ok || !j.signedURL) throw new Error("មើលមិនបាន");
-      window.open(`${SB_URL}/storage/v1${j.signedURL}`, "_blank", "noopener"); return;
+      const v = $("rcv"), im = $("rcv-img"), msg = $("rcv-msg"), op = $("rcv-open");
+      v.style.display = "flex"; im.style.display = "none"; op.style.display = "none"; msg.textContent = "កំពុងផ្ទុករូប...";
+      try {
+        const t = await token();
+        const r = await fetch(`${SB_URL}/storage/v1/object/sign/receipts/${b.dataset.rc}`, { method: "POST", headers: { apikey: SB_KEY, Authorization: "Bearer " + t, "Content-Type": "application/json" }, body: JSON.stringify({ expiresIn: 300 }) });
+        const j = await r.json().catch(() => ({}));
+        if (!r.ok || !j.signedURL) throw new Error(`${r.status} ${j.message || j.error || ""}`.trim());
+        const u = `${SB_URL}/storage/v1${j.signedURL}`;
+        im.onload = () => { msg.textContent = ""; im.style.display = ""; op.href = u; op.style.display = ""; };
+        im.onerror = () => { msg.textContent = "បើករូបមិនបាន (ឯកសារអាចខូច ឬមិនមែនរូប)"; };
+        im.src = u;
+      } catch (err) { msg.textContent = "មើលមិនបាន៖ " + err.message; }
+      return;
     }
     if (b.dataset.s) { await api(`orders?id=eq.${id}`, { method: "PATCH", body: JSON.stringify({ status: b.dataset.s }) }); orders.find((o) => String(o.id) === id).status = b.dataset.s; }
     else if (b.dataset.del) {
@@ -177,6 +191,7 @@ $("go").onclick = async () => {
   catch (e) { $("lerr").textContent = "អ៊ីមែល ឬពាក្យសម្ងាត់មិនត្រឹមត្រូវ"; }
 };
 $("pw").addEventListener("keydown", (e) => { if (e.key === "Enter") $("go").click(); });
+$("rcv-x").onclick = () => { $("rcv").style.display = "none"; $("rcv-img").removeAttribute("src"); };
 $("rf").onclick = load; $("lo").onclick = logout;
 if (sess) show();
 </script>
