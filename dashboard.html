@@ -84,6 +84,13 @@ async function api(path, opt = {}) {
   if (!r.ok) throw new Error("HTTP " + r.status);
   return opt.method && opt.method !== "GET" ? null : r.json();
 }
+// បំប្លែងចំនួនទឹកប្រាក់៖ មិនគិត .00 / ក្បៀស / ដកឃ្លា / ៛ និងទទួលលេខខ្មែរ
+function parseAmount(v) {
+  let s = String(v || "").replace(/[០-៩]/g, (c) => "០១២៣៤៥៦៧៨៩".indexOf(c)).replace(/[^\d.,]/g, "").replace(/,/g, "");
+  if (/\.\d{1,2}$/.test(s)) s = s.replace(/\.\d{1,2}$/, "");   // 38000.00 → 38000
+  s = s.replace(/\./g, "");                                      // 38.000 → 38000
+  return s === "" ? null : parseInt(s, 10);
+}
 function payState(o) {
   if (o.paid_amount == null) return ["⏳ មិនទាន់ផ្ទៀងផ្ទាត់ទឹកប្រាក់", "var(--muted)"];
   const df = o.paid_amount - (o.price || 0);
@@ -93,7 +100,7 @@ function payState(o) {
 function payPanel(o) {
   if (o.pay_method !== "qr") return "";
   const [t, c] = payState(o), short = o.paid_amount != null && o.paid_amount < (o.price || 0);
-  return `<div class="pay"><div class="payrow"><input data-payer value="${esc(o.payer_name || "")}" placeholder="ឈ្មោះអ្នកបង់ (លើបង្កាន់ដៃ)"><input data-paid type="number" inputmode="numeric" value="${o.paid_amount == null ? "" : o.paid_amount}" placeholder="ទឹកប្រាក់ ៛"><button class="sm" data-savepay="1" type="button">រក្សា</button></div>
+  return `<div class="pay"><div class="payrow"><input data-payer value="${esc(o.payer_name || "")}" placeholder="ឈ្មោះអ្នកបង់ (លើបង្កាន់ដៃ)"><input data-paid type="text" inputmode="decimal" value="${o.paid_amount == null ? "" : o.paid_amount}" placeholder="ទឹកប្រាក់ ៛"><button class="sm" data-savepay="1" type="button">រក្សា</button></div>
     <div class="paystat" style="color:${c}">${t}</div>${short ? `<button class="sm" data-sms="1" type="button" style="border-color:var(--bad);color:var(--bad)">📩 ប្រាប់ភ្ញៀវថាបង់មិនទាន់គ្រប់</button>` : ""}</div>`;
 }
 const money = (n) => Number(n || 0).toLocaleString("en-US") + " ៛";
@@ -137,7 +144,7 @@ $("list").onclick = async (e) => {
     }
     if (b.dataset.savepay) {
       const o = orders.find((x) => String(x.id) === id), payer = card.querySelector("[data-payer]").value.trim(), v = card.querySelector("[data-paid]").value.trim();
-      const paid = v === "" ? null : Math.max(0, parseInt(v, 10) || 0);
+      const paid = parseAmount(v);
       await api(`orders?id=eq.${id}`, { method: "PATCH", body: JSON.stringify({ payer_name: payer || null, paid_amount: paid }) });
       o.payer_name = payer || null; o.paid_amount = paid; draw(); return;
     }
