@@ -1299,8 +1299,8 @@ function loadAdminData() {
 if (adminOn) loadAdminData();
 let settings = { ...SETTINGS, ...(useData() ? adminData.settings : {}) };
 const rebuildSettings = () => { settings = { ...SETTINGS, ...(useData() ? adminData.settings : {}) }; };
-const SB_URL = "https://YOUR-PROJECT.supabase.co";   // ← ដាក់ Project URL
-const SB_KEY = "YOUR-ANON-PUBLIC-KEY";                // ← ដាក់ anon public key
+const SB_URL = "https://jbdxyxypgmdldxktixyd.supabase.co";   // ← ដាក់ Project URL
+const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpiZHh5eHlwZ21kbGR4a3RpeHlkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMzMjAzNzYsImV4cCI6MjEwODg5NjM3Nn0.3vvF45w20T_giyk66jXKqEoAd9bylA7Py4O89JAtfE0";                // ← ដាក់ anon public key
 function applyShared(d) {
   if (!d) return;
   PRODUCTS.length = ORIG_PRODUCTS.length;

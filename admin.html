@@ -211,6 +211,7 @@
     <div class="ad-card">
       <h1>Admin</h1>
       <p class="ad-sub">សម្រាប់ម្ចាស់ហាងប៉ុណ្ណោះ</p>
+      <input id="admin-email" class="ad-input" type="email" placeholder="អ៊ីមែល" autocomplete="username" style="margin-bottom:10px" />
       <input id="admin-pass" class="ad-input" type="password" placeholder="ពាក្យសម្ងាត់" autocomplete="current-password" />
       <div class="ad-err" id="admin-err"></div>
       <button class="sheet-confirm" id="admin-go" type="button">ចូល</button>
@@ -328,9 +329,9 @@ const SETTINGS = {        // ការកំណត់រចនា និងហ�
 // ពាក្យសម្ងាត់លំនាំដើម៖ admin123 (ត្រូវប្តូរ! មើលក្នុង Admin → ប្តូរពាក្យសម្ងាត់)
 const ADMIN_HASH = "240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9";
 // ---------- Supabase ----------
-const SB_URL = "https://YOUR-PROJECT.supabase.co";   // ← ដាក់ Project URL
-const SB_KEY = "YOUR-ANON-PUBLIC-KEY";                // ← ដាក់ anon public key
-const OWNER_EMAIL = "owner@example.com";             // ← អ៊ីមែលម្ចាស់ហាងក្នុង Supabase Auth
+const SB_URL = "https://jbdxyxypgmdldxktixyd.supabase.co";   // ← ដាក់ Project URL
+const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpiZHh5eHlwZ21kbGR4a3RpeHlkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMzMjAzNzYsImV4cCI6MjEwODg5NjM3Nn0.3vvF45w20T_giyk66jXKqEoAd9bylA7Py4O89JAtfE0";                // ← ដាក់ anon public key
+const OWNER_EMAIL = "rabbitbot85@gmail.com";             // ← អ៊ីមែលម្ចាស់ហាងក្នុង Supabase Auth
 const sbOn = () => /^https:\/\/[a-z0-9]+\.supabase\.co$/.test(SB_URL) && !SB_KEY.startsWith("YOUR");
 let sbSess = null; try { sbSess = JSON.parse(localStorage.getItem("sbSess") || "null"); } catch (e) {}
 async function sbAuth(body, grant) {
@@ -421,6 +422,7 @@ async function sha256(text) {
 const adminLogin = document.getElementById("admin-login");
 const adminSheet = document.getElementById("admin-app");
 const adminPass = document.getElementById("admin-pass");
+try { document.getElementById("admin-email").value = localStorage.getItem("adminEmail") || ""; } catch (e) {}
 const adminErr = document.getElementById("admin-err");
 
 function openAdminLogin() {
@@ -432,7 +434,7 @@ function openAdminLogin() {
 async function tryAdminLogin() {
   try {
     if (sbOn()) {
-      try { await sbAuth({ email: OWNER_EMAIL, password: adminPass.value }, "password"); }
+      try { const em = (document.getElementById("admin-email").value || OWNER_EMAIL).trim(); await sbAuth({ email: em, password: adminPass.value }, "password"); try { localStorage.setItem("adminEmail", em); } catch (e) {} }
       catch (e) { adminErr.textContent = "ពាក្យសម្ងាត់មិនត្រឹមត្រូវ ឬភ្ជាប់ Supabase មិនបាន"; return; }
     } else if ((await sha256(adminPass.value)) !== ADMIN_HASH) { adminErr.textContent = "ពាក្យសម្ងាត់មិនត្រឹមត្រូវ"; return; }
   } catch (e) { adminErr.textContent = "ត្រូវការគេហទំព័រ https ទើបចូលបាន"; return; }
