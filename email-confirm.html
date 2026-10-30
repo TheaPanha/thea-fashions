@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="km">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="color-scheme" content="light" />
+<title>បញ្ជាក់អ៊ីមែល</title>
+</head>
+<body style="margin:0;padding:0;background:#F6F1E7;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#F6F1E7;padding:24px 12px;">
+    <tr>
+      <td align="center">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:480px;background:#FFFFFF;border-radius:18px;overflow:hidden;border:1px solid #E6DCC8;">
+          <tr>
+            <td align="center" style="background:#C2566E;padding:22px 16px;">
+              <span style="display:inline-block;width:44px;height:44px;line-height:44px;border-radius:50%;background:#FFFFFF;color:#C2566E;font-family:Georgia,serif;font-size:24px;font-weight:700;">T</span>
+              <div style="font-family:'Noto Sans Khmer',Arial,sans-serif;font-size:18px;font-weight:700;color:#FFFFFF;margin-top:8px;">Thea Fashion</div>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:28px 24px 8px;font-family:'Noto Sans Khmer','Khmer OS',Arial,sans-serif;color:#241B12;">
+              <h1 style="margin:0 0 12px;font-size:20px;line-height:1.5;">សូមបញ្ជាក់អ៊ីមែលរបស់អ្នក</h1>
+              <p style="margin:0 0 8px;font-size:15px;line-height:1.8;color:#4A3F33;">សូមអរគុណដែលបានបង្កើតគណនី។ ចុចប៊ូតុងខាងក្រោមដើម្បីបញ្ជាក់អ៊ីមែល ហើយចាប់ផ្តើមទិញទំនិញ។</p>
+            </td>
+          </tr>
+          <tr>
+            <td align="center" style="padding:16px 24px 24px;">
+              <a href="{{ .ConfirmationURL }}" style="display:inline-block;background:#C2566E;color:#FFFFFF;text-decoration:none;font-family:'Noto Sans Khmer','Khmer OS',Arial,sans-serif;font-size:16px;font-weight:700;padding:14px 32px;border-radius:12px;">បញ្ជាក់អ៊ីមែល</a>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:0 24px 24px;font-family:'Noto Sans Khmer','Khmer OS',Arial,sans-serif;font-size:12px;line-height:1.8;color:#7A6E60;">
+              បើប៊ូតុងមិនដំណើរការ សូម copy តំណនេះទៅបិទភ្ជាប់ក្នុងកម្មវិធីរុករក៖<br />
+              <a href="{{ .ConfirmationURL }}" style="color:#C2566E;word-break:break-all;">{{ .ConfirmationURL }}</a>
+              <br /><br />
+              បើអ្នកមិនបានបង្កើតគណនីនេះទេ សូមមិនអើពើអ៊ីមែលនេះ។
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
