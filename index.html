@@ -1,0 +1,1913 @@
+<!doctype html>
+<html lang="km">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>Thea Fashion · ខោអាវទាន់សម័យ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Noto+Serif+Khmer:wght@500;600;700&family=Noto+Sans+Khmer:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/js/all.min.js"></script>
+<style>
+  :root {
+    --linen: #F7F1EA;
+    --card: #FFFCF6;
+    --border: #E6D3C8;
+    --ink: #241B12;
+    --muted: #8A7468;
+    --clay: #C2566E;
+    --clay-dark: #9E3A52;
+    --clay-light: #D2667E;
+    --clay-rgb: 194,86,110;
+    --moss: #4B6B4A;
+    --brass: #B98A3E;
+  }
+  * { box-sizing: border-box; }
+  html, body, * { touch-action: pan-x pan-y; }
+  a, button, input, select, textarea, label, summary, .card, .lightbox, .lightbox img, .sheet-backdrop, .sheet { touch-action: manipulation; }
+  body {
+    margin: 0;
+    color: var(--ink);
+    font-family: "Noto Sans Khmer", -apple-system, sans-serif;
+    background:
+      radial-gradient(1200px 500px at 50% -150px, rgba(185,138,62,0.28), transparent 70%),
+      radial-gradient(800px 400px at 100% 100%, rgba(166,63,39,0.10), transparent 70%),
+      var(--linen);
+    background-attachment: fixed;
+  }
+  .wrap {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 40px 24px 56px;
+  }
+  header {
+    text-align: center;
+    margin-bottom: 36px;
+  }
+  .eyebrow {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    color: var(--clay);
+    background: rgba(166,63,39,0.10);
+    border: 1px solid rgba(166,63,39,0.25);
+    padding: 5px 14px;
+    border-radius: 999px;
+    margin-bottom: 14px;
+  }
+  h1 {
+    font-family: "Noto Serif Khmer", Georgia, serif;
+    font-weight: 700;
+    font-size: 38px;
+    line-height: 1.35;
+    margin: 0 0 10px 0;
+    background: linear-gradient(135deg, #241B12 30%, #A63F27 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .tagline {
+    margin: 0 auto 20px;
+    max-width: 520px;
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--muted);
+  }
+  .rule {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
+  .rule::before, .rule::after {
+    content: "";
+    height: 2px;
+    width: 56px;
+    background: linear-gradient(90deg, transparent, var(--brass));
+    border-radius: 2px;
+  }
+  .rule::after { transform: scaleX(-1); }
+  .rule i {
+    width: 9px; height: 9px;
+    background: var(--clay);
+    transform: rotate(45deg);
+    display: block;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+  }
+
+  .card {
+    position: relative;
+    height: 270px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 10px 26px rgba(36,27,18,0.16);
+    display: flex;
+    flex-direction: column;
+  }
+  .photo-slot {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    background: #E9DBC0;
+    overflow: hidden;
+    z-index: 0;
+    cursor: pointer;
+  }
+  .photo-slot .preview-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .body {
+    position: relative;
+    z-index: 1;
+    height: 100%;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    background: linear-gradient(to top, rgba(24,17,10,0.82) 0%, rgba(24,17,10,0.32) 55%, rgba(24,17,10,0.02) 100%);
+  }
+  .body h3 {
+    font-family: "Noto Serif Khmer", Georgia, serif;
+    font-weight: 600;
+    font-size: 16px;
+    margin: 0 0 6px 0;
+    line-height: 1.3;
+    color: #FBF4E6;
+  }
+  .price {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    color: #E3BE7E;
+    margin: 0 0 12px 0;
+  }
+  .buy-btn {
+    margin-top: 0;
+    width: 100%;
+    border: none;
+    border-radius: 999px;
+    padding: 10px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    cursor: pointer;
+    background: var(--ink);
+    color: var(--linen);
+    transition: background 0.25s ease, transform 0.15s ease;
+  }
+  .buy-btn:hover { background: var(--clay); }
+  .buy-btn:active { transform: scale(0.98); }
+  .buy-btn.added { background: var(--moss); }
+
+  .lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    background: rgba(24,17,10,0.88);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+  .lightbox.open { display: flex; }
+  .lightbox img {
+    max-width: 100%;
+    max-height: 100%;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+    opacity: 0;
+    animation: fadeIn 0.25s ease forwards;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  .lightbox-close,
+  .lightbox-download {
+    position: absolute;
+    top: 20px;
+    width: 40px;
+    height: 40px;
+    border-radius: 999px;
+    border: none;
+    background: var(--linen);
+    color: var(--ink);
+    font-size: 17px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.2s ease;
+  }
+  .lightbox-close:hover,
+  .lightbox-download:hover { background: #fff; }
+  .lightbox-close { right: 24px; }
+  .lightbox-download { right: 74px; }
+  /* ---- Round 2: polish ---- */
+  .topbar {
+    position: sticky; top: 0; z-index: 40;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 20px;
+    background: rgba(36,27,18,0.92);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-bottom: 2px solid var(--brass);
+  }
+  .brand {
+    font-family: "Noto Serif Khmer", Georgia, serif;
+    font-weight: 600; font-size: 15px; color: #F1E5D0;
+  }
+  .top-actions { display: flex; gap: 8px; }
+  .top-actions a, .contact a {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    text-decoration: none; font-weight: 600;
+    transition: transform 0.15s ease, background 0.2s ease;
+  }
+  .top-actions a {
+    width: 36px; height: 36px; border-radius: 999px;
+    background: var(--brass); color: #241B12; font-size: 15px;
+  }
+  .top-actions a:hover { background: #D4A858; }
+  header {
+    background:
+      linear-gradient(135deg, rgba(255,252,246,0.9), rgba(241,229,208,0.6)),
+      repeating-linear-gradient(45deg, rgba(185,138,62,0.10) 0 2px, transparent 2px 14px);
+    border: 1px solid rgba(185,138,62,0.5);
+    border-radius: 24px;
+    padding: 34px 20px 28px;
+    box-shadow: 0 10px 30px rgba(36,27,18,0.10), inset 0 0 0 5px rgba(255,252,246,0.7);
+  }
+  .card::after {
+    content: "";
+    position: absolute; inset: 6px;
+    border: 1px solid rgba(251,244,230,0.35);
+    border-radius: 13px;
+    pointer-events: none;
+    z-index: 2;
+  }
+  .body h3 { text-shadow: 0 1px 6px rgba(0,0,0,0.45); }
+  .contact {
+    display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;
+    margin-top: 16px;
+  }
+  .contact a {
+    padding: 11px 20px; border-radius: 999px; font-size: 14px;
+    box-shadow: 0 4px 12px rgba(36,27,18,0.2);
+  }
+  .contact a:active { transform: scale(0.97); }
+  .contact .call { background: var(--ink); color: var(--linen); }
+  .contact .tg { background: #2A9AD6; color: #fff; }
+  .contact .msg { background: linear-gradient(135deg, #0A7CFF, #A334FA); color: #fff; }
+  footer .thanks { font-size: 14px; }
+  /* ---- Round 3: polish ---- */
+  h1 { font-size: 42px; letter-spacing: 0.01em; }
+  .section-head {
+    display: flex; align-items: center; gap: 14px;
+    margin: 0 4px 18px;
+  }
+  .section-head h2 {
+    font-family: "Noto Serif Khmer", Georgia, serif;
+    font-size: 20px; font-weight: 600; margin: 0; white-space: nowrap;
+  }
+  .section-head .line {
+    flex: 1; height: 1px;
+    background: linear-gradient(90deg, var(--brass), transparent);
+  }
+  .section-head .count {
+    font-size: 12px; font-weight: 600; color: var(--clay);
+    background: rgba(166,63,39,0.10);
+    border: 1px solid rgba(166,63,39,0.25);
+    padding: 4px 12px; border-radius: 999px; white-space: nowrap;
+  }
+  .photo-slot {
+    background: linear-gradient(110deg, #E9DBC0 30%, #F4E9D2 50%, #E9DBC0 70%);
+    background-size: 200% 100%;
+    animation: shimmer 1.4s linear infinite;
+  }
+  @keyframes shimmer { to { background-position: -200% 0; } }
+  .ph {
+    display: none; position: absolute; inset: 0;
+    align-items: center; justify-content: center;
+    font-size: 34px; color: rgba(138,116,88,0.6);
+  }
+  .photo-slot.noimg { animation: none; }
+  .photo-slot.noimg .ph { display: flex; }
+  .card { box-shadow: 0 8px 22px rgba(36,27,18,0.14); }
+  .card:hover { box-shadow: 0 18px 38px rgba(36,27,18,0.28); }
+  .body { background: linear-gradient(to top, rgba(24,17,10,0.9) 0%, rgba(24,17,10,0.45) 50%, rgba(24,17,10,0) 100%); }
+  .price {
+    background: linear-gradient(135deg, #E3BE7E, #B98A3E);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+    letter-spacing: 0.01em;
+  }
+  .buy-btn { position: relative; overflow: hidden; }
+  .buy-btn::after {
+    content: ""; position: absolute; top: 0; left: -60%;
+    width: 40%; height: 100%;
+    background: linear-gradient(100deg, transparent, rgba(255,255,255,0.28), transparent);
+    transform: skewX(-20deg);
+    animation: shine 3.6s ease-in-out infinite;
+  }
+  @keyframes shine { 0%, 60% { left: -60%; } 100% { left: 140%; } }
+  .to-top {
+    position: fixed; right: 16px;
+    bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+    width: 44px; height: 44px; border-radius: 999px; border: none;
+    background: var(--ink); color: var(--linen); font-size: 16px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.3);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; z-index: 45;
+    opacity: 0; pointer-events: none; transform: translateY(10px);
+    transition: opacity 0.25s ease, transform 0.25s ease;
+  }
+  .to-top.show { opacity: 1; pointer-events: auto; transform: translateY(0); }
+  /* ---- Fashion theme ---- */
+  .brand, h1 { font-family: "Playfair Display", "Noto Serif Khmer", Georgia, serif; }
+  .brand { letter-spacing: 0.04em; font-size: 17px; }
+  h1 {
+    font-size: 48px; font-weight: 600; letter-spacing: 0.02em;
+    background: linear-gradient(135deg, #1A1A1A 35%, var(--clay) 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .eyebrow { letter-spacing: 0.12em; font-size: 11px; }
+  header {
+    background: linear-gradient(135deg, #FFFFFF 0%, #FBEDEA 100%);
+    border-color: rgba(var(--clay-rgb),0.35);
+    box-shadow: 0 10px 30px rgba(36,27,18,0.08), inset 0 0 0 5px rgba(255,255,255,0.8);
+  }
+  .rule::before, .rule::after { background: linear-gradient(90deg, transparent, var(--clay)); }
+  .section-head .line { background: linear-gradient(90deg, var(--clay), transparent); }
+  .card { height: auto; aspect-ratio: 3 / 4; }
+  .card:hover { box-shadow: 0 18px 38px rgba(var(--clay-rgb),0.28); }
+  .buy-btn {
+    background: linear-gradient(135deg, var(--clay), var(--clay-dark));
+    box-shadow: 0 4px 12px rgba(var(--clay-rgb),0.4);
+  }
+  .buy-btn:hover { background: linear-gradient(135deg, var(--clay-light), var(--clay)); }
+  .topbar { border-bottom-color: var(--clay); }
+  .to-top { background: var(--clay); }
+  .contact .call { background: #1A1A1A; }
+  /* ---- Round: hero, marquee, favorites, reveal ---- */
+  html { scroll-behavior: smooth; }
+  header { position: relative; overflow: hidden; padding: 44px 20px 36px; }
+  header > * { position: relative; z-index: 1; }
+  header::before, header::after {
+    content: ""; position: absolute; border-radius: 50%; filter: blur(8px); z-index: 0;
+  }
+  header::before {
+    width: 260px; height: 260px; left: -80px; top: -90px;
+    background: radial-gradient(circle, rgba(var(--clay-rgb),0.30), transparent 70%);
+  }
+  header::after {
+    width: 300px; height: 300px; right: -100px; bottom: -120px;
+    background: radial-gradient(circle, rgba(185,138,62,0.30), transparent 70%);
+  }
+  .cta {
+    display: inline-flex; align-items: center; gap: 8px;
+    margin-top: 20px; padding: 12px 26px; border-radius: 999px;
+    background: #1A1A1A; color: #fff; text-decoration: none;
+    font-weight: 600; font-size: 14px;
+    box-shadow: 0 8px 20px rgba(26,26,26,0.25);
+    transition: transform 0.15s ease, background 0.2s ease;
+  }
+  .cta:hover { background: var(--clay); }
+  .cta:active { transform: scale(0.97); }
+  .marquee {
+    overflow: hidden; margin: -10px 0 28px;
+    background: #1A1A1A; color: #F7F1EA;
+    border-radius: 999px; padding: 10px 0;
+  }
+  .marquee .track {
+    display: flex; gap: 28px; width: max-content;
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 13px; letter-spacing: 0.18em; white-space: nowrap;
+    animation: marquee 24s linear infinite;
+  }
+  .marquee .track i { font-style: normal; color: var(--brass); }
+  @keyframes marquee { to { transform: translateX(-50%); } }
+  .section-head { scroll-margin-top: 70px; }
+
+  .card { animation: none; opacity: 0; transform: translateY(18px);
+    transition: opacity 0.55s ease, transform 0.55s ease, box-shadow 0.25s ease; }
+  .card.in { opacity: 1; transform: none; }
+  .card.in:hover { transform: translateY(-4px); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .marquee .track, .buy-btn::after, .photo-slot, .flash::after, .flash-icon, header { animation: none; }
+    .topbar { transition: none; }
+    html { scroll-behavior: auto; }
+  }
+  /* ---- UI animations ---- */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .eyebrow, h1, .tagline, .rule, .cta {
+    opacity: 0; animation: fadeUp 0.7s cubic-bezier(0.2, 0.8, 0.3, 1) forwards;
+  }
+  .eyebrow { animation-delay: 0.05s; }
+  h1 { animation-delay: 0.18s; }
+  .tagline { animation-delay: 0.32s; }
+  .rule { animation-delay: 0.44s; }
+  .cta { animation-delay: 0.56s; }
+  @keyframes floaty {
+    from { transform: translate(0, 0); }
+    to { transform: translate(18px, 14px); }
+  }
+  header::before { animation: floaty 7s ease-in-out infinite alternate; }
+  header::after { animation: floaty 9s ease-in-out infinite alternate-reverse; }
+  .marquee { animation: fadeUp 0.7s ease 0.7s both; }
+
+  .progress {
+    position: fixed; top: 0; left: 0; right: 0; height: 3px; z-index: 70;
+    background: linear-gradient(90deg, var(--clay), var(--brass));
+    transform-origin: left; transform: scaleX(0);
+    pointer-events: none;
+  }
+  .topbar { transition: box-shadow 0.3s ease, padding 0.3s ease; }
+  .topbar.scrolled { box-shadow: 0 6px 20px rgba(0,0,0,0.25); padding-top: 7px; padding-bottom: 7px; }
+
+  .card::before {
+    content: ""; position: absolute; top: 0; left: -80%;
+    width: 50%; height: 100%; z-index: 2; pointer-events: none;
+    background: linear-gradient(100deg, transparent, rgba(255,255,255,0.28), transparent);
+    transform: skewX(-18deg);
+  }
+  .card:hover::before { left: 130%; transition: left 0.8s ease; }
+
+  .ripple {
+    position: absolute; border-radius: 50%; pointer-events: none;
+    background: rgba(255,255,255,0.45);
+    transform: scale(0); animation: ripple 0.6s ease-out forwards;
+  }
+  @keyframes ripple { to { transform: scale(1); opacity: 0; } }
+
+  .top-actions a, .contact a, .cta { transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease; }
+  .top-actions a:hover, .contact a:hover { transform: translateY(-2px); }
+  .cta i { transition: transform 0.25s ease; }
+  .cta:hover i { transform: translateY(3px); }
+  .to-top:hover { transform: translateY(-3px); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .eyebrow, h1, .tagline, .rule, .cta, .marquee { opacity: 1; animation: none; }
+    header::before, header::after { animation: none; }
+    .card::before { display: none; }
+  }
+  /* ---- Size sheet ---- */
+  .sheet-backdrop {
+    position: fixed; inset: 0; z-index: 80;
+    background: rgba(26,26,26,0.55);
+    display: none; align-items: flex-end; justify-content: center;
+  }
+  .sheet-backdrop.open { display: flex; animation: sheetFade 0.25s ease; }
+  @keyframes sheetFade { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes sheetUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+  .sheet {
+    width: 100%; max-width: 480px;
+    background: var(--card);
+    border-radius: 24px 24px 0 0;
+    padding: 12px 22px calc(22px + env(safe-area-inset-bottom, 0px));
+    box-shadow: 0 -10px 40px rgba(0,0,0,0.25);
+    animation: sheetUp 0.32s cubic-bezier(0.2, 0.8, 0.3, 1);
+  }
+  @media (min-width: 641px) {
+    .sheet-backdrop { align-items: center; }
+    .sheet { border-radius: 24px; padding-bottom: 22px; }
+  }
+  .sheet-handle {
+    width: 44px; height: 5px; border-radius: 999px;
+    background: var(--border); margin: 0 auto 16px;
+  }
+  .sheet h3 {
+    font-family: "Noto Serif Khmer", Georgia, serif;
+    font-size: 20px; margin: 0 0 4px;
+  }
+  .sheet-price { margin: 0 0 18px; font-weight: 600; color: var(--clay); font-size: 16px; }
+  .sheet-label { font-size: 13px; font-weight: 600; color: var(--muted); margin-bottom: 10px; }
+  .sizes { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; }
+  .size-chip {
+    min-width: 52px; padding: 11px 16px;
+    border: 1.5px solid var(--border); border-radius: 12px;
+    background: #fff; color: var(--ink);
+    font-family: inherit; font-size: 15px; font-weight: 600; cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+  }
+  .size-chip:hover { border-color: var(--clay); }
+  .size-chip:active { transform: scale(0.95); }
+  .size-chip.active { background: #1A1A1A; border-color: #1A1A1A; color: #fff; }
+  .sheet-confirm {
+    width: 100%; padding: 14px; border: none; border-radius: 999px;
+    background: linear-gradient(135deg, var(--clay), var(--clay-dark)); color: #fff;
+    font-family: inherit; font-size: 15px; font-weight: 600; cursor: pointer;
+    box-shadow: 0 6px 16px rgba(var(--clay-rgb),0.4);
+    transition: opacity 0.2s ease, transform 0.15s ease;
+  }
+  .sheet-confirm:disabled { opacity: 0.45; box-shadow: none; cursor: not-allowed; }
+  .sheet-confirm:not(:disabled):active { transform: scale(0.98); }
+  .sheet-cancel {
+    width: 100%; margin-top: 8px; padding: 12px; border: none; background: none;
+    color: var(--muted); font-family: inherit; font-size: 14px; cursor: pointer;
+  }
+  /* ---- Price styling ---- */
+  .price {
+    display: inline-flex; align-items: baseline; gap: 3px;
+    align-self: flex-start;
+    background: rgba(26,26,26,0.6);
+    -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+    border: 1px solid rgba(227,190,126,0.75);
+    color: #F3D58E;
+    padding: 4px 12px 4px 11px; border-radius: 999px;
+    font-size: 16px; font-weight: 700; line-height: 1.2;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+    margin: 0 0 12px 0;
+  }
+  .price b {
+    font-family: "Playfair Display", Georgia, serif;
+    font-weight: 700; letter-spacing: 0.02em;
+    font-variant-numeric: lining-nums tabular-nums;
+  }
+  .price small {
+    font-family: "Noto Sans Khmer", sans-serif;
+    font-size: 0.7em; font-weight: 600; opacity: 0.9;
+  }
+  .sheet-price {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 24px; font-weight: 700; letter-spacing: 0.02em;
+  }
+  /* ---- Card refinement ---- */
+  .card {
+    border: none;
+    border-radius: 22px;
+    box-shadow: 0 10px 26px rgba(60,20,32,0.16), 0 2px 6px rgba(60,20,32,0.08);
+  }
+  .card.in:hover { box-shadow: 0 20px 40px rgba(var(--clay-rgb),0.32), 0 4px 10px rgba(60,20,32,0.12); }
+  .card::after {
+    inset: 8px; border-radius: 15px;
+    border: 1px solid rgba(255,255,255,0.28);
+  }
+  .body {
+    padding: 18px 16px 16px;
+    background: linear-gradient(to top, rgba(40,14,22,0.94) 0%, rgba(40,14,22,0.58) 42%, rgba(40,14,22,0) 78%);
+  }
+  .body h3 {
+    font-size: 17px; font-weight: 600; letter-spacing: 0.01em;
+    margin: 0 0 8px;
+  }
+  .place {
+    display: inline-flex; align-items: center; gap: 6px;
+    align-self: flex-start;
+    font-size: 11px; font-weight: 500; color: #fff;
+    background: rgba(255,255,255,0.14);
+    border: 1px solid rgba(255,255,255,0.28);
+    padding: 3px 10px; border-radius: 999px;
+    margin: 0 0 10px;
+  }
+  .place i { font-size: 10px; opacity: 0.85; }
+  .buy-btn { padding: 11px; font-size: 13px; border-radius: 14px; }
+  /* ---- Discount ---- */
+  .sale-row {
+    display: flex; align-items: center; flex-wrap: wrap; gap: 6px;
+    align-self: flex-start;
+    margin: -6px 0 10px 2px;
+  }
+  .old {
+    font-size: 12px; color: rgba(255,255,255,0.75);
+    text-decoration: line-through; text-decoration-thickness: 1.5px;
+  }
+  .save {
+    background: linear-gradient(135deg, #E8445F, #B8213F);
+    color: #fff; font-size: 11px; font-weight: 700; letter-spacing: 0.02em;
+    padding: 2px 9px; border-radius: 999px;
+    box-shadow: 0 2px 8px rgba(232,68,95,0.5);
+  }
+  .old-inline { font-size: 14px; font-weight: 500; color: var(--muted); }
+  .sale-pill {
+    display: inline-block; vertical-align: middle;
+    background: #E8445F; color: #fff; font-size: 12px; font-weight: 700;
+    padding: 3px 9px; border-radius: 999px; margin-left: 4px;
+    font-family: "Playfair Display", Georgia, serif;
+  }
+  /* ---- Flash sale banner ---- */
+  .flash {
+    display: flex; align-items: center; gap: 14px;
+    margin: 0 0 22px; padding: 14px 18px;
+    border-radius: 20px; color: #fff;
+    background: linear-gradient(120deg, #E8445F 0%, #B8213F 55%, #8E1634 100%);
+    box-shadow: 0 10px 26px rgba(184,33,63,0.35);
+    position: relative; overflow: hidden;
+  }
+  .flash::after {
+    content: ""; position: absolute; top: 0; left: -60%; width: 40%; height: 100%;
+    background: linear-gradient(100deg, transparent, rgba(255,255,255,0.22), transparent);
+    transform: skewX(-20deg); animation: shine 4s ease-in-out infinite;
+  }
+  .flash-icon {
+    flex: 0 0 auto; width: 44px; height: 44px; border-radius: 50%;
+    background: rgba(255,255,255,0.18); border: 1px solid rgba(255,255,255,0.4);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; color: #FFE08A;
+    animation: boltPulse 1.6s ease-in-out infinite;
+  }
+  @keyframes boltPulse { 50% { transform: scale(1.12); box-shadow: 0 0 18px rgba(255,224,138,0.7); } }
+  .flash-text { flex: 1; min-width: 0; }
+  .flash-text b { display: block; font-family: "Noto Serif Khmer", Georgia, serif; font-size: 16px; font-weight: 600; }
+  .flash-text small { display: block; margin-top: 2px; font-size: 12px; opacity: 0.88; }
+  .timer { display: flex; align-items: center; gap: 4px; flex: 0 0 auto; position: relative; z-index: 1; }
+  .timer span {
+    min-width: 36px; padding: 7px 6px; text-align: center;
+    background: rgba(26,26,26,0.78); color: #FFE08A; border-radius: 9px;
+    font-family: "Playfair Display", Georgia, serif; font-weight: 700; font-size: 18px;
+    font-variant-numeric: tabular-nums lining-nums;
+  }
+  .timer i { font-style: normal; font-weight: 700; opacity: 0.9; }
+  /* ---- Sale section ---- */
+  #sale-section { margin-bottom: 34px; }
+  #all-products { scroll-margin-top: 70px; }
+  .sale-head h2 { color: #B8213F; }
+  .sale-head .line { background: linear-gradient(90deg, #E8445F, transparent); }
+  .sale-count { background: rgba(232,68,95,0.12); border-color: rgba(232,68,95,0.35); color: #B8213F; }
+  /* ---- Sale row: single scrolling line ---- */
+  #sale-grid {
+    display: flex; grid-template-columns: none;
+    gap: 16px; overflow-x: auto; overflow-y: hidden;
+    padding: 6px 4px 22px;
+    scrollbar-width: none;
+    -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 22px, #000 calc(100% - 22px), transparent 100%);
+    mask-image: linear-gradient(90deg, transparent 0, #000 22px, #000 calc(100% - 22px), transparent 100%);
+  }
+  #sale-grid::-webkit-scrollbar { display: none; }
+  #sale-grid .card { flex: 0 0 auto; width: 230px; }
+  /* ---- Admin ---- */
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  /* ---- Admin tabs & fields ---- */
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  /* ---- Admin: easier editing ---- */
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  /* ---- Stock ---- */
+  .card.is-soldout .photo-slot { filter: grayscale(1) brightness(0.8); }
+  .card.is-soldout .body { background: linear-gradient(to top, rgba(20,20,20,0.95) 0%, rgba(20,20,20,0.6) 45%, rgba(20,20,20,0.1) 100%); }
+  .soldout {
+    position: absolute; top: 50%; left: 50%; z-index: 3;
+    transform: translate(-50%, -50%) rotate(-12deg);
+    padding: 8px 20px; border: 2.5px solid #fff; border-radius: 10px;
+    background: rgba(26,26,26,0.72); color: #fff;
+    font-weight: 700; font-size: 18px; letter-spacing: 0.04em; white-space: nowrap;
+    pointer-events: none;
+  }
+  .lowstock {
+    position: absolute; top: 14px; right: 14px; z-index: 3;
+    padding: 4px 11px; border-radius: 999px;
+    background: #FFE08A; color: #6B4A00; font-size: 12px; font-weight: 700;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.25); pointer-events: none;
+  }
+  .buy-btn:disabled { background: #666; box-shadow: none; cursor: not-allowed; }
+  .buy-btn:disabled::after { display: none; }
+  
+  
+  
+  
+  
+  /* ---- Stats ---- */
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  /* ---- Admin: fixed header/footer, only the middle scrolls ---- */
+  
+  
+  
+  
+  
+  
+  
+  
+  .ad-num, .st-card b, .sale-pill, .timer span, .sheet-price, .brand { font-variant-numeric: lining-nums; }
+  /* ---- Admin: photos & add product ---- */
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  /* ---- Admin: tabs scroll ---- */
+  
+  
+  
+  /* ---- Polish: logo, lightbox nav, footer, hero ---- */
+  .brand-box { display: flex; align-items: center; gap: 10px; user-select: none; -webkit-user-select: none; }
+  .logo-mark {
+    width: 32px; height: 32px; border-radius: 50%; flex: 0 0 auto;
+    display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(135deg, var(--clay), var(--brass));
+    color: #fff; font-family: "Playfair Display", Georgia, serif; font-weight: 700; font-size: 17px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.35), inset 0 0 0 1.5px rgba(255,255,255,0.35);
+  }
+  header { background-size: 200% 200%; animation: heroShift 16s ease-in-out infinite; }
+  @keyframes heroShift { 0%, 100% { background-position: 0% 0%; } 50% { background-position: 100% 100%; } }
+  .section-head h2 { font-size: 22px; letter-spacing: 0.01em; }
+
+  .lightbox { flex-direction: column; padding: 70px 16px 96px; }
+  .lightbox img { max-height: 100%; }
+  .lb-nav {
+    position: absolute; top: 50%; transform: translateY(-50%); z-index: 2;
+    width: 46px; height: 46px; border-radius: 50%; border: none; cursor: pointer;
+    background: rgba(255,255,255,0.2); color: #fff; font-size: 18px;
+    -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.2s ease;
+  }
+  .lb-nav:hover { background: rgba(255,255,255,0.38); }
+  .lb-nav.prev { left: 12px; } .lb-nav.next { right: 12px; }
+  .lb-cap {
+    position: absolute; left: 0; right: 0; bottom: 0;
+    padding: 18px 20px calc(18px + env(safe-area-inset-bottom, 0px));
+    display: flex; align-items: flex-end; justify-content: space-between; gap: 12px;
+    color: #fff; background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
+  }
+  .lb-cap b { display: block; font-family: "Noto Serif Khmer", Georgia, serif; font-size: 17px; font-weight: 600; }
+  .lb-cap span { display: block; margin-top: 3px; font-size: 16px; font-weight: 700; color: #F3D58E; font-family: "Playfair Display", Georgia, serif; }
+  .lb-cap span s { font-size: 13px; font-weight: 400; color: rgba(255,255,255,0.7); margin-left: 6px; }
+  .lb-cap small { font-size: 12px; opacity: 0.8; white-space: nowrap; }
+
+  footer {
+    margin-top: 44px; padding: 32px 20px 24px; border-radius: 26px;
+    background: linear-gradient(135deg, #241B12, #3A2A20); color: #F1E5D0;
+    text-align: center; position: relative; overflow: hidden;
+    box-shadow: 0 14px 34px rgba(36,27,18,0.3);
+  }
+  footer::before {
+    content: ""; position: absolute; width: 260px; height: 260px; right: -90px; top: -110px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(var(--clay-rgb),0.45), transparent 70%);
+  }
+  footer > * { position: relative; }
+  .f-brand { font-family: "Playfair Display", Georgia, serif; font-size: 26px; font-weight: 600; letter-spacing: 0.04em; margin-bottom: 6px; }
+  footer .thanks { font-size: 14px; opacity: 0.85; }
+  footer .contact .call { background: #F7F1EA; color: #1A1A1A; }
+  .copy { margin-top: 20px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,0.15); font-size: 12px; opacity: 0.7; }
+  /* ---- UX polish ---- */
+  html { -webkit-tap-highlight-color: transparent; -webkit-text-size-adjust: 100%; }
+  body { -webkit-font-smoothing: antialiased; }
+  :focus-visible { outline: 3px solid rgba(var(--clay-rgb), 0.6); outline-offset: 2px; }
+  input:focus-visible, select:focus-visible, textarea:focus-visible { outline-offset: 0; }
+  .topbar { transition: transform 0.3s ease, box-shadow 0.3s ease, padding 0.3s ease; }
+  .topbar.hide { transform: translateY(-100%); }
+  .sheet-prod { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; }
+  .sheet-thumb {
+    width: 64px; height: 84px; flex: 0 0 auto; object-fit: cover; border-radius: 12px;
+    background: #E9DBC0; box-shadow: 0 4px 12px rgba(0,0,0,0.18);
+  }
+  .sheet-prod h3 { margin: 0 0 4px; }
+  .sheet-prod .sheet-price { margin: 0; }
+  .size-chip { min-width: 58px; padding: 13px 18px; border-radius: 14px; }
+  .size-chip.active::before { content: "✓ "; }
+  .sheet-confirm { padding: 16px; font-size: 16px; }
+  .cta, .buy-btn, .ad-btn { min-height: 40px; }
+  /* ---- Card v4: បែប Zando (ស្អាត សាមញ្ញ ព័ត៌មានចាស់ៗ ងាយមើល) ---- */
+  .card {
+    display: flex; flex-direction: column; height: auto; aspect-ratio: auto;
+    background: transparent; border: none; border-radius: 0; padding: 0; box-shadow: none; overflow: visible;
+  }
+  .card::before, .card::after { display: none; }
+  .card.in:hover { transform: none; box-shadow: none; }
+  .card .photo-slot {
+    position: relative; inset: auto; width: 100%; height: auto; aspect-ratio: 3 / 4; flex: 0 0 auto;
+    border-radius: 6px; box-shadow: none; overflow: hidden;
+    background: linear-gradient(110deg, #EEEEEE 30%, #F8F8F8 50%, #EEEEEE 70%); background-size: 200% 100%;
+    transition: box-shadow 0.25s ease;
+  }
+  .card:hover .photo-slot { box-shadow: 0 10px 24px rgba(0,0,0,0.18); }
+  .card .photo-slot::after { display: none; }
+  .card .body {
+    position: relative; flex: 1; height: auto; display: flex; flex-direction: column;
+    align-items: stretch; text-align: left; justify-content: flex-start;
+    padding: 10px 2px 0; background: transparent;
+  }
+  .brand-line {
+    font-size: 11px; font-weight: 600; letter-spacing: 0.09em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .card .body h3 {
+    font-family: inherit; color: var(--ink); text-shadow: none;
+    font-size: 14px; font-weight: 500; line-height: 1.4; margin: 0 0 4px;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+    min-height: 2.8em; max-height: none;
+  }
+  .card .place {
+    align-self: flex-start; background: none; border: none; padding: 0; margin: 0 0 8px;
+    color: var(--muted); font-size: 12px; font-weight: 400;
+  }
+  .pricebox { display: flex; align-items: baseline; flex-wrap: wrap; gap: 2px 8px; margin: 0 0 10px; }
+  .card .price {
+    align-self: auto; background: none; border: none; box-shadow: none;
+    -webkit-backdrop-filter: none; backdrop-filter: none;
+    padding: 0; margin: 0; color: var(--ink); font-size: 17px; font-weight: 700;
+  }
+  .pricebox.on-sale .price { color: #D0021B; }
+  .card .old { font-size: 12px; color: var(--muted); text-decoration: line-through; }
+  .card .body .buy-btn {
+    margin-top: auto; width: 100%; background: #1A1A1A; color: #fff; border: none;
+    border-radius: 4px; padding: 11px; font-size: 13px; font-weight: 600; box-shadow: none;
+  }
+  .card .body .buy-btn:hover { background: var(--clay); }
+  .card .body .buy-btn::after { display: none; }
+  .card .body .buy-btn .ripple { background: rgba(255,255,255,0.4); }
+  .card .body .buy-btn.added { background: var(--moss); color: #fff; }
+  .card .body .buy-btn:disabled { background: #E4E4E4; color: #9A9A9A; cursor: not-allowed; }
+  .disc {
+    position: absolute; top: 8px; left: 8px; z-index: 3; pointer-events: none;
+    background: #D0021B; color: #fff; font-size: 12px; font-weight: 700; letter-spacing: 0.02em;
+    padding: 3px 8px; border-radius: 3px;
+  }
+  .lowstock {
+    top: 8px; right: 8px; background: #fff; color: #D0021B; border-radius: 3px;
+    font-size: 11px; padding: 3px 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+  }
+  .card.is-soldout .body h3 { color: var(--muted); }
+  .soldout { top: 36%; }
+
+  /* ---- Layout បែប Zando ---- */
+  .announce { background: #1A1A1A; color: #fff; text-align: center; font-size: 12.5px; font-weight: 500; letter-spacing: 0.02em; padding: 8px 12px; }
+  .topbar { display: block; padding: 0; background: #fff; color: var(--ink); border-bottom: 1px solid #ECECEC; box-shadow: none; }
+  .topbar.scrolled { padding: 0; box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
+  .tb-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 20px; }
+  .brand { color: var(--ink); font-size: 20px; font-weight: 700; letter-spacing: 0.03em; }
+  .top-actions a { background: #fff; color: var(--ink); border: 1px solid #DADADA; width: 38px; height: 38px; }
+  .top-actions a:hover { background: #1A1A1A; color: #fff; border-color: #1A1A1A; transform: none; }
+  .catnav { display: flex; gap: 2px; overflow-x: auto; padding: 0 14px; border-top: 1px solid #F0F0F0; scrollbar-width: none; }
+  .catnav::-webkit-scrollbar { display: none; }
+  .catnav button {
+    flex: 0 0 auto; border: none; background: none; cursor: pointer; white-space: nowrap;
+    font-family: inherit; font-size: 14px; font-weight: 600; color: var(--ink);
+    padding: 12px 14px; border-bottom: 3px solid transparent; margin-bottom: -1px;
+    transition: color 0.2s ease, border-color 0.2s ease;
+  }
+  .catnav button:hover { color: var(--clay); }
+  .catnav button.on { border-bottom-color: #1A1A1A; }
+  .catnav button.sale { color: #D0021B; }
+
+  header {
+    text-align: left; padding: 44px 36px 40px; border: none; border-radius: 16px; color: #fff;
+    background: linear-gradient(120deg, #1A1A1A 0%, #3A1F2A 55%, var(--clay-dark) 100%);
+    box-shadow: none; animation: none; background-size: auto;
+  }
+  header .eyebrow { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.3); color: #fff; }
+  header h1 {
+    background: none; -webkit-background-clip: border-box; background-clip: border-box;
+    color: #fff; -webkit-text-fill-color: #fff; font-size: 52px;
+  }
+  header .tagline { color: rgba(255,255,255,0.82); margin-left: 0; margin-right: 0; max-width: 520px; }
+  header .rule { display: none; }
+  header .cta { background: #fff; color: #1A1A1A; box-shadow: none; }
+  header .cta:hover { background: var(--clay); color: #fff; }
+
+  .section-head { margin: 0 0 14px; }
+  .section-head h2 { font-size: 20px; font-weight: 700; color: var(--ink); letter-spacing: 0; }
+  .section-head .line { display: none; }
+  .section-head .count { margin-left: auto; }
+  .sale-head h2 { color: #D0021B; }
+  #all-products, #products { scroll-margin-top: 110px; }
+  .empty-cat { grid-column: 1 / -1; text-align: center; padding: 50px 16px; color: var(--muted); font-size: 15px; }
+  /* ---- Search + sort ---- */
+  .tb-search { position: relative; flex: 1; max-width: 460px; }
+  .tb-search i { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #888; font-size: 14px; pointer-events: none; }
+  .tb-search input {
+    width: 100%; padding: 11px 14px 11px 40px; border: 1px solid #DADADA; border-radius: 999px;
+    background: #F6F6F6; color: var(--ink); font-family: inherit; font-size: 16px; outline: none;
+    transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+  }
+  .tb-search input:focus { background: #fff; border-color: #1A1A1A; box-shadow: 0 0 0 3px rgba(0,0,0,0.06); }
+  .sort {
+    flex: 0 0 auto; padding: 8px 30px 8px 12px; border: 1px solid #DADADA; border-radius: 6px;
+    background: #fff; color: var(--ink); font-family: inherit; font-size: 13px; font-weight: 600; cursor: pointer;
+  }
+  .section-head h2 { padding-left: 2px; white-space: nowrap; }
+  /* ---- Promo banners ---- */
+  .promo { position: relative; margin: 0 0 18px; border-radius: 14px; overflow: hidden; box-shadow: 0 10px 28px rgba(0,0,0,0.16); }
+  .promo-track { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+  .promo-track::-webkit-scrollbar { display: none; }
+  .promo-slide {
+    position: relative; flex: 0 0 100%; scroll-snap-align: start; overflow: hidden;
+    min-height: 340px; display: flex; align-items: center; color: #fff;
+  }
+  .promo-slide::before {
+    content: ""; position: absolute; width: 420px; height: 420px; right: -100px; top: -120px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,255,255,0.22), transparent 70%);
+  }
+  .promo-slide::after {
+    content: ""; position: absolute; inset: 0;
+    background: linear-gradient(90deg, rgba(0,0,0,0.5), rgba(0,0,0,0.05) 75%);
+  }
+  .bn-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .bn-in { position: relative; z-index: 2; padding: 36px 56px; max-width: 62%; text-align: left; }
+  .bn-sub { display: block; font-size: 13px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; opacity: 0.92; margin-bottom: 10px; }
+  .bn-title {
+    font-family: "Playfair Display", "Noto Serif Khmer", Georgia, serif; font-size: 44px; font-weight: 700;
+    line-height: 1.25; margin: 0 0 20px; text-shadow: 0 2px 14px rgba(0,0,0,0.35);
+  }
+  .bn-btn {
+    border: none; cursor: pointer; background: #fff; color: #1A1A1A; font-family: inherit; font-size: 14px; font-weight: 700;
+    padding: 13px 28px; border-radius: 4px; transition: background 0.2s ease, color 0.2s ease, transform 0.15s ease;
+  }
+  .bn-btn:hover { background: #1A1A1A; color: #fff; }
+  .bn-btn:active { transform: scale(0.97); }
+  .promo-nav {
+    position: absolute; top: 50%; transform: translateY(-50%); z-index: 3; width: 44px; height: 44px;
+    border-radius: 50%; border: none; cursor: pointer; background: rgba(255,255,255,0.9); color: #1A1A1A; font-size: 16px;
+    display: none; align-items: center; justify-content: center; box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+  }
+  .promo-nav.prev { left: 14px; } .promo-nav.next { right: 14px; }
+  @media (hover: hover) { .promo-nav { display: flex; } }
+  .promo-dots { position: absolute; left: 0; right: 0; bottom: 14px; z-index: 3; display: flex; justify-content: center; gap: 7px; }
+  .promo-dots button { width: 8px; height: 8px; border-radius: 999px; border: none; padding: 0; cursor: pointer; background: rgba(255,255,255,0.55); transition: width 0.25s ease, background 0.25s ease; }
+  .promo-dots button.on { width: 26px; background: #fff; }
+  @media (prefers-reduced-motion: reduce) { .promo-track { scroll-behavior: auto; } }
+  @media (max-width: 640px) {
+    .wrap { padding: 14px 10px 36px; }
+    .announce { font-size: 11px; padding: 7px 10px; }
+    .tb-row { padding: 9px 12px; }
+    .top-actions a { width: 34px; height: 34px; }
+    .catnav { padding: 0 6px; }
+    .catnav button { font-size: 13px; padding: 10px 11px; }
+    #all-products, #products { scroll-margin-top: 96px; }
+    header { padding: 26px 18px 24px; border-radius: 14px; }
+    header .eyebrow { margin-bottom: 8px; }
+    h1 { font-size: 30px; }
+    header h1 { font-size: 32px; }
+    header .tagline { font-size: 12px; margin-bottom: 12px; }
+    .cta { margin-top: 12px; padding: 10px 22px; font-size: 13px; min-height: 40px; }
+    .topbar { padding: 0; }
+    .tb-row { flex-wrap: wrap; padding: 10px 12px; gap: 8px 10px; }
+    .tb-row .brand-box { flex: 1; }
+    .tb-search { order: 3; flex: 0 0 100%; max-width: none; }
+    .sort { font-size: 12px; padding: 6px 24px 6px 8px; }
+    .brand { font-size: 13px; }
+    .marquee { margin-bottom: 20px; }
+    .marquee .track { font-size: 11px; gap: 20px; }
+    .flash { padding: 10px 12px; gap: 9px; border-radius: 16px; margin-bottom: 16px; }
+    .flash-icon { width: 34px; height: 34px; font-size: 15px; }
+    .flash-text b { font-size: 12px; }
+    .flash-text small { font-size: 10px; }
+    .timer span { min-width: 26px; padding: 5px 3px; font-size: 13px; border-radius: 7px; }
+    .timer { gap: 2px; }
+    .section-head h2 { font-size: 16px; }
+    .section-head { margin-bottom: 12px; }
+    .lb-nav { width: 40px; height: 40px; }
+    footer { border-radius: 20px; padding: 26px 16px 20px; }
+    .f-brand { font-size: 22px; }
+    .contact a { padding: 10px 16px; font-size: 13px; }
+    .ph { font-size: 20px; }
+    /* កាតទំនិញ */
+    .promo { border-radius: 10px; margin-bottom: 14px; }
+    .promo-slide { min-height: 190px; }
+    .bn-in { padding: 20px 18px 30px; max-width: 78%; }
+    .bn-sub { font-size: 10px; margin-bottom: 6px; }
+    .bn-title { font-size: 23px; margin-bottom: 12px; }
+    .bn-btn { font-size: 12px; padding: 10px 18px; }
+    .promo-dots { bottom: 8px; }
+    .grid { gap: 14px 8px; }
+    .card .photo-slot { border-radius: 4px; }
+    .card .body { padding: 6px 1px 0; }
+    .brand-line { display: none; }
+    .card .body h3 { font-size: 11px; margin-bottom: 3px; line-height: 1.35; min-height: 2.7em; }
+    .place { display: none; }
+    .pricebox { gap: 0 5px; margin-bottom: 6px; }
+    .card .price { font-size: 13px; }
+    .card .old { font-size: 9px; }
+    .card .body .buy-btn { padding: 7px 2px; min-height: 30px; font-size: 10px; gap: 3px; border-radius: 3px; }
+    .disc { top: 4px; left: 4px; font-size: 9px; padding: 2px 5px; }
+    .lowstock { top: 4px; right: 4px; font-size: 9px; padding: 2px 5px; }
+    #sale-grid { gap: 8px; padding-bottom: 14px; }
+    #sale-grid .card { width: 132px; }
+    .soldout { font-size: 10px; padding: 4px 8px; border-width: 2px; }
+    /* Admin */
+    
+    
+    
+  }
+
+</style>
+</head>
+<body>
+  <div class="announce" id="announce"><span id="announce-text"></span></div>
+  <div class="progress" id="progress"></div>
+  <div class="topbar" id="topbar">
+    <div class="tb-row">
+    <div class="brand-box"><span class="logo-mark" id="logo-mark">T</span><span class="brand">Thea Fashion</span></div>
+    <div class="tb-search">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input id="search" type="search" placeholder="ស្វែងរកខោអាវ..." autocomplete="off" enterkeyhint="search" />
+    </div>
+    <div class="top-actions">
+      <a id="tb-call" href="tel:0968782682" aria-label="ហៅទូរស័ព្ទ"><i class="fa-solid fa-phone"></i></a>
+      <a id="tb-tg" href="https://t.me/theapanha04042004" target="_blank" rel="noopener" aria-label="Telegram"><i class="fa-brands fa-telegram"></i></a>
+      <a id="tb-msg" href="https://www.facebook.com/share/1MQPrStX8p/?mibextid=wwXIfr" target="_blank" rel="noopener" aria-label="Messenger"><i class="fa-brands fa-facebook-messenger"></i></a>
+    </div>
+    </div>
+    <nav class="catnav" id="catnav" aria-label="ប្រភេទទំនិញ"></nav>
+  </div>
+  <div class="wrap">
+    <section class="promo" id="promo" aria-label="ផ្សព្វផ្សាយ">
+      <div class="promo-track" id="promo-track"></div>
+      <button class="promo-nav prev" id="promo-prev" type="button" aria-label="មុន"><i class="fa-solid fa-chevron-left"></i></button>
+      <button class="promo-nav next" id="promo-next" type="button" aria-label="បន្ទាប់"><i class="fa-solid fa-chevron-right"></i></button>
+      <div class="promo-dots" id="promo-dots"></div>
+    </section>
+    <header>
+      <span class="eyebrow" id="eyebrow">NEW COLLECTION · ខោអាវទាន់សម័យ</span>
+      <h1 id="hero-name">Thea Fashion</h1>
+      <p class="tagline" id="tagline">ខោអាវស្អាតៗ ទាន់សម័យ គ្រប់ទំហំ សម្រាប់ជាប់ចិត្តអ្នកគ្រប់ថ្ងៃ</p>
+      <div class="rule"><i></i></div>
+      <a class="cta" href="#products">មើលខោអាវ <i class="fa-solid fa-arrow-down"></i></a>
+    </header>
+    <div class="marquee"><div class="track" id="mq-track"><span>THEA FASHION</span><i>✦</i><span>NEW COLLECTION</span><i>✦</i><span>ខោអាវទាន់សម័យ</span><i>✦</i><span>THEA FASHION</span><i>✦</i><span>NEW COLLECTION</span><i>✦</i><span>ខោអាវទាន់សម័យ</span><i>✦</i><span>THEA FASHION</span><i>✦</i><span>NEW COLLECTION</span><i>✦</i><span>ខោអាវទាន់សម័យ</span><i>✦</i><span>THEA FASHION</span><i>✦</i><span>NEW COLLECTION</span><i>✦</i><span>ខោអាវទាន់សម័យ</span><i>✦</i></div></div>
+    <div class="flash" id="flash">
+      <div class="flash-icon"><i class="fa-solid fa-bolt"></i></div>
+      <div class="flash-text">
+        <b id="flash-title">បញ្ចុះតម្លៃពិសេសថ្ងៃនេះ</b>
+        <small id="flash-sub">ប្តូរទំនិញថ្មី រៀងរាល់ 4 ម៉ោង · ម៉ោងកម្ពុជា</small>
+      </div>
+      <div class="timer" id="timer">
+        <span id="t-h">00</span><i>:</i><span id="t-m">00</span><i>:</i><span id="t-s">00</span>
+      </div>
+    </div>
+    <div id="sale-section">
+      <div class="section-head sale-head" id="products">
+        <h2>ទំនិញបញ្ចុះតម្លៃ</h2>
+        <span class="line"></span>
+        <span class="count sale-count" id="sale-count"></span>
+      </div>
+      <div class="grid" id="sale-grid"></div>
+    </div>
+
+    <div class="section-head" id="all-products">
+      <h2 id="all-title">ខោអាវផ្សេងទៀត</h2>
+      <span class="line"></span>
+      <span class="count" id="count"></span>
+      <select class="sort" id="sort" aria-label="តម្រៀប">
+        <option value="default">តម្រៀប៖ ធម្មតា</option>
+        <option value="price-asc">តម្លៃ ទាប → ខ្ពស់</option>
+        <option value="price-desc">តម្លៃ ខ្ពស់ → ទាប</option>
+        <option value="disc">បញ្ចុះច្រើនបំផុត</option>
+      </select>
+    </div>
+    <div class="grid" id="grid"></div>
+    <footer>
+      <div class="f-brand" id="ft-brand">Thea Fashion</div>
+      <div class="thanks" id="ft-thanks">សូមអរគុណដែលគាំទ្រហាងរបស់យើង 💗</div>
+      <div class="contact">
+        <a class="call" id="ft-call" href="tel:0968782682"><i class="fa-solid fa-phone"></i> <span id="ft-phone-text">096 878 2682</span></a>
+        <a class="tg" id="ft-tg" href="https://t.me/theapanha04042004" target="_blank" rel="noopener"><i class="fa-brands fa-telegram"></i> Telegram</a>
+        <a class="msg" id="ft-msg" href="https://www.facebook.com/share/1MQPrStX8p/?mibextid=wwXIfr" target="_blank" rel="noopener"><i class="fa-brands fa-facebook-messenger"></i> Messenger</a>
+      </div>
+      <div class="copy">© <span id="ft-year"></span> <span id="ft-name">Thea Fashion</span></div>
+    </footer>
+  </div>
+
+  <div class="lightbox" id="lightbox">
+    <a class="lightbox-download" id="lightbox-download" download><i class="fa-solid fa-download"></i></a>
+    <button class="lightbox-close" id="lightbox-close"><i class="fa-solid fa-xmark"></i></button>
+    <button class="lb-nav prev" id="lb-prev" aria-label="មុន"><i class="fa-solid fa-chevron-left"></i></button>
+    <img id="lightbox-img" src="" alt="" />
+    <button class="lb-nav next" id="lb-next" aria-label="បន្ទាប់"><i class="fa-solid fa-chevron-right"></i></button>
+    <div class="lb-cap"><div><b id="lb-name"></b><span id="lb-price"></span></div><small id="lb-count"></small></div>
+  </div>
+
+  <div class="sheet-backdrop" id="sheet">
+    <div class="sheet" role="dialog" aria-modal="true">
+      <div class="sheet-handle"></div>
+      <div class="sheet-prod">
+        <img class="sheet-thumb" id="sheet-img" src="" alt="" onerror="this.style.visibility='hidden'" />
+        <div><h3 id="sheet-name"></h3><p class="sheet-price" id="sheet-price"></p></div>
+      </div>
+      <div class="sheet-label">ជ្រើសរើសទំហំ</div>
+      <div class="sizes" id="sizes"></div>
+      <button class="sheet-confirm" id="sheet-confirm" type="button" disabled>សូមជ្រើសរើសទំហំសិន</button>
+      <button class="sheet-cancel" id="sheet-cancel" type="button">បោះបង់</button>
+    </div>
+  </div>
+
+  <button class="to-top" id="to-top" aria-label="ឡើងលើ"><i class="fa-solid fa-chevron-up"></i></button>
+
+<script>
+
+// ដាក់ username Telegram របស់ហាងនៅទីនេះ (មិនបាច់ដាក់ @)
+
+const PRODUCTS = [
+  { name: "អាវយឺតកប្បាស", place: "ទំហំ S - XL", price: 35000 },
+  { name: "អាវប៉ូឡូ", place: "ទំហំ S - XL", price: 45000 },
+  { name: "អាវដៃវែង", place: "ទំហំ S - XL", price: 55000 },
+  { name: "អាវសឺមី", place: "ទំហំ S - XL", price: 60000 },
+  { name: "អាវក្រៅ", place: "ទំហំ S - XL", price: 120000 },
+  { name: "អាវកាឌីហ្គែន", place: "ទំហំ S - XL", price: 85000 },
+  { name: "អាវហូដី", place: "ទំហំ S - XL", price: 90000 },
+  { name: "អាវបាំងត្រជាក់", place: "ទំហំ M - XXL", price: 150000 },
+  { name: "ខោខូវប៊យ", place: "ទំហំ 28 - 36", price: 95000 },
+  { name: "ខោជើងវែង", place: "ទំហំ 28 - 36", price: 70000 },
+  { name: "ខោខ្លី", place: "ទំហំ 28 - 36", price: 40000 },
+  { name: "ខោលេគីន", place: "Free Size", price: 38000 },
+  { name: "ខោជើងធំ", place: "ទំហំ S - XL", price: 75000 },
+  { name: "ខោស្លាក់", place: "ទំហំ S - XL", price: 80000 },
+  { name: "សំពត់ខ្លី", place: "ទំហំ S - L", price: 55000 },
+  { name: "សំពត់វែង", place: "ទំហំ S - L", price: 75000 },
+  { name: "សំពត់ប៉ាក់ក្បាច់", place: "ទំហំ S - L", price: 90000 },
+  { name: "រ៉ូបខ្លី", place: "ទំហំ S - L", price: 110000 },
+  { name: "រ៉ូបវែង", place: "ទំហំ S - L", price: 140000 },
+  { name: "រ៉ូបពិធី", place: "ទំហំ S - L", price: 180000 },
+  { name: "អាវក្រុប", place: "ទំហំ S - L", price: 32000 },
+  { name: "អាវដៃខ្លីស្ត្រី", place: "ទំហំ S - L", price: 38000 },
+  { name: "អាវសូត្រ", place: "ទំហំ S - L", price: 130000 },
+  { name: "ឈុតពីរដុំ", place: "ទំហំ S - XL", price: 160000 },
+  { name: "ឈុតកីឡា", place: "ទំហំ M - XXL", price: 120000 },
+  { name: "អាវកីឡា", place: "ទំហំ M - XXL", price: 48000 },
+  { name: "ឈុតគេង", place: "Free Size", price: 65000 },
+  { name: "អាវធំស្ត្រី", place: "ទំហំ S - XL", price: 125000 },
+  { name: "អាវក្រណាត់ត្បាញ", place: "ទំហំ S - XL", price: 85000 },
+  { name: "មួក", place: "Free Size", price: 20000 },
+  { name: "ខ្សែក្រវ៉ាត់", place: "Free Size", price: 28000 },
+  { name: "កន្សែងកសូត្រ", place: "Free Size", price: 45000 },
+  { name: "អាវយឺតបោះពុម្ព", place: "ទំហំ S - XL", price: 38000 },
+  { name: "អាវយឺតដៃវែង", place: "ទំហំ S - XL", price: 42000 },
+  { name: "អាវទ្រនាប់", place: "ទំហំ S - L", price: 30000 },
+  { name: "អាវក្រណាត់ទន់", place: "ទំហំ S - XL", price: 68000 },
+  { name: "អាវសឺមីឆ្នូត", place: "ទំហំ S - XL", price: 62000 },
+  { name: "អាវសឺមីពណ៌ស", place: "ទំហំ S - XL", price: 58000 },
+  { name: "អាវក្រៅស្បែក", place: "ទំហំ M - XXL", price: 210000 },
+  { name: "អាវក្រៅភ្លៀង", place: "ទំហំ M - XXL", price: 95000 },
+  { name: "អាវក្រៅកប្បាសក្រាស់", place: "ទំហំ M - XXL", price: 130000 },
+  { name: "អាវខ្សែ", place: "ទំហំ S - L", price: 36000 },
+  { name: "អាវក្រុបដៃវែង", place: "ទំហំ S - L", price: 40000 },
+  { name: "អាវក្រណាត់សូត្រស្ត្រី", place: "ទំហំ S - L", price: 72000 },
+  { name: "ខោខូវប៊យជើងវែងស្ត្រី", place: "ទំហំ 26 - 32", price: 98000 },
+  { name: "ខោខូវប៊យខ្លី", place: "ទំហំ 26 - 34", price: 52000 },
+  { name: "ខោក្រណាត់រឹង", place: "ទំហំ 28 - 36", price: 78000 },
+  { name: "ខោធ្វើការ", place: "ទំហំ 28 - 38", price: 82000 },
+  { name: "ខោកីឡា", place: "ទំហំ M - XXL", price: 45000 },
+  { name: "ខោគេង", place: "Free Size", price: 28000 },
+  { name: "សំពត់ក្រណាត់ទន់", place: "ទំហំ S - L", price: 62000 },
+  { name: "សំពត់ខ្លីពណ៌ខ្មៅ", place: "ទំហំ S - L", price: 48000 },
+  { name: "សំពត់ភ្លីត", place: "ទំហំ S - L", price: 68000 },
+  { name: "រ៉ូបកំណត់ចង្កេះ", place: "ទំហំ S - L", price: 125000 },
+  { name: "រ៉ូបសូត្រ", place: "ទំហំ S - L", price: 190000 },
+  { name: "រ៉ូបក្មេងស្រី", place: "ទំហំ 3 - 12 ឆ្នាំ", price: 75000 },
+  { name: "ឈុតក្មេងប្រុស", place: "ទំហំ 3 - 12 ឆ្នាំ", price: 68000 },
+  { name: "ឈុតគូស្នេហ៍", place: "ទំហំ S - XL", price: 150000 },
+  { name: "ស្រោមជើង", place: "Free Size", price: 6000 },
+  { name: "កាបូបស្ពាយ", place: "Free Size", price: 55000 },
+  { name: "ស្រោមដៃ", place: "Free Size", price: 22000 },
+  { name: "ខ្សែក", place: "Free Size", price: 18000 },
+  { name: "អាវយឺតគូ", place: "ទំហំ S - XL", price: 70000 },
+  { name: "ខោខូវប៊យជើងធំ", place: "ទំហំ 28 - 36", price: 92000 },
+  { name: "រ៉ូបវែងស្ត្រី", place: "ទំហំ S - L", price: 135000 },
+  { name: "អាវក្រៅស្ត្រី", place: "ទំហំ S - XL", price: 115000 },
+  { name: "ខោជើងវែងស្ត្រី", place: "ទំហំ S - XL", price: 72000 },
+  { name: "ឈុតសម្លៀកបំពាក់ក្មេង", place: "ទំហំ 3 - 12 ឆ្នាំ", price: 85000 },
+];
+
+// ===== កែនៅទីនេះ (ទំនិញ ការលាក់ ស្តុក ការបញ្ចុះដោយដៃ និងការកំណត់) =====
+const MANUAL_SALE = {};   // បញ្ចុះតម្លៃដោយដៃ { លេខទំនិញ: តម្លៃថ្មី } (ទទេ = ជ្រើសស្វ័យប្រវត្តិ)
+const HIDDEN = [];        // លេខទំនិញដែលលាក់
+const STOCK = {};         // ស្តុក { លេខទំនិញ: ចំនួននៅសល់ } (0 = អស់ស្តុក, គ្មានក្នុងបញ្ជី = គ្មានកំណត់)
+const SETTINGS = {        // ការកំណត់រចនា និងហាង
+  name: "Thea Fashion",
+  eyebrow: "NEW COLLECTION · ខោអាវទាន់សម័យ",
+  tagline: "ខោអាវស្អាតៗ ទាន់សម័យ គ្រប់ទំហំ សម្រាប់ជាប់ចិត្តអ្នកគ្រប់ថ្ងៃ",
+  marquee: "THEA FASHION|NEW COLLECTION|ខោអាវទាន់សម័យ",
+  flashTitle: "បញ្ចុះតម្លៃពិសេសថ្ងៃនេះ",
+  thanks: "សូមអរគុណដែលគាំទ្រហាងរបស់យើង 💗",
+  phone: "0968782682",
+  telegram: "theapanha04042004",
+  messenger: "https://www.facebook.com/share/1MQPrStX8p/?mibextid=wwXIfr",
+  accent: "#C2566E",
+  announce: "ទំនិញបញ្ចុះតម្លៃថ្មី · ឆាតកម្មង់បានភ្លាមៗ តាម Telegram និង Messenger",
+  showMarquee: false,
+  showFlash: true,
+  saleCount: 16,
+  saleHours: 4,
+  statsUrl: "",             // URL របស់ Worker ស្ថិតិ (ទទេ = មិនប្រើ)
+  showPromo: true,          // បង្ហាញផ្ទាំងផ្សព្វផ្សាយធំ
+  banners: [                // ផ្ទាំងផ្សព្វផ្សាយធំ 3 · target៖ all / sale / top / bottom / dress / set / acc ឬ តំណ https://...
+    { title: "បញ្ចុះតម្លៃពិសេស", sub: "ទំនិញថ្មី រៀងរាល់ 4 ម៉ោង", btn: "មើលទំនិញបញ្ចុះតម្លៃ", target: "sale", c1: "#E8445F", c2: "#8E1634" },
+    { title: "NEW COLLECTION", sub: "ខោអាវទាន់សម័យ ស្អាតៗ", btn: "ទិញឥឡូវ", target: "all", c1: "#2B2B2B", c2: "#7A3B4C" },
+    { title: "ឈុត & រ៉ូប", sub: "សម្រាប់គ្រប់ឱកាស", btn: "មើលរ៉ូប", target: "dress", c1: "#B98A3E", c2: "#5C3B1E" }
+  ]
+};
+// ===================================================================
+
+// ---------- Admin (ម្ចាស់ហាង) ----------
+const ORIG_PRODUCTS = PRODUCTS.map((p) => ({ ...p }));
+let adminOn = false;
+try { adminOn = localStorage.getItem("adminOn") === "1"; } catch (e) {}
+let adminData = { edits: {}, hidden: [...HIDDEN], sale: { ...MANUAL_SALE }, stock: { ...STOCK }, settings: {}, added: [] };
+let shared = false;                                   // ទិន្នន័យចែករំលែកពី Supabase
+const useData = () => adminOn || shared;
+let adminImages = {};   // រូបដែលម្ចាស់ហាងដាក់ { លេខទំនិញ: dataURL } (លើឧបករណ៍នេះ)
+const photoOf = (n) => (useData() && adminImages[n]) ? adminImages[n] : `Example${n}.jpg`;
+function loadAdminData() {
+  PRODUCTS.length = ORIG_PRODUCTS.length;      // លុបទំនិញថ្មីដែលបានបន្ថែមពីមុន (ការពារស្ទួន)
+  try {
+    const saved = JSON.parse(localStorage.getItem("adminData") || "null");
+    if (saved) adminData = { edits: saved.edits || {}, hidden: saved.hidden || [], sale: saved.sale || {}, stock: saved.stock || { ...STOCK }, settings: saved.settings || {}, added: saved.added || [] };
+  } catch (e) {}
+  try { adminImages = JSON.parse(localStorage.getItem("adminImages") || "{}") || {}; } catch (e) { adminImages = {}; }
+  Object.entries(adminData.edits).forEach(([k, v]) => { if (PRODUCTS[k]) Object.assign(PRODUCTS[k], v); });
+  (adminData.added || []).forEach((a) => PRODUCTS.push({ name: a.name, place: a.place, price: a.price }));
+}
+if (adminOn) loadAdminData();
+let settings = { ...SETTINGS, ...(useData() ? adminData.settings : {}) };
+const rebuildSettings = () => { settings = { ...SETTINGS, ...(useData() ? adminData.settings : {}) }; };
+const SB_URL = "https://YOUR-PROJECT.supabase.co";   // ← ដាក់ Project URL
+const SB_KEY = "YOUR-ANON-PUBLIC-KEY";                // ← ដាក់ anon public key
+function applyShared(d) {
+  if (!d) return;
+  PRODUCTS.length = ORIG_PRODUCTS.length;
+  PRODUCTS.forEach((p, k) => Object.assign(p, ORIG_PRODUCTS[k]));
+  adminData = { edits: d.edits || {}, hidden: d.hidden || [], sale: d.sale || {}, stock: d.stock || { ...STOCK }, settings: d.settings || {}, added: d.added || [] };
+  adminImages = d.imgs || {};
+  Object.entries(adminData.edits).forEach(([k, v]) => { if (PRODUCTS[k]) Object.assign(PRODUCTS[k], v); });
+  adminData.added.forEach((a) => PRODUCTS.push({ name: a.name, place: a.place, price: a.price }));
+  shared = true; rebuildSettings();
+}
+try { applyShared(JSON.parse(localStorage.getItem("sharedCache") || "null")); } catch (e) {}
+const esc = (v) => String(v).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
+const hiddenSet = () => new Set(useData() ? adminData.hidden : HIDDEN);
+const manualSale = () => (useData() ? adminData.sale : MANUAL_SALE);
+
+const formatRiel = (n) => n.toLocaleString("en-US") + " ៛";
+
+const io = "IntersectionObserver" in window
+  ? new IntersectionObserver((entries) => {
+      entries.forEach((en) => {
+        if (en.isIntersecting) { en.target.classList.add("in"); io.unobserve(en.target); }
+      });
+    }, { threshold: 0.08 })
+  : null;
+
+function ripple(btn, e) {
+  const r = btn.getBoundingClientRect();
+  const size = Math.max(r.width, r.height) * 2;
+  const el = document.createElement("span");
+  el.className = "ripple";
+  el.style.width = el.style.height = size + "px";
+  el.style.left = (e.clientX - r.left - size / 2) + "px";
+  el.style.top = (e.clientY - r.top - size / 2) + "px";
+  btn.appendChild(el);
+  setTimeout(() => el.remove(), 650);
+}
+
+let lastScrollY = 0;
+const progressBar = document.getElementById("progress");
+const topbarEl = document.getElementById("topbar");
+function onScrollUI() {
+  const max = document.documentElement.scrollHeight - window.innerHeight;
+  progressBar.style.transform = `scaleX(${max > 0 ? Math.min(window.scrollY / max, 1) : 0})`;
+  topbarEl.classList.toggle("scrolled", window.scrollY > 10);
+  const y = window.scrollY;
+  if (Math.abs(y - lastScrollY) > 6) {
+    topbarEl.classList.toggle("hide", y > lastScrollY && y > 160);   // អូសចុះ → លាក់ · អូសឡើង → បង្ហាញ
+    lastScrollY = y;
+  }
+}
+window.addEventListener("scroll", onScrollUI, { passive: true });
+onScrollUI();
+
+// ---------- ស្តុក + ស្ថិតិ ----------
+const stockMap = () => (useData() ? adminData.stock : STOCK);
+function stockOf(idx) {
+  const v = stockMap()[idx + 1];
+  return v === undefined || v === "" || v === null ? null : Number(v);   // null = គ្មានកំណត់
+}
+function track(type, n) {
+  if (adminOn) return;                       // មិនរាប់ការចុចរបស់ម្ចាស់ហាង
+  try {
+    const url = settings.statsUrl;
+    if (url && navigator.sendBeacon) { navigator.sendBeacon(url, JSON.stringify({ type, n })); return; }
+    const st = JSON.parse(localStorage.getItem("stats") || '{"view":{},"order":{}}');
+    st[type][n] = (st[type][n] || 0) + 1;
+    localStorage.setItem("stats", JSON.stringify(st));
+  } catch (e) {}
+}
+
+// ---------- Discounts ----------
+// បញ្ចុះតម្លៃប្តូរទំនិញរៀងរាល់ saleHours ម៉ោង តាមម៉ោងកម្ពុជា
+// SALE = { លេខទំនិញ: តម្លៃថ្មីក្រោយបញ្ចុះ } ត្រូវបង្កើតដោយស្វ័យប្រវត្តិតាមរង្វង់ម៉ោង
+const SALE_PERCENTS = [10, 15, 20, 25, 30];
+
+// ម៉ោងកម្ពុជា (UTC+7 គ្មានម៉ោងរដូវក្តៅ) មិនអាស្រ័យលើម៉ោងទូរស័ព្ទរបស់អតិថិជនទេ
+const KH_OFFSET_MS = 7 * 3600 * 1000;
+const khNow = () => new Date(Date.now() + KH_OFFSET_MS); // ប្រើ getUTC* ដើម្បីអានម៉ោងកម្ពុជា
+// រង្វង់បញ្ចុះតម្លៃ៖ ប្តូរទំនិញថ្មីរៀងរាល់ saleHours ម៉ោង (ចាប់ពីម៉ោង 00:00 ម៉ោងកម្ពុជា)
+const periodMs = () => settings.saleHours * 3600 * 1000;   // saleHours ត្រូវចែកដាច់នឹង 24
+const periodKey = () => Math.floor(khNow().getTime() / periodMs());
+const msLeftInPeriod = () => periodMs() - (khNow().getTime() % periodMs());
+function seededRandom(seed) {
+  return function () {
+    seed |= 0; seed = (seed + 0x6D2B79F5) | 0;
+    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+function buildSale() {
+  const manual = manualSale();
+  const keys = Object.keys(manual);
+  if (keys.length) {            // បញ្ចុះតម្លៃដោយដៃ
+    const map = {};
+    keys.forEach((n) => {
+      const np = Number(manual[n]);
+      if (PRODUCTS[n - 1] && np > 0 && np < PRODUCTS[n - 1].price) map[n] = np;
+    });
+    return map;
+  }
+  const rnd = seededRandom(periodKey());
+  const ids = PRODUCTS.map((_, k) => k + 1);
+  for (let k = ids.length - 1; k > 0; k--) {
+    const j = Math.floor(rnd() * (k + 1));
+    [ids[k], ids[j]] = [ids[j], ids[k]];
+  }
+  const map = {};
+  ids.slice(0, settings.saleCount).forEach((n) => {
+    const price = PRODUCTS[n - 1].price;
+    const pct = SALE_PERCENTS[Math.floor(rnd() * SALE_PERCENTS.length)];
+    let np = Math.round((price * (100 - pct)) / 100 / 1000) * 1000;
+    if (np >= price) np = price - 1000;
+    if (np > 0) map[n] = np;
+  });
+  return map;
+}
+let SALE = buildSale();
+const saleOf = (item) => {
+  const np = SALE[item.idx + 1];
+  return np && np < item.price ? item.price - np : 0; // ចំនួនទឹកប្រាក់ដែលបញ្ចុះ
+};
+const finalPrice = (item) => item.price - saleOf(item);
+const saveText = (item) => saleOf(item).toLocaleString("en-US") + " ៛";
+
+// ---------- Size + order ----------
+const SIZE_ORDER = ["XS", "S", "M", "L", "XL", "XXL"];
+function sizesOf(place) {
+  if (/free/i.test(place)) return [];
+  if (place.includes("ឆ្នាំ")) return ["3-4 ឆ្នាំ", "5-6 ឆ្នាំ", "7-8 ឆ្នាំ", "9-10 ឆ្នាំ", "11-12 ឆ្នាំ"];
+  const L = place.match(/\b(XXL|XL|XS|S|M|L)\s*-\s*(XXL|XL|XS|S|M|L)\b/);
+  if (L) {
+    const a = SIZE_ORDER.indexOf(L[1]), b = SIZE_ORDER.indexOf(L[2]);
+    if (a >= 0 && b >= a) return SIZE_ORDER.slice(a, b + 1);
+  }
+  const N = place.match(/(\d+)\s*-\s*(\d+)/);
+  if (N) {
+    const out = [];
+    for (let n = Number(N[1]); n <= Number(N[2]); n += 2) out.push(String(n));
+    return out;
+  }
+  return [];
+}
+
+async function sendOrder(item, i, size, btn) {
+  const sizeText = size ? ` ទំហំ ${size}` : "";
+  const msg = `សួស្តី! ខ្ញុំចង់កម្មង់ ${item.name}${sizeText} តម្លៃ ${formatRiel(finalPrice(item))}${saleOf(item) ? ` (បញ្ចុះ ${saveText(item)})` : ""}`;
+
+  // 1) ផ្ញើរូប + សារ តាមបញ្ជី Share (ជ្រើស Telegram)
+  {
+    try {
+      const res = await fetch(photoOf(i + 1));
+      const blob = await res.blob();
+      const file = new File([blob], `${item.name}.jpg`, { type: blob.type || "image/jpeg" });
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({ files: [file], text: msg });
+        return;
+      }
+    } catch (err) {
+      if (err && err.name === "AbortError") return; // អតិថិជនបោះបង់
+    }
+  }
+
+  // 2) បម្រុង៖ ចម្លងសារ ហើយបើក Telegram ផ្ទាល់
+  try { navigator.clipboard.writeText(msg); } catch (err) {}
+  const url = `https://t.me/${settings.telegram.replace(/^@/, "")}?text=${encodeURIComponent(msg)}`;
+  window.open(url, "_blank");
+  const orig = btn.innerHTML;
+  btn.classList.add("added");
+  btn.innerHTML = `<i class="fa-solid fa-check"></i><span class="label">ចម្លងហើយ</span>`;
+  setTimeout(() => { btn.classList.remove("added"); btn.innerHTML = orig; }, 1800);
+}
+
+const sheet = document.getElementById("sheet");
+const sizesBox = document.getElementById("sizes");
+const sheetConfirm = document.getElementById("sheet-confirm");
+let sheetCtx = null;
+let chosenSize = "";
+
+function openSizeSheet(item, i, sizes, btn) {
+  sheetCtx = { item, i, btn };
+  chosenSize = "";
+  document.getElementById("sheet-name").textContent = item.name;
+  const si = document.getElementById("sheet-img"); si.style.visibility = ""; si.src = photoOf(i + 1);
+  const sp = document.getElementById("sheet-price");
+  sp.innerHTML = saleOf(item)
+    ? `${formatRiel(finalPrice(item))} <s class="old-inline">${formatRiel(item.price)}</s> <span class="sale-pill">-${saveText(item)}</span>`
+    : formatRiel(item.price);
+  sizesBox.innerHTML = "";
+  sizes.forEach((sz) => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "size-chip";
+    b.textContent = sz;
+    b.addEventListener("click", () => {
+      chosenSize = sz;
+      sizesBox.querySelectorAll(".size-chip").forEach((x) => x.classList.toggle("active", x === b));
+      sheetConfirm.disabled = false;
+      sheetConfirm.textContent = `បន្តទៅកម្មង់ · ទំហំ ${sz}`;
+    });
+    sizesBox.appendChild(b);
+  });
+  sheetConfirm.disabled = true;
+  sheetConfirm.textContent = "សូមជ្រើសរើសទំហំសិន";
+  sheet.classList.add("open");
+}
+function closeSizeSheet() { sheet.classList.remove("open"); }
+document.getElementById("sheet-cancel").addEventListener("click", closeSizeSheet);
+sheet.addEventListener("click", (e) => { if (e.target === sheet) closeSizeSheet(); });
+sheetConfirm.addEventListener("click", () => {
+  if (!sheetCtx || !chosenSize) return;
+  const { item, i, btn } = sheetCtx;
+  closeSizeSheet();
+  sendOrder(item, i, chosenSize, btn);
+});
+document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeSizeSheet(); });
+
+// ---------- ជួរទំនិញបញ្ចុះតម្លៃ រត់ស្វ័យប្រវត្តិ ----------
+let autoRaf = null;
+function startAutoScroll(el, n) {
+  cancelAnimationFrame(autoRaf);
+  el.scrollLeft = 0;
+  if (!n || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  let pos = 0, paused = false, resumeTimer;
+  const SPEED = 0.8; // px ក្នុងមួយ frame
+  const pause = () => { paused = true; clearTimeout(resumeTimer); };
+  const resume = (delay = 1800) => { clearTimeout(resumeTimer); resumeTimer = setTimeout(() => { pos = el.scrollLeft; paused = false; }, delay); };
+  el.onmouseenter = pause;
+  el.onmouseleave = () => resume(300);
+  el.ontouchstart = pause;
+  el.ontouchend = () => resume();
+  el.ontouchcancel = () => resume();
+  el.onwheel = () => { pause(); resume(); };
+  function step() {
+    if (!paused && el.children.length > n) {
+      const loopWidth = el.children[n].offsetLeft - el.children[0].offsetLeft;
+      pos += SPEED;
+      if (loopWidth > 0 && pos >= loopWidth) pos -= loopWidth;
+      el.scrollLeft = pos;
+    }
+    autoRaf = requestAnimationFrame(step);
+  }
+  autoRaf = requestAnimationFrame(step);
+}
+
+// ---------- Lightbox (មើលរូបធំ + ទៅមុខ/ក្រោយ) ----------
+let lbList = [], lbPos = 0;
+function showLightbox() {
+  const it = lbList[lbPos], n = it.idx + 1;
+  const img = document.getElementById("lightbox-img");
+  img.src = photoOf(n);
+  img.alt = it.name;
+  img.style.animation = "none"; void img.offsetWidth; img.style.animation = "";
+  const dl = document.getElementById("lightbox-download");
+  dl.href = photoOf(n);
+  dl.setAttribute("download", `${it.name}.jpg`);
+  document.getElementById("lb-name").textContent = it.name;
+  const sale = saleOf(it);
+  document.getElementById("lb-price").innerHTML = sale
+    ? `${formatRiel(finalPrice(it))} <s>${formatRiel(it.price)}</s>`
+    : formatRiel(it.price);
+  document.getElementById("lb-count").textContent = `${lbPos + 1} / ${lbList.length}`;
+  const multi = lbList.length > 1;
+  document.getElementById("lb-prev").style.display = multi ? "" : "none";
+  document.getElementById("lb-next").style.display = multi ? "" : "none";
+  track("view", n);
+}
+function openLightbox(list, pos) {
+  lbList = list; lbPos = pos;
+  showLightbox();
+  document.getElementById("lightbox").classList.add("open");
+}
+function stepLightbox(d) {
+  if (lbList.length < 2) return;
+  lbPos = (lbPos + d + lbList.length) % lbList.length;
+  showLightbox();
+}
+document.getElementById("lb-prev").addEventListener("click", (e) => { e.stopPropagation(); stepLightbox(-1); });
+document.getElementById("lb-next").addEventListener("click", (e) => { e.stopPropagation(); stepLightbox(1); });
+document.addEventListener("keydown", (e) => {
+  if (!document.getElementById("lightbox").classList.contains("open")) return;
+  if (e.key === "ArrowLeft") stepLightbox(-1);
+  if (e.key === "ArrowRight") stepLightbox(1);
+});
+(function () {
+  const box = document.getElementById("lightbox");
+  let x0 = null;
+  box.addEventListener("touchstart", (e) => { x0 = e.touches[0].clientX; }, { passive: true });
+  box.addEventListener("touchend", (e) => {
+    if (x0 === null) return;
+    const dx = e.changedTouches[0].clientX - x0;
+    x0 = null;
+    if (Math.abs(dx) > 50) stepLightbox(dx < 0 ? 1 : -1);
+  }, { passive: true });
+})();
+
+// ---------- ប្រភេទទំនិញ (ម៉ឺនុយ) ----------
+const CATS = [["all", "ទាំងអស់"], ["sale", "បញ្ចុះតម្លៃ"], ["top", "អាវ"], ["bottom", "ខោ"], ["dress", "សំពត់ · រ៉ូប"], ["set", "ឈុត"], ["acc", "គ្រឿងបន្ថែម"]];
+let activeCat = "all";
+let query = "", sortBy = "default";
+function sortList(list) {
+  const arr = list.slice();
+  if (sortBy === "price-asc") arr.sort((a, b) => finalPrice(a) - finalPrice(b));
+  else if (sortBy === "price-desc") arr.sort((a, b) => finalPrice(b) - finalPrice(a));
+  else if (sortBy === "disc") arr.sort((a, b) => saleOf(b) / b.price - saleOf(a) / a.price);
+  return arr;
+}
+function catOf(p) {
+  const n = p.name;
+  if (n.includes("ឈុត")) return "set";
+  if (n.includes("រ៉ូប") || n.includes("សំពត់")) return "dress";
+  if (n.includes("ខោ") && !n.startsWith("អាវ")) return "bottom";
+  if (n.includes("អាវ")) return "top";
+  return "acc";
+}
+function renderCatNav() {
+  const nav = document.getElementById("catnav");
+  nav.innerHTML = "";
+  CATS.forEach(([k, label]) => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.textContent = label;
+    b.className = (k === activeCat ? "on " : "") + (k === "sale" ? "sale" : "");
+    b.addEventListener("click", () => {
+      activeCat = k;
+      renderCatNav();
+      render();
+      const t = document.getElementById(k === "all" ? "products" : "all-products");
+      if (t) t.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+    nav.appendChild(b);
+  });
+}
+
+function render() {
+  const hidden = hiddenSet();
+  const all = PRODUCTS.map((p, idx) => ({ ...p, idx })).filter((p) => !hidden.has(p.idx + 1));
+  const saleGrid = document.getElementById("sale-grid");
+  const title = document.getElementById("all-title");
+  const grid = document.getElementById("grid");
+  const q = query.trim().toLowerCase();
+  if (activeCat === "all" && !q) {
+    const onSale = all.filter((p) => saleOf(p) > 0);
+    const rest = all.filter((p) => saleOf(p) === 0);
+    title.textContent = "ខោអាវផ្សេងទៀត";
+    document.getElementById("sale-count").textContent = `${onSale.length} ទំនិញ`;
+    document.getElementById("count").textContent = `${rest.length} ទំនិញ`;
+    document.getElementById("sale-section").style.display = onSale.length ? "" : "none";
+    fillGrid(saleGrid, onSale.concat(onSale), true);   // ដាក់ពីរដង ដើម្បីរត់បន្តគ្នាមិនដាច់
+    startAutoScroll(saleGrid, onSale.length);
+    fillGrid(grid, sortList(rest), false);
+  } else {
+    const base = activeCat === "all" ? all : activeCat === "sale" ? all.filter((p) => saleOf(p) > 0) : all.filter((p) => catOf(p) === activeCat);
+    const list = sortList(base.filter((p) => !q || p.name.toLowerCase().includes(q)));
+    title.textContent = q ? `ស្វែងរក "${query.trim()}"` : (CATS.find((c) => c[0] === activeCat) || [0, ""])[1];
+    document.getElementById("count").textContent = `${list.length} ទំនិញ`;
+    document.getElementById("sale-section").style.display = "none";
+    startAutoScroll(saleGrid, 0);
+    fillGrid(grid, list, false);
+    if (!list.length) grid.innerHTML = `<div class="empty-cat">${q ? "រកមិនឃើញទំនិញដែលអ្នកស្វែងរក" : "មិនទាន់មានទំនិញក្នុងប្រភេទនេះ"}</div>`;
+  }
+}
+
+function fillGrid(grid, list, instant) {
+  grid.innerHTML = "";
+  const baseList = instant ? list.slice(0, list.length / 2) : list;   // ជួររត់ដាក់ពីរដង → ប្រើតែពាក់កណ្តាល
+  list.forEach((item, pos) => {
+    const basePos = instant ? pos % baseList.length : pos;
+    const i = item.idx;
+    const card = document.createElement("div");
+    const stock = stockOf(i);
+    card.className = "card" + (stock === 0 ? " is-soldout" : "");
+    card.style.transitionDelay = `${(pos % 4) * 80}ms`;
+    card.addEventListener("transitionend", (ev) => {
+      if (ev.propertyName === "opacity") card.style.transitionDelay = "";
+    });
+    card.innerHTML = `
+      <div class="photo-slot">
+        <img class="preview-img" src="${photoOf(i + 1)}" alt="${item.name}" ${useData() && adminImages[i + 1] ? "" : 'loading="lazy"'} decoding="async"
+             onload="this.parentElement.style.animation='none'"
+             onerror="this.style.display='none';this.parentElement.classList.add('noimg')" />
+        <div class="ph"><i class="fa-regular fa-image"></i></div>
+      </div>
+      ${saleOf(item) ? `<span class="disc">-${Math.max(1, Math.round((saleOf(item) / item.price) * 100))}%</span>` : ""}
+      ${stock === 0 ? `<span class="soldout">អស់ស្តុក</span>` : stock !== null && stock <= 5 ? `<span class="lowstock">នៅសល់ ${stock}</span>` : ""}
+      <div class="body">
+        <span class="brand-line">${esc(settings.name)}</span>
+        <h3>${item.name}</h3>
+        <span class="place">${item.place}</span>
+        <div class="pricebox${saleOf(item) ? " on-sale" : ""}">
+          <span class="price"><b>${finalPrice(item).toLocaleString("en-US")}</b><small>៛</small></span>
+          ${saleOf(item) ? `<span class="old">${item.price.toLocaleString("en-US")} ៛</span>` : ""}
+        </div>
+        <button class="buy-btn"${stock === 0 ? " disabled" : ""}>
+          <i class="fa-solid ${stock === 0 ? "fa-ban" : "fa-comment-dots"}"></i>
+          <span class="label">${stock === 0 ? "អស់ស្តុក" : "ឆាតកម្មង់"}</span>
+        </button>
+      </div>
+    `;
+
+    card.addEventListener("click", (e) => {
+      if (e.target.closest(".buy-btn")) return;
+      openLightbox(baseList, basePos);
+    });
+
+    const buyBtn = card.querySelector(".buy-btn");
+    buyBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      if (stockOf(i) === 0) return;
+      track("order", i + 1);
+      ripple(buyBtn, e);
+      const sizes = sizesOf(item.place);
+      if (sizes.length) openSizeSheet(item, i, sizes, buyBtn);
+      else sendOrder(item, i, "", buyBtn);
+    });
+
+    grid.appendChild(card);
+    (io && !instant) ? io.observe(card) : card.classList.add("in");
+  });
+}
+
+renderCatNav();
+render();
+document.getElementById("search").addEventListener("input", (e) => {
+  const had = query.trim() !== "";
+  query = e.target.value;
+  render();
+  if (!had && query.trim()) { const t = document.getElementById("all-products"); if (t) t.scrollIntoView({ behavior: "smooth", block: "start" }); }
+});
+document.getElementById("sort").addEventListener("change", (e) => { sortBy = e.target.value; render(); });
+
+// ---------- ផ្ទាំងផ្សព្វផ្សាយធំ 3 ----------
+const bannerImg = (n) => (useData() && adminImages["b" + n]) ? adminImages["b" + n] : `Banner${n}.jpg`;
+function bannerAction(b) {
+  const t = (b && b.target) || "all";
+  if (/^https?:/i.test(t)) { window.open(t, "_blank", "noopener"); return; }
+  activeCat = CATS.some((c) => c[0] === t) ? t : "all";
+  query = "";
+  const se = document.getElementById("search"); if (se) se.value = "";
+  renderCatNav(); render();
+  const el = document.getElementById(activeCat === "all" ? "products" : "all-products");
+  if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+let promoIdx = 0, promoPause = false, promoTimer = null, promoResume;
+function renderPromo() {
+  const track = document.getElementById("promo-track"), dots = document.getElementById("promo-dots");
+  if (!track) return;
+  const list = (settings.banners || []).slice(0, 3);
+  track.innerHTML = list.map((b, i) => `
+    <div class="promo-slide" style="background:linear-gradient(120deg, ${esc(b.c1 || "#333")}, ${esc(b.c2 || "#666")})">
+      <img class="bn-img" src="${esc(bannerImg(i + 1))}" alt="" onerror="this.style.display='none'" />
+      <div class="bn-in">
+        <span class="bn-sub">${esc(b.sub || "")}</span>
+        <h2 class="bn-title">${esc(b.title || "")}</h2>
+        ${b.btn ? `<button class="bn-btn" data-i="${i}" type="button">${esc(b.btn)}</button>` : ""}
+      </div>
+    </div>`).join("");
+  dots.innerHTML = list.map((_, i) => `<button type="button" data-d="${i}" aria-label="ផ្ទាំង ${i + 1}" class="${i === 0 ? "on" : ""}"></button>`).join("");
+  promoIdx = 0; track.scrollLeft = 0;
+  track.querySelectorAll(".bn-btn").forEach((btn) => btn.addEventListener("click", () => bannerAction(list[Number(btn.dataset.i)])));
+  dots.querySelectorAll("button").forEach((d) => d.addEventListener("click", () => goPromo(Number(d.dataset.d))));
+  document.getElementById("promo").style.display = settings.showPromo === false || !list.length ? "none" : "";
+}
+function goPromo(i) {
+  const track = document.getElementById("promo-track"), n = track.children.length;
+  if (!n) return;
+  promoIdx = (i + n) % n;
+  track.scrollTo({ left: promoIdx * track.clientWidth, behavior: "smooth" });
+}
+(function initPromo() {
+  const track = document.getElementById("promo-track"), dots = document.getElementById("promo-dots"), box = document.getElementById("promo");
+  track.addEventListener("scroll", () => {
+    const i = Math.round(track.scrollLeft / Math.max(1, track.clientWidth));
+    if (i !== promoIdx || true) {
+      promoIdx = i;
+      dots.querySelectorAll("button").forEach((d, k) => d.classList.toggle("on", k === i));
+    }
+  }, { passive: true });
+  document.getElementById("promo-prev").addEventListener("click", () => goPromo(promoIdx - 1));
+  document.getElementById("promo-next").addEventListener("click", () => goPromo(promoIdx + 1));
+  const pause = () => { promoPause = true; clearTimeout(promoResume); };
+  const resume = (d = 4000) => { clearTimeout(promoResume); promoResume = setTimeout(() => (promoPause = false), d); };
+  box.addEventListener("mouseenter", pause); box.addEventListener("mouseleave", () => resume(800));
+  box.addEventListener("touchstart", pause, { passive: true }); box.addEventListener("touchend", () => resume(), { passive: true });
+  if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    promoTimer = setInterval(() => { if (!promoPause && !document.hidden) goPromo(promoIdx + 1); }, 5000);
+  }
+})();
+renderPromo();
+
+// ---------- Countdown ----------
+let currentPeriod = periodKey();
+const tH = document.getElementById("t-h"), tM = document.getElementById("t-m"), tS = document.getElementById("t-s");
+const pad2 = (n) => String(n).padStart(2, "0");
+function tickTimer() {
+  const total = Math.max(0, Math.floor(msLeftInPeriod() / 1000));
+  tH.textContent = pad2(Math.floor(total / 3600));
+  tM.textContent = pad2(Math.floor((total % 3600) / 60));
+  tS.textContent = pad2(total % 60);
+  if (periodKey() !== currentPeriod) {      // រង្វង់ថ្មី → ប្តូរទំនិញបញ្ចុះតម្លៃ
+    currentPeriod = periodKey();
+    SALE = buildSale();
+    render();
+  }
+}
+tickTimer();
+setInterval(tickTimer, 1000);
+
+const toTop = document.getElementById("to-top");
+window.addEventListener("scroll", () => {
+  toTop.classList.toggle("show", window.scrollY > 400);
+}, { passive: true });
+toTop.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
+
+// ---------- Theme + Settings ----------
+function hexToRgb(h) {
+  const m = /^#?([0-9a-f]{6})$/i.exec(h || "");
+  if (!m) return [194, 86, 110];
+  const n = parseInt(m[1], 16);
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+}
+const mixRgb = (rgb, t, a) => rgb.map((c, i) => Math.round(c + (t[i] - c) * a));
+const rgbToHex = (rgb) => "#" + rgb.map((c) => c.toString(16).padStart(2, "0")).join("");
+function applyTheme(hex) {
+  const rgb = hexToRgb(hex), r = document.documentElement.style;
+  r.setProperty("--clay", rgbToHex(rgb));
+  r.setProperty("--clay-dark", rgbToHex(mixRgb(rgb, [0, 0, 0], 0.25)));
+  r.setProperty("--clay-light", rgbToHex(mixRgb(rgb, [255, 255, 255], 0.18)));
+  r.setProperty("--clay-rgb", rgb.join(","));
+}
+function applySettings() {
+  const S = settings;
+  const setText = (sel, t) => { const el = document.querySelector(sel); if (el) el.textContent = t; };
+  document.title = `${S.name} · ${S.eyebrow}`;
+  setText(".brand", S.name); setText("#hero-name", S.name);
+  setText("#ft-brand", S.name); setText("#ft-name", S.name);
+  const an = document.getElementById("announce");
+  if (an) { setText("#announce-text", S.announce || ""); an.style.display = S.announce ? "" : "none"; }
+  document.querySelectorAll(".brand-line").forEach((el) => (el.textContent = S.name));
+  setText("#logo-mark", (String(S.name).trim()[0] || "T").toUpperCase());
+  setText("#ft-year", String(khNow().getUTCFullYear()));
+  setText("#eyebrow", S.eyebrow); setText("#tagline", S.tagline);
+  setText("#flash-title", S.flashTitle);
+  setText("#flash-sub", `ប្តូរទំនិញថ្មី រៀងរាល់ ${S.saleHours} ម៉ោង · ម៉ោងកម្ពុជា`);
+  setText("#ft-thanks", S.thanks);
+  const digits = String(S.phone).replace(/\s+/g, "");
+  ["tb-call", "ft-call"].forEach((id) => { const a = document.getElementById(id); if (a) a.href = "tel:" + digits; });
+  setText("#ft-phone-text", digits.replace(/^(\d{3})(\d{3})(\d+)$/, "$1 $2 $3"));
+  const tg = "https://t.me/" + String(S.telegram).replace(/^@/, "");
+  ["tb-tg", "ft-tg"].forEach((id) => { const a = document.getElementById(id); if (a) a.href = tg; });
+  ["tb-msg", "ft-msg"].forEach((id) => { const a = document.getElementById(id); if (a) a.href = S.messenger; });
+  const items = String(S.marquee).split("|").map((x) => x.trim()).filter(Boolean);
+  const unit = items.map((t) => `<span>${esc(t)}</span><i>✦</i>`).join("");
+  document.getElementById("mq-track").innerHTML = unit.repeat(4);
+  document.querySelector(".marquee").style.display = S.showMarquee ? "" : "none";
+  const pr = document.getElementById("promo"); if (pr) pr.style.display = S.showPromo === false ? "none" : "";
+  document.getElementById("flash").style.display = S.showFlash ? "" : "none";
+  applyTheme(S.accent);
+}
+
+applySettings();
+
+// Block double-tap zoom
+let lastTouchEnd = 0;
+document.addEventListener("touchend", (e) => {
+  const now = Date.now();
+  if (now - lastTouchEnd < 350 && !e.target.closest(".lightbox, .sheet-backdrop, input, select, textarea")) e.preventDefault();
+  lastTouchEnd = now;
+}, { passive: false });
+document.addEventListener("dblclick", (e) => e.preventDefault(), { passive: false });
+// ម្រាមដៃពីរ (pinch) → មិនឱ្យ zoom
+document.addEventListener("touchstart", (e) => { if (e.touches && e.touches.length > 1) e.preventDefault(); }, { passive: false });
+document.addEventListener("touchmove", (e) => { if (e.scale && e.scale !== 1) e.preventDefault(); }, { passive: false });
+
+// Block pinch-zoom (iOS Safari ignores user-scalable)
+["gesturestart", "gesturechange", "gestureend"].forEach((ev) =>
+  document.addEventListener(ev, (e) => e.preventDefault())
+);
+
+const lightbox = document.getElementById("lightbox");
+document.getElementById("lightbox-close").addEventListener("click", () => {
+  lightbox.classList.remove("open");
+});
+lightbox.addEventListener("click", (e) => {
+  if (e.target === lightbox) lightbox.classList.remove("open");
+});
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") lightbox.classList.remove("open");
+});
+
+// ទាញទិន្នន័យថ្មីពី Supabase ឱ្យអតិថិជនគ្រប់គ្នាឃើញ
+(async () => {
+  if (!/^https:\/\/[a-z0-9]+\.supabase\.co$/.test(SB_URL) || SB_KEY.startsWith("YOUR")) return;
+  try {
+    const r = await fetch(`${SB_URL}/rest/v1/shop?id=eq.1&select=data`, { headers: { apikey: SB_KEY, Authorization: "Bearer " + SB_KEY }, cache: "no-store" });
+    const j = await r.json(), d = j && j[0] && j[0].data;
+    if (!d) return;
+    const s = JSON.stringify(d);
+    if (localStorage.getItem("sharedCache") === s) return;      // គ្មានអ្វីថ្មី
+    try { localStorage.setItem("sharedCache", s); } catch (e) {}
+    applyShared(d); SALE = buildSale(); renderCatNav(); render(); renderPromo(); applySettings();
+  } catch (e) {}
+})();
+
+// ត្រឡប់មកពី admin → ផ្ទុកទំព័រឡើងវិញ ដើម្បីឃើញរូបថ្មី
+window.addEventListener("pageshow", (e) => { if (e.persisted && adminOn) location.reload(); });
+window.addEventListener("storage", (e) => { if (e.key === "adminImages" && adminOn) location.reload(); });
+</script>
+</body>
+</html>
