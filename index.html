@@ -1240,6 +1240,10 @@
       <div class="sheet-handle"></div>
       <h3 id="au-title" style="margin:6px 0 2px">ចូលគណនី</h3>
       <p class="of-hint" id="au-sub"></p>
+      <button type="button" class="of-btn" id="au-google" style="width:100%;display:flex;align-items:center;justify-content:center;gap:10px;padding:12px;font-size:15px;margin-bottom:10px">
+        <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.9 2.4 30.4 0 24 0 14.6 0 6.5 5.4 2.6 13.2l7.9 6.1C12.4 13.6 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8c4.4-4.1 7.1-10.1 7.1-17.5z"/><path fill="#FBBC05" d="M10.5 28.7a14.5 14.5 0 0 1 0-9.4l-7.9-6.1a24 24 0 0 0 0 21.6l7.9-6.1z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.5-5.8c-2.1 1.4-4.9 2.3-8.4 2.3-6.3 0-11.6-4.1-13.5-9.8l-7.9 6.1C6.5 42.6 14.6 48 24 48z"/></svg>
+        បន្តជាមួយ Google</button>
+      <div class="of-hint" style="text-align:center;margin:0 0 8px">ឬប្រើអ៊ីមែល</div>
       <input class="of-input" id="au-name" type="text" placeholder="ឈ្មោះរបស់អ្នក" autocomplete="name" style="display:none" />
       <input class="of-input" id="au-email" type="email" placeholder="អ៊ីមែល" autocomplete="username" />
       <input class="of-input" id="au-pw" type="password" placeholder="ពាក្យសម្ងាត់ (យ៉ាងតិច ៦ តួ)" autocomplete="current-password" />
@@ -1971,7 +1975,7 @@ function needLogin() { return sbReady() && Number(settings.requireLogin) === 1 &
 const jwtData = (t) => { try { return JSON.parse(decodeURIComponent(escape(atob(t.split(".")[1].replace(/-/g, "+").replace(/_/g, "/"))))); } catch (e) { return {}; } };
 function setSess(j) {
   const p = jwtData(j.access_token);
-  CU.sess = { at: j.access_token, rt: j.refresh_token, exp: Date.now() + (j.expires_in - 60) * 1000, email: p.email, name: (p.user_metadata && p.user_metadata.name) || String(p.email || "").split("@")[0] };
+  CU.sess = { at: j.access_token, rt: j.refresh_token, exp: Date.now() + (j.expires_in - 60) * 1000, email: p.email, name: (p.user_metadata && (p.user_metadata.name || p.user_metadata.full_name)) || String(p.email || "").split("@")[0] };
   try { localStorage.setItem("custSess", JSON.stringify(CU.sess)); } catch (e) {}
   accBtn();
 }
@@ -1999,6 +2003,10 @@ function openAuth(mode, sub) {
   if (sub !== undefined) $c("au-sub").textContent = sub;
   $c("au-err").textContent = ""; $c("authsheet").classList.add("open");
 }
+$c("au-google").onclick = () => {
+  try { sessionStorage.setItem("authResume", afterAuth === openCheckout ? "cart" : ""); } catch (e) {}
+  location.href = `${SB_URL}/auth/v1/authorize?provider=google&redirect_to=${encodeURIComponent(location.origin + location.pathname)}`;
+};
 $c("au-switch").onclick = () => openAuth(auMode === "login" ? "signup" : "login");
 $c("au-close").onclick = () => { $c("authsheet").classList.remove("open"); afterAuth = null; };
 $c("authsheet").addEventListener("click", (e) => { if (e.target.id === "authsheet") $c("au-close").onclick(); });
@@ -2063,6 +2071,19 @@ $c("my-del").onclick = async (e) => {
   b.disabled = false; b.dataset.sure = "";
 };
 accBtn();
+// ត្រឡប់មកពី Google → Supabase ដាក់ token ក្នុង #hash
+(function () {
+  const h = location.hash;
+  if (!/access_token=|error_description=/.test(h)) return;
+  const p = new URLSearchParams(h.slice(1));
+  try { history.replaceState(null, "", location.pathname + location.search); } catch (e) {}
+  if (p.get("access_token")) {
+    setSess({ access_token: p.get("access_token"), refresh_token: p.get("refresh_token"), expires_in: +p.get("expires_in") || 3600 });
+    toast("✓ ចូលគណនីតាម Google រួចរាល់");
+    let r = ""; try { r = sessionStorage.getItem("authResume") || ""; sessionStorage.removeItem("authResume"); } catch (e) {}
+    if (r === "cart") setTimeout(openCart, 500);
+  } else toast("ចូលតាម Google មិនបាន");
+})();
 // ចូលមួយដង → បំពេញលេខទូរស័ព្ទដែលបានប្រើចុងក្រោយ (មានស្រាប់ក្នុង orderContact)
 
 // ---------- ជួរទំនិញបញ្ចុះតម្លៃ រត់ស្វ័យប្រវត្តិ ----------
