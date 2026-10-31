@@ -536,6 +536,7 @@
   .pf-av::after { content: "📷"; position: absolute; right: 0; bottom: 0; font-size: 13px; background: #fff; border-radius: 50%; width: 24px; height: 24px; line-height: 24px; text-align: center; box-shadow: 0 1px 4px rgba(0,0,0,.25); }
   .pf-box { border: 1px solid var(--border); border-radius: 14px; padding: 12px; margin-bottom: 12px; background: #fff; }
   .pf-box .of-input { margin-bottom: 8px; padding: 10px 12px; font-size: 15px; }
+  .of-input[type=date] { -webkit-appearance: none; appearance: none; display: block; min-width: 0; max-width: 100%; text-align: left; }
   .pf-lb { font-size: 12px; color: var(--muted); margin: 0 0 3px; }
   .cbadge { position: absolute; top: -5px; right: -5px; min-width: 17px; height: 17px; padding: 0 4px; border-radius: 9px; background: #B8213F; color: #fff; font: 700 10px/17px inherit; text-align: center; }
   .fav-btn { position: absolute; top: 8px; right: 8px; z-index: 4; width: 32px; height: 32px; border: none; border-radius: 50%; background: rgba(255,255,255,.92); color: #444; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,.15); }
@@ -2082,6 +2083,7 @@ async function loadProfile() {
 }
 async function saveProfile(extra) {
   const msg = pfEl("pf-msg"); msg.style.color = ""; msg.textContent = "";
+  if (/\d{5,}/.test(pfEl("pf-holder").value.replace(/[\s-]/g, ""))) { msg.style.color = "#B8213F"; msg.textContent = "ប្រអប់ឈ្មោះមិនត្រូវមានលេខកាតទេ សូមវាយតែឈ្មោះ។ លេខកាតដាក់ត្រឹម ៤ ខ្ទង់ចុងក្រោយ"; return; }
   const last4 = pfEl("pf-last4").value.replace(/\D/g, "").slice(-4);
   const row = { id: CU.sess.uid, name: pfEl("pf-name").value.trim() || null, phone: pfEl("pf-phone").value.trim() || null, birthday: pfEl("pf-bday").value || null, address: pfEl("pf-addr").value.trim() || null,
     bank_name: pfEl("pf-bank").value || null, bank_holder: pfEl("pf-holder").value.trim() || null, bank_last4: last4 || null, avatar_url: (PF && PF.avatar_url) || null, updated_at: new Date().toISOString(), ...(extra || {}) };
