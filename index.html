@@ -532,6 +532,11 @@
   .mo { border: 1px solid var(--border); border-radius: 14px; padding: 12px; margin-bottom: 10px; background: #fff; font-size: 14px; line-height: 1.7; }
   .mo-s { font-size: 12px; color: var(--muted); margin: 2px 0 6px; }
   #tb-acc.on { color: #3F7D5C; }
+  .pf-av { width: 76px; height: 76px; border-radius: 50%; background: var(--border) center/cover no-repeat; display: grid; place-items: center; font-size: 30px; color: var(--muted); cursor: pointer; margin: 0 auto 6px; position: relative; overflow: hidden; }
+  .pf-av::after { content: "📷"; position: absolute; right: 0; bottom: 0; font-size: 13px; background: #fff; border-radius: 50%; width: 24px; height: 24px; line-height: 24px; text-align: center; box-shadow: 0 1px 4px rgba(0,0,0,.25); }
+  .pf-box { border: 1px solid var(--border); border-radius: 14px; padding: 12px; margin-bottom: 12px; background: #fff; }
+  .pf-box .of-input { margin-bottom: 8px; padding: 10px 12px; font-size: 15px; }
+  .pf-lb { font-size: 12px; color: var(--muted); margin: 0 0 3px; }
   .cbadge { position: absolute; top: -5px; right: -5px; min-width: 17px; height: 17px; padding: 0 4px; border-radius: 9px; background: #B8213F; color: #fff; font: 700 10px/17px inherit; text-align: center; }
   .fav-btn { position: absolute; top: 8px; right: 8px; z-index: 4; width: 32px; height: 32px; border: none; border-radius: 50%; background: rgba(255,255,255,.92); color: #444; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,.15); }
   .fav-btn.on { color: #E0245E; }
@@ -1253,6 +1258,22 @@
       <div class="sheet-handle"></div>
       <h3 style="margin:6px 0 2px">គណនីរបស់ខ្ញុំ</h3>
       <p class="of-hint" id="my-name"></p>
+      <div class="pf-box">
+        <div class="pf-av" id="pf-av"></div><input type="file" id="pf-file" accept="image/*" hidden />
+        <div class="of-hint" style="text-align:center;margin:0 0 10px">ចុចរូបដើម្បីដាក់/ប្តូររូបភាព</div>
+        <div class="pf-lb">ឈ្មោះ</div><input class="of-input" id="pf-name" type="text" autocomplete="name" />
+        <div class="pf-lb">លេខទូរស័ព្ទ</div><input class="of-input" id="pf-phone" type="tel" inputmode="tel" autocomplete="tel" />
+        <div class="pf-lb">ថ្ងៃកំណើត</div><input class="of-input" id="pf-bday" type="date" />
+        <div class="pf-lb">ទីតាំង / អាសយដ្ឋាន</div><input class="of-input" id="pf-addr" type="text" placeholder="វាយអាសយដ្ឋាន ឬប្រើទីតាំងខ្ញុំ" />
+        <button type="button" class="of-btn" id="pf-gps" style="width:100%;margin-bottom:12px">📍 ប្រើទីតាំងខ្ញុំ (Google Map)</button>
+        <div class="pf-lb">ធនាគារសម្រាប់ទូទាត់/ដកប្រាក់ត្រឡប់</div>
+        <select class="of-input" id="pf-bank"><option value="">— ជ្រើសរើសធនាគារ —</option><option>ACLEDA</option><option>ABA</option><option>Wing</option><option>Canadia</option><option>Sathapana</option><option>ផ្សេងទៀត</option></select>
+        <input class="of-input" id="pf-holder" type="text" placeholder="ឈ្មោះម្ចាស់គណនី" />
+        <input class="of-input" id="pf-last4" type="text" inputmode="numeric" maxlength="4" placeholder="លេខកាត ៤ ខ្ទង់ចុងក្រោយ" />
+        <div class="of-hint" style="margin:-2px 0 8px">🔒 រក្សាទុកតែ ៤ ខ្ទង់ចុងក្រោយ។ កុំដាក់លេខកាតពេញ ឬលេខ CVV ។</div>
+        <button class="sheet-confirm" id="pf-save" type="button" style="margin-top:2px">រក្សាទុកព័ត៌មាន</button>
+        <div class="of-hint" id="pf-msg" style="text-align:center;margin:8px 0 0"></div>
+      </div>
       <div class="of-hint" style="margin:0 0 6px;font-weight:700;color:var(--ink)">ការកម្មង់របស់ខ្ញុំ</div>
       <div id="my-list"></div>
       <button class="sheet-cancel" id="my-out" type="button">ចេញពីគណនី</button>
@@ -1671,7 +1692,7 @@ document.getElementById("of-map").addEventListener("click", () => {
 function openSizeSheet(item, i, sizes, btn) {
   sheetCtx = { item, i, btn };
   chosenSize = ""; needSize = sizes.length > 0;
-  try { const c = JSON.parse(localStorage.getItem("orderContact") || "{}"); ofPhone.value = c.phone || ""; ofLoc.value = c.loc || ""; } catch (e) {}
+  try { const c = JSON.parse(localStorage.getItem("orderContact") || "{}"); ofPhone.value = c.phone || (PF && PF.phone) || ""; ofLoc.value = c.loc || (PF && PF.address) || ""; } catch (e) {}
   ofHint.textContent = "";
   document.getElementById("size-block").style.display = needSize ? "" : "none";
   document.getElementById("sheet-name").textContent = item.name;
@@ -1928,7 +1949,7 @@ $c("cp-go").onclick = () => applyCoupon($c("cp-code").value);
 function openCheckout() {
   const T = cartTotals(); if (!T.L.length) return;
   sheetCtx = { cart: true, btn: null }; chosenSize = ""; needSize = false;
-  try { const c = JSON.parse(localStorage.getItem("orderContact") || "{}"); ofPhone.value = c.phone || ""; ofLoc.value = c.loc || ""; } catch (e) {}
+  try { const c = JSON.parse(localStorage.getItem("orderContact") || "{}"); ofPhone.value = c.phone || (PF && PF.phone) || ""; ofLoc.value = c.loc || (PF && PF.address) || ""; } catch (e) {}
   ofHint.textContent = "";
   $c("size-block").style.display = "none";
   $c("sheet-name").textContent = `កន្ត្រកទំនិញ (${T.qty} មុខ)`;
@@ -1969,7 +1990,7 @@ function needLogin() { return sbReady() && Number(settings.requireLogin) === 1 &
 const jwtData = (t) => { try { return JSON.parse(decodeURIComponent(escape(atob(t.split(".")[1].replace(/-/g, "+").replace(/_/g, "/"))))); } catch (e) { return {}; } };
 function setSess(j) {
   const p = jwtData(j.access_token);
-  CU.sess = { at: j.access_token, rt: j.refresh_token, exp: Date.now() + (j.expires_in - 60) * 1000, name: (p.user_metadata && (p.user_metadata.name || p.user_metadata.full_name)) || "អតិថិជន" };
+  CU.sess = { at: j.access_token, rt: j.refresh_token, exp: Date.now() + (j.expires_in - 60) * 1000, uid: p.sub, name: (p.user_metadata && (p.user_metadata.name || p.user_metadata.full_name)) || "អតិថិជន" };
   try { localStorage.setItem("custSess", JSON.stringify(CU.sess)); } catch (e) {}
   accBtn();
 }
@@ -2020,7 +2041,7 @@ $c("tb-acc").addEventListener("click", (e) => {
   if (!sbReady()) return;
   if (!CU.sess) { afterAuth = null; openAuth("login", ""); return; }
   $c("my-name").textContent = CU.sess.name;
-  $c("mysheet").classList.add("open"); loadMine(); clearInterval(myT); myT = setInterval(loadMine, 30000);
+  $c("mysheet").classList.add("open"); pfFill(); loadProfile(); loadMine(); clearInterval(myT); myT = setInterval(loadMine, 30000);
 });
 $c("mysheet").addEventListener("click", (e) => { if (e.target.id === "mysheet") closeMine(); const c = e.target.closest("[data-copy]"); if (c) copyText(c.dataset.copy, c); });
 $c("my-close").onclick = closeMine;
@@ -2040,7 +2061,60 @@ $c("my-del").onclick = async (e) => {
   } catch (err) { b.textContent = "លុបមិនបាន សូមព្យាយាមម្តងទៀត"; }
   b.disabled = false; b.dataset.sure = "";
 };
+
+// ----- ព័ត៌មានផ្ទាល់ខ្លួន -----
+let PF = null;
+const pfEl = (id) => document.getElementById(id);
+function pfFill() {
+  const p = PF || {}, nm = p.name || (CU.sess && CU.sess.name) || "";
+  pfEl("pf-name").value = nm; pfEl("pf-phone").value = p.phone || ""; pfEl("pf-bday").value = p.birthday || ""; pfEl("pf-addr").value = p.address || "";
+  pfEl("pf-bank").value = p.bank_name || ""; pfEl("pf-holder").value = p.bank_holder || ""; pfEl("pf-last4").value = p.bank_last4 || "";
+  const av = pfEl("pf-av"); av.style.backgroundImage = p.avatar_url ? `url("${p.avatar_url}")` : ""; av.textContent = p.avatar_url ? "" : (nm.trim()[0] || "👤");
+}
+async function loadProfile() {
+  if (!CU.sess || !sbReady()) return;
+  try {
+    const t = await cToken();
+    const r = await fetch(`${SB_URL}/rest/v1/profiles?id=eq.${CU.sess.uid}&select=*`, { headers: { apikey: SB_KEY, Authorization: "Bearer " + t }, cache: "no-store" });
+    if (r.ok) { const j = await r.json(); PF = j[0] || null; if (PF && PF.name) { CU.sess.name = PF.name; try { localStorage.setItem("custSess", JSON.stringify(CU.sess)); } catch (e) {} } }
+  } catch (e) {}
+  pfFill();
+}
+async function saveProfile(extra) {
+  const msg = pfEl("pf-msg"); msg.style.color = ""; msg.textContent = "";
+  const last4 = pfEl("pf-last4").value.replace(/\D/g, "").slice(-4);
+  const row = { id: CU.sess.uid, name: pfEl("pf-name").value.trim() || null, phone: pfEl("pf-phone").value.trim() || null, birthday: pfEl("pf-bday").value || null, address: pfEl("pf-addr").value.trim() || null,
+    bank_name: pfEl("pf-bank").value || null, bank_holder: pfEl("pf-holder").value.trim() || null, bank_last4: last4 || null, avatar_url: (PF && PF.avatar_url) || null, updated_at: new Date().toISOString(), ...(extra || {}) };
+  pfEl("pf-last4").value = last4;
+  try {
+    const t = await cToken();
+    const r = await fetch(`${SB_URL}/rest/v1/profiles?on_conflict=id`, { method: "POST", headers: { apikey: SB_KEY, Authorization: "Bearer " + t, "Content-Type": "application/json", Prefer: "resolution=merge-duplicates,return=minimal" }, body: JSON.stringify(row) });
+    if (!r.ok) throw new Error(r.status);
+    PF = { ...(PF || {}), ...row };
+    if (row.name) { CU.sess.name = row.name; try { localStorage.setItem("custSess", JSON.stringify(CU.sess)); } catch (e) {} pfEl("my-name").textContent = row.name; }
+    pfFill(); msg.style.color = "#3F7D5C"; msg.textContent = "✓ បានរក្សាទុក";
+  } catch (e) { msg.style.color = "#B8213F"; msg.textContent = "រក្សាទុកមិនបាន (" + e.message + ") សូមព្យាយាមម្តងទៀត"; }
+}
+pfEl("pf-save").onclick = () => saveProfile();
+pfEl("pf-av").onclick = () => pfEl("pf-file").click();
+pfEl("pf-file").addEventListener("change", async (e) => {
+  const f = e.target.files[0]; e.target.value = ""; if (!f || !CU.sess) return;
+  const msg = pfEl("pf-msg"); msg.style.color = ""; msg.textContent = "កំពុងផ្ទុករូប...";
+  try {
+    const blob = await shrink(f, 400), t = await cToken(), path = `${CU.sess.uid}/avatar.jpg`;
+    const r = await fetch(`${SB_URL}/storage/v1/object/avatars/${path}`, { method: "POST", headers: { apikey: SB_KEY, Authorization: "Bearer " + t, "x-upsert": "true", "Content-Type": "image/jpeg" }, body: blob });
+    if (!r.ok) throw new Error(r.status);
+    await saveProfile({ avatar_url: `${SB_URL}/storage/v1/object/public/avatars/${path}?v=${Date.now()}` });
+  } catch (err) { msg.style.color = "#B8213F"; msg.textContent = "ផ្ទុករូបមិនបាន (" + err.message + ")"; }
+});
+pfEl("pf-gps").onclick = () => {
+  const msg = pfEl("pf-msg"); msg.style.color = "";
+  if (!navigator.geolocation) { msg.textContent = "ឧបករណ៍នេះមិនគាំទ្រទីតាំង"; return; }
+  msg.textContent = "កំពុងរកទីតាំង...";
+  navigator.geolocation.getCurrentPosition((pos) => { pfEl("pf-addr").value = `https://www.google.com/maps?q=${pos.coords.latitude.toFixed(6)},${pos.coords.longitude.toFixed(6)}`; msg.textContent = "✓ បានភ្ជាប់ទីតាំង ចុចរក្សាទុក"; }, () => { msg.textContent = "មិនអាចទទួលទីតាំងបាន"; }, { enableHighAccuracy: true, timeout: 12000 });
+};
 accBtn();
+loadProfile();
 // ត្រឡប់មកពី Google → Supabase ដាក់ token ក្នុង #hash
 (function () {
   const h = location.hash;
@@ -2049,7 +2123,7 @@ accBtn();
   try { history.replaceState(null, "", location.pathname + location.search); } catch (e) {}
   if (p.get("access_token")) {
     setSess({ access_token: p.get("access_token"), refresh_token: p.get("refresh_token"), expires_in: +p.get("expires_in") || 3600 });
-    toast("✓ ចូលគណនីតាម Google រួចរាល់");
+    toast("✓ ចូលគណនីតាម Google រួចរាល់"); loadProfile();
     let r = ""; try { r = sessionStorage.getItem("authResume") || ""; sessionStorage.removeItem("authResume"); } catch (e) {}
     if (r === "cart") setTimeout(openCart, 500);
   } else toast("ចូលតាម Google មិនបាន");
