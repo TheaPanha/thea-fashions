@@ -1267,11 +1267,6 @@
         <div class="pf-lb">ថ្ងៃកំណើត</div><input class="of-input" id="pf-bday" type="date" />
         <div class="pf-lb">ទីតាំង / អាសយដ្ឋាន</div><input class="of-input" id="pf-addr" type="text" placeholder="វាយអាសយដ្ឋាន ឬប្រើទីតាំងខ្ញុំ" />
         <button type="button" class="of-btn" id="pf-gps" style="width:100%;margin-bottom:12px">📍 ប្រើទីតាំងខ្ញុំ (Google Map)</button>
-        <div class="pf-lb">ធនាគារសម្រាប់ទូទាត់/ដកប្រាក់ត្រឡប់</div>
-        <select class="of-input" id="pf-bank"><option value="">— ជ្រើសរើសធនាគារ —</option><option>ACLEDA</option><option>ABA</option><option>Wing</option><option>Canadia</option><option>Sathapana</option><option>ផ្សេងទៀត</option></select>
-        <input class="of-input" id="pf-holder" type="text" placeholder="ឈ្មោះម្ចាស់គណនី" />
-        <input class="of-input" id="pf-last4" type="text" inputmode="numeric" maxlength="4" placeholder="លេខកាត ៤ ខ្ទង់ចុងក្រោយ" />
-        <div class="of-hint" style="margin:-2px 0 8px">🔒 រក្សាទុកតែ ៤ ខ្ទង់ចុងក្រោយ។ កុំដាក់លេខកាតពេញ ឬលេខ CVV ។</div>
         <button class="sheet-confirm" id="pf-save" type="button" style="margin-top:2px">រក្សាទុកព័ត៌មាន</button>
         <div class="of-hint" id="pf-msg" style="text-align:center;margin:8px 0 0"></div>
       </div>
@@ -1989,6 +1984,7 @@ try { CU.sess = JSON.parse(localStorage.getItem("custSess") || "null"); } catch 
 let auMode = "login", afterAuth = null, myT;
 function needLogin() { return sbReady() && Number(settings.requireLogin) === 1 && !CU.sess; }
 const jwtData = (t) => { try { return JSON.parse(decodeURIComponent(escape(atob(t.split(".")[1].replace(/-/g, "+").replace(/_/g, "/"))))); } catch (e) { return {}; } };
+if (CU.sess && !CU.sess.uid) { CU.sess.uid = jwtData(CU.sess.at).sub; }   // សម័យចាស់មិនមាន uid
 function setSess(j) {
   const p = jwtData(j.access_token);
   CU.sess = { at: j.access_token, rt: j.refresh_token, exp: Date.now() + (j.expires_in - 60) * 1000, uid: p.sub, name: (p.user_metadata && (p.user_metadata.name || p.user_metadata.full_name)) || "អតិថិជន" };
@@ -2069,7 +2065,6 @@ const pfEl = (id) => document.getElementById(id);
 function pfFill() {
   const p = PF || {}, nm = p.name || (CU.sess && CU.sess.name) || "";
   pfEl("pf-name").value = nm; pfEl("pf-phone").value = p.phone || ""; pfEl("pf-bday").value = p.birthday || ""; pfEl("pf-addr").value = p.address || "";
-  pfEl("pf-bank").value = p.bank_name || ""; pfEl("pf-holder").value = p.bank_holder || ""; pfEl("pf-last4").value = p.bank_last4 || "";
   const av = pfEl("pf-av"); av.style.backgroundImage = p.avatar_url ? `url("${p.avatar_url}")` : ""; av.textContent = p.avatar_url ? "" : (nm.trim()[0] || "👤");
 }
 async function loadProfile() {
@@ -2083,11 +2078,8 @@ async function loadProfile() {
 }
 async function saveProfile(extra) {
   const msg = pfEl("pf-msg"); msg.style.color = ""; msg.textContent = "";
-  if (/\d{5,}/.test(pfEl("pf-holder").value.replace(/[\s-]/g, ""))) { msg.style.color = "#B8213F"; msg.textContent = "ប្រអប់ឈ្មោះមិនត្រូវមានលេខកាតទេ សូមវាយតែឈ្មោះ។ លេខកាតដាក់ត្រឹម ៤ ខ្ទង់ចុងក្រោយ"; return; }
-  const last4 = pfEl("pf-last4").value.replace(/\D/g, "").slice(-4);
   const row = { id: CU.sess.uid, name: pfEl("pf-name").value.trim() || null, phone: pfEl("pf-phone").value.trim() || null, birthday: pfEl("pf-bday").value || null, address: pfEl("pf-addr").value.trim() || null,
-    bank_name: pfEl("pf-bank").value || null, bank_holder: pfEl("pf-holder").value.trim() || null, bank_last4: last4 || null, avatar_url: (PF && PF.avatar_url) || null, updated_at: new Date().toISOString(), ...(extra || {}) };
-  pfEl("pf-last4").value = last4;
+    avatar_url: (PF && PF.avatar_url) || null, updated_at: new Date().toISOString(), ...(extra || {}) };
   try {
     const t = await cToken();
     const hdr = { apikey: SB_KEY, Authorization: "Bearer " + t, "Content-Type": "application/json" }, { id, ...rest } = row;
