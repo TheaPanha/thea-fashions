@@ -2088,8 +2088,11 @@ async function saveProfile(extra) {
   pfEl("pf-last4").value = last4;
   try {
     const t = await cToken();
-    const r = await fetch(`${SB_URL}/rest/v1/profiles?on_conflict=id`, { method: "POST", headers: { apikey: SB_KEY, Authorization: "Bearer " + t, "Content-Type": "application/json", Prefer: "resolution=merge-duplicates,return=minimal" }, body: JSON.stringify(row) });
-    if (!r.ok) throw new Error(r.status);
+    const hdr = { apikey: SB_KEY, Authorization: "Bearer " + t, "Content-Type": "application/json" }, { id, ...rest } = row;
+    let r = await fetch(`${SB_URL}/rest/v1/profiles?id=eq.${id}`, { method: "PATCH", headers: { ...hdr, Prefer: "return=representation" }, body: JSON.stringify(rest) });
+    const rows = r.ok ? await r.json().catch(() => []) : [];
+    if (!r.ok || !rows.length) r = await fetch(`${SB_URL}/rest/v1/profiles`, { method: "POST", headers: { ...hdr, Prefer: "return=minimal" }, body: JSON.stringify(row) });
+    if (!r.ok) { let m = ""; try { const j = await r.json(); m = j.message || j.hint || j.code || ""; } catch (x) {} throw new Error(`${r.status} ${m}`.trim()); }
     PF = { ...(PF || {}), ...row };
     if (row.name) { CU.sess.name = row.name; try { localStorage.setItem("custSess", JSON.stringify(CU.sess)); } catch (e) {} pfEl("my-name").textContent = row.name; }
     pfFill(); msg.style.color = "#3F7D5C"; msg.textContent = "✓ បានរក្សាទុក";
