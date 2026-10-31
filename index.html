@@ -1243,13 +1243,7 @@
       <button type="button" class="of-btn" id="au-google" style="width:100%;display:flex;align-items:center;justify-content:center;gap:10px;padding:12px;font-size:15px;margin-bottom:10px">
         <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.9 2.4 30.4 0 24 0 14.6 0 6.5 5.4 2.6 13.2l7.9 6.1C12.4 13.6 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8c4.4-4.1 7.1-10.1 7.1-17.5z"/><path fill="#FBBC05" d="M10.5 28.7a14.5 14.5 0 0 1 0-9.4l-7.9-6.1a24 24 0 0 0 0 21.6l7.9-6.1z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.5-5.8c-2.1 1.4-4.9 2.3-8.4 2.3-6.3 0-11.6-4.1-13.5-9.8l-7.9 6.1C6.5 42.6 14.6 48 24 48z"/></svg>
         បន្តជាមួយ Google</button>
-      <div class="of-hint" style="text-align:center;margin:0 0 8px">ឬប្រើអ៊ីមែល</div>
-      <input class="of-input" id="au-name" type="text" placeholder="ឈ្មោះរបស់អ្នក" autocomplete="name" style="display:none" />
-      <input class="of-input" id="au-email" type="email" placeholder="អ៊ីមែល" autocomplete="username" />
-      <input class="of-input" id="au-pw" type="password" placeholder="ពាក្យសម្ងាត់ (យ៉ាងតិច ៦ តួ)" autocomplete="current-password" />
-      <div class="of-hint" id="au-err"></div>
-      <button class="sheet-confirm" id="au-go" type="button">ចូល</button>
-      <button class="sheet-cancel" id="au-switch" type="button"></button>
+      <div class="of-hint" id="au-err" style="color:#B8213F;text-align:center"></div>
       <button class="sheet-cancel" id="au-close" type="button">បិទ</button>
     </div>
   </div>
@@ -1975,7 +1969,7 @@ function needLogin() { return sbReady() && Number(settings.requireLogin) === 1 &
 const jwtData = (t) => { try { return JSON.parse(decodeURIComponent(escape(atob(t.split(".")[1].replace(/-/g, "+").replace(/_/g, "/"))))); } catch (e) { return {}; } };
 function setSess(j) {
   const p = jwtData(j.access_token);
-  CU.sess = { at: j.access_token, rt: j.refresh_token, exp: Date.now() + (j.expires_in - 60) * 1000, email: p.email, name: (p.user_metadata && (p.user_metadata.name || p.user_metadata.full_name)) || String(p.email || "").split("@")[0] };
+  CU.sess = { at: j.access_token, rt: j.refresh_token, exp: Date.now() + (j.expires_in - 60) * 1000, name: (p.user_metadata && (p.user_metadata.name || p.user_metadata.full_name)) || "អតិថិជន" };
   try { localStorage.setItem("custSess", JSON.stringify(CU.sess)); } catch (e) {}
   accBtn();
 }
@@ -1995,40 +1989,16 @@ async function cToken() {
   return CU.sess.at;
 }
 function openAuth(mode, sub) {
-  auMode = mode;
-  $c("au-title").textContent = mode === "login" ? "ចូលគណនី" : "បង្កើតគណនី";
-  $c("au-name").style.display = mode === "login" ? "none" : "";
-  $c("au-go").textContent = mode === "login" ? "ចូល" : "បង្កើតគណនី";
-  $c("au-switch").textContent = mode === "login" ? "មិនទាន់មានគណនី? បង្កើតគណនី" : "មានគណនីហើយ? ចូល";
-  if (sub !== undefined) $c("au-sub").textContent = sub;
+  $c("au-title").textContent = "ចូលគណនី";
+  $c("au-sub").textContent = sub || "ចូលដោយគណនី Google របស់អ្នក";
   $c("au-err").textContent = ""; $c("authsheet").classList.add("open");
 }
 $c("au-google").onclick = () => {
   try { sessionStorage.setItem("authResume", afterAuth === openCheckout ? "cart" : ""); } catch (e) {}
   location.href = `${SB_URL}/auth/v1/authorize?provider=google&redirect_to=${encodeURIComponent(location.origin + location.pathname)}`;
 };
-$c("au-switch").onclick = () => openAuth(auMode === "login" ? "signup" : "login");
 $c("au-close").onclick = () => { $c("authsheet").classList.remove("open"); afterAuth = null; };
 $c("authsheet").addEventListener("click", (e) => { if (e.target.id === "authsheet") $c("au-close").onclick(); });
-$c("au-go").onclick = async () => {
-  const email = $c("au-email").value.trim(), pw = $c("au-pw").value, name = $c("au-name").value.trim(), er = $c("au-err");
-  er.style.color = "#B8213F"; er.textContent = "";
-  if (!email || pw.length < 6) { er.textContent = "សូមបំពេញអ៊ីមែល និងពាក្យសម្ងាត់ (យ៉ាងតិច ៦ តួ)"; return; }
-  if (auMode === "signup" && !name) { er.textContent = "សូមបំពេញឈ្មោះ"; return; }
-  $c("au-go").disabled = true;
-  try {
-    let j;
-    if (auMode === "signup") {
-      j = await cReq("signup", { email, password: pw, data: { name } });
-      if (!j.access_token) { er.style.color = "#2E7D52"; er.textContent = "បានបង្កើតគណនី! សូមបើកអ៊ីមែលដើម្បីបញ្ជាក់ រួចចូលម្តងទៀត។"; openAuth("login"); er.textContent = "បានបង្កើតគណនី! សូមបើកអ៊ីមែលដើម្បីបញ្ជាក់ រួចចូលម្តងទៀត។"; er.style.color = "#2E7D52"; return; }
-    } else j = await cReq("token?grant_type=password", { email, password: pw });
-    setSess(j); $c("authsheet").classList.remove("open"); $c("au-pw").value = "";
-    const f = afterAuth; afterAuth = null; if (f) f(); else toast("✓ ចូលគណនីរួចរាល់");
-  } catch (e) {
-    er.textContent = /invalid login/i.test(e.message) ? "អ៊ីមែល ឬពាក្យសម្ងាត់មិនត្រឹមត្រូវ" : /already/i.test(e.message) ? "អ៊ីមែលនេះមានគណនីរួចហើយ សូមចូល" : /confirm/i.test(e.message) ? "សូមបញ្ជាក់អ៊ីមែលជាមុន" : e.message;
-  } finally { $c("au-go").disabled = false; }
-};
-$c("au-pw").addEventListener("keydown", (e) => { if (e.key === "Enter") $c("au-go").click(); });
 async function loadMine() {
   const box = $c("my-list");
   try {
@@ -2049,7 +2019,7 @@ $c("tb-acc").addEventListener("click", (e) => {
   e.preventDefault();
   if (!sbReady()) return;
   if (!CU.sess) { afterAuth = null; openAuth("login", ""); return; }
-  $c("my-name").textContent = `${CU.sess.name} · ${CU.sess.email}`;
+  $c("my-name").textContent = CU.sess.name;
   $c("mysheet").classList.add("open"); loadMine(); clearInterval(myT); myT = setInterval(loadMine, 30000);
 });
 $c("mysheet").addEventListener("click", (e) => { if (e.target.id === "mysheet") closeMine(); const c = e.target.closest("[data-copy]"); if (c) copyText(c.dataset.copy, c); });
