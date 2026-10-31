@@ -529,6 +529,25 @@
   .tk-box { border: 1px solid var(--border); border-radius: 14px; padding: 12px; margin-bottom: 12px; background: #fff; font-size: 14px; line-height: 1.7; }
   .code-box { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 6px 0 12px; padding: 12px; border: 1.5px dashed var(--clay); border-radius: 14px; }
   .code-box b { font-size: 22px; letter-spacing: 1.5px; }
+  .mo { border: 1px solid var(--border); border-radius: 14px; padding: 12px; margin-bottom: 10px; background: #fff; font-size: 14px; line-height: 1.7; }
+  .mo-s { font-size: 12px; color: var(--muted); margin: 2px 0 6px; }
+  #tb-acc.on { color: #3F7D5C; }
+  .cbadge { position: absolute; top: -5px; right: -5px; min-width: 17px; height: 17px; padding: 0 4px; border-radius: 9px; background: #B8213F; color: #fff; font: 700 10px/17px inherit; text-align: center; }
+  .fav-btn { position: absolute; top: 8px; right: 8px; z-index: 4; width: 32px; height: 32px; border: none; border-radius: 50%; background: rgba(255,255,255,.92); color: #444; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,.15); }
+  .fav-btn.on { color: #E0245E; }
+  .btnrow { display: flex; gap: 6px; align-items: stretch; } .btnrow .buy-btn { flex: 1; width: auto; }
+  .cart-add { flex: none; width: 40px; border: 1.5px solid var(--clay); background: #fff; color: var(--clay); border-radius: 999px; cursor: pointer; font-size: 14px; }
+  .cart-add:disabled { opacity: .4; }
+  #tb-fav.on { color: #E0245E; }
+  .ci { display: grid; grid-template-columns: 56px 1fr; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+  .ci img { width: 56px; height: 70px; object-fit: cover; border-radius: 10px; background: #eee; }
+  .ci b { font-size: 14px; } .ci .cs { font-size: 12px; color: var(--muted); }
+  .qty { display: inline-flex; align-items: center; gap: 8px; margin-top: 6px; }
+  .qty button { width: 28px; height: 28px; border-radius: 50%; border: 1.5px solid var(--border); background: #fff; font-size: 16px; line-height: 1; cursor: pointer; }
+  .cart-sum { margin: 12px 0; font-size: 14px; line-height: 2; } .cart-sum div { display: flex; justify-content: space-between; } .cart-sum .tot { font-weight: 700; font-size: 17px; }
+  .cp-row { display: flex; gap: 6px; margin-top: 10px; } .cp-row .of-input { margin: 0; }
+  #toast { position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom)); transform: translateX(-50%) translateY(30px); background: #1A1A1A; color: #fff; padding: 11px 18px; border-radius: 999px; font-size: 14px; opacity: 0; pointer-events: none; transition: .25s; z-index: 200; }
+  #toast.show { opacity: 1; transform: translateX(-50%); }
   .pay-opts { display: flex; flex-direction: column; gap: 8px; margin: 12px 0; }
   .pay-opt { padding: 13px; border: 1.5px solid var(--border); border-radius: 12px; background: #fff; color: var(--ink); font-family: inherit; font-size: 15px; font-weight: 600; text-align: left; cursor: pointer; }
   .pay-opt.on { border-color: var(--clay); background: rgba(var(--clay-rgb),0.08); }
@@ -1108,6 +1127,9 @@
       <input id="search" type="search" placeholder="ស្វែងរកខោអាវ..." autocomplete="off" enterkeyhint="search" />
     </div>
     <div class="top-actions">
+      <a id="tb-acc" href="#" aria-label="គណនី"><i class="fa-regular fa-user"></i></a>
+      <a id="tb-fav" href="#" aria-label="ចូលចិត្ត"><i class="fa-regular fa-heart"></i></a>
+      <a id="tb-cart" href="#" aria-label="កន្ត្រកទំនិញ" style="position:relative"><i class="fa-solid fa-cart-shopping"></i><b class="cbadge" id="cart-badge" hidden></b></a>
       <a id="tb-track" href="#" aria-label="តាមដានការកម្មង់"><i class="fa-solid fa-truck-fast"></i></a>
       <a id="tb-call" href="tel:0968782682" aria-label="ហៅទូរស័ព្ទ"><i class="fa-solid fa-phone"></i></a>
       <a id="tb-tg" href="https://t.me/theapanha04042004" target="_blank" rel="noopener" aria-label="Telegram"><i class="fa-brands fa-telegram"></i></a>
@@ -1213,6 +1235,59 @@
     </div>
   </div>
 
+  <div class="sheet-backdrop" id="authsheet">
+    <div class="sheet" role="dialog" aria-modal="true">
+      <div class="sheet-handle"></div>
+      <h3 id="au-title" style="margin:6px 0 2px">ចូលគណនី</h3>
+      <p class="of-hint" id="au-sub"></p>
+      <input class="of-input" id="au-name" type="text" placeholder="ឈ្មោះរបស់អ្នក" autocomplete="name" style="display:none" />
+      <input class="of-input" id="au-email" type="email" placeholder="អ៊ីមែល" autocomplete="username" />
+      <input class="of-input" id="au-pw" type="password" placeholder="ពាក្យសម្ងាត់ (យ៉ាងតិច ៦ តួ)" autocomplete="current-password" />
+      <div class="of-hint" id="au-err"></div>
+      <button class="sheet-confirm" id="au-go" type="button">ចូល</button>
+      <button class="sheet-cancel" id="au-switch" type="button"></button>
+      <button class="sheet-cancel" id="au-close" type="button">បិទ</button>
+    </div>
+  </div>
+
+  <div class="sheet-backdrop" id="mysheet">
+    <div class="sheet" role="dialog" aria-modal="true">
+      <div class="sheet-handle"></div>
+      <h3 style="margin:6px 0 2px">គណនីរបស់ខ្ញុំ</h3>
+      <p class="of-hint" id="my-name"></p>
+      <div class="of-hint" style="margin:0 0 6px;font-weight:700;color:var(--ink)">ការកម្មង់របស់ខ្ញុំ</div>
+      <div id="my-list"></div>
+      <button class="sheet-cancel" id="my-out" type="button">ចេញពីគណនី</button>
+      <button class="sheet-cancel" id="my-del" type="button" style="color:#B8213F">🗑 លុបគណនីរបស់ខ្ញុំ</button>
+      <button class="sheet-cancel" id="my-close" type="button">បិទ</button>
+    </div>
+  </div>
+
+  <div class="sheet-backdrop" id="cartsheet">
+    <div class="sheet" role="dialog" aria-modal="true">
+      <div class="sheet-handle"></div>
+      <h3 style="margin:6px 0 4px">🛒 កន្ត្រកទំនិញ</h3>
+      <div id="cart-list"></div>
+      <div class="cp-row"><input class="of-input" id="cp-code" type="text" placeholder="លេខកូដបញ្ចុះតម្លៃ" autocapitalize="characters" autocomplete="off" /><button type="button" class="of-btn" id="cp-go" style="flex:none;padding:0 14px">ប្រើ</button></div>
+      <div class="of-hint" id="cp-msg" style="margin-top:6px"></div>
+      <div class="cart-sum" id="cart-sum"></div>
+      <button class="sheet-confirm" id="cart-go" type="button">បន្តទៅកម្មង់</button>
+      <button class="sheet-cancel" id="cart-clear" type="button" style="color:#B8213F">សម្អាតកន្ត្រក</button>
+      <button class="sheet-cancel" id="cart-close" type="button">បិទ</button>
+    </div>
+  </div>
+
+  <div class="sheet-backdrop" id="addsheet">
+    <div class="sheet" role="dialog" aria-modal="true">
+      <div class="sheet-handle"></div>
+      <h3 id="add-name" style="margin:6px 0 10px"></h3>
+      <div class="of-hint">ជ្រើសរើសទំហំ</div>
+      <div class="sizes" id="add-sizes"></div>
+      <button class="sheet-cancel" id="add-close" type="button">បិទ</button>
+    </div>
+  </div>
+  <div id="toast"></div>
+
   <div class="sheet-backdrop" id="paysheet">
     <div class="sheet" role="dialog" aria-modal="true">
       <div class="sheet-handle"></div>
@@ -1231,6 +1306,7 @@
         <div class="of-hint" style="margin-top:8px">បង់រួច សូមថតអេក្រង់បង្កាន់ដៃ ហើយផ្ញើនៅទីនេះ ទើបអាចបញ្ជាក់ការទិញបាន</div>
       </div>
       <div id="pay-cod" class="of-hint" style="display:none">អីវ៉ាន់ដឹកដល់ដៃអ្នក ហើយបង់ប្រាក់ជូនអ្នកដឹកពេលទទួល។</div>
+      <div class="of-hint" id="pay-err" style="color:#B8213F"></div>
       <button class="sheet-confirm" id="pay-go" type="button">បញ្ជាក់ការទិញ</button>
       <button class="sheet-cancel" id="pay-back" type="button">ថយក្រោយ</button>
     </div>
@@ -1356,6 +1432,7 @@ const SETTINGS = {        // ការកំណត់រចនា និងហ�
   showFlash: true,
   saleCount: 16,
   saleHours: 4,
+  requireLogin: 0,         // 1 = ភ្ញៀវត្រូវចូលគណនីមុនទិញ
   payAccount: "",          // គណនីទទួលប្រាក់ (ACLEDA) · ដាក់រូប KHQR ឈ្មោះ KHQR.jpg
   statsUrl: "",             // URL របស់ Worker ស្ថិតិ (ទទេ = មិនប្រើ)
   showPromo: true,          // បង្ហាញផ្ទាំងផ្សព្វផ្សាយធំ
@@ -1670,16 +1747,21 @@ async function uploadReceipt(file) {
 }
 sheetConfirm.addEventListener("click", () => {
   if (!sheetCtx || sheetConfirm.disabled) return;
-  const { item, i, btn } = sheetCtx;
   const loc = ofLoc.value.trim(), phone = ofPhone.value.trim();
   try { localStorage.setItem("orderContact", JSON.stringify({ phone, loc })); } catch (e) {}
-  pending = { item, i, btn, size: chosenSize, contact: { phone, loc, isLink: isUrl(loc), link: mapLinkOf(loc) } };
+  const items = sheetCtx.cart
+    ? cartLines().map((l) => ({ n: l.n, name: l.name, size: l.size || "", qty: l.qty, price: l.price }))
+    : [{ n: sheetCtx.i + 1, name: sheetCtx.item.name, size: chosenSize || "", qty: 1, price: finalPrice(sheetCtx.item) }];
+  const sub = items.reduce((s, x) => s + x.price * x.qty, 0), disc = sheetCtx.cart && cartCoupon ? Math.min(cartCoupon.discount, sub) : 0;
+  pending = { items, sub, disc, coupon: sheetCtx.cart && cartCoupon ? cartCoupon.code : null, btn: sheetCtx.btn, cart: !!sheetCtx.cart, contact: { phone, loc, isLink: isUrl(loc), link: mapLinkOf(loc) } };
   closeSizeSheet();
   const acc = String(settings.payAccount || "").trim();
   document.querySelector('.pay-opt[data-m="qr"]').style.display = acc ? "" : "none";
   document.getElementById("pay-acc").textContent = acc;
   document.getElementById("pay-img").style.display = "";
-  document.getElementById("pay-total").textContent = `${item.name}${chosenSize ? " · " + chosenSize : ""} · ${formatRiel(finalPrice(item))}`;
+  document.getElementById("pay-err").textContent = "";
+  const f = items[0];
+  document.getElementById("pay-total").textContent = (items.length === 1 ? `${f.name}${f.size ? " · " + f.size : ""}${f.qty > 1 ? " ×" + f.qty : ""}` : `${items.length} មុខ`) + ` · ${formatRiel(sub - disc)}` + (disc ? ` (បញ្ចុះ ${formatRiel(disc)})` : "");
   receiptFile = null; document.getElementById("rc-file").value = ""; rcName.textContent = "";
   setPay(acc ? "qr" : "cod");
   paySheet.classList.add("open");
@@ -1728,23 +1810,260 @@ $t("tk-go").onclick = async () => {
 };
 document.getElementById("pay-back").addEventListener("click", () => { paySheet.classList.remove("open"); sheet.classList.add("open"); });
 paySheet.addEventListener("click", (e) => { if (e.target === paySheet) paySheet.classList.remove("open"); });
+async function placeOrder(P, code, rpath) {
+  const f = P.items[0];
+  const body = { order_code: code, product_no: f.n, product: P.items.length > 1 ? `${f.name} +${P.items.length - 1}` : f.name, size: P.items.length === 1 ? (f.size || null) : null, phone: P.contact.phone, location: P.contact.isLink ? null : P.contact.loc, map_link: P.contact.link, pay_method: payMethod, receipt_url: rpath, items: P.items, coupon: P.coupon };
+  try {
+    let tok = SB_KEY; if (CU.sess) { try { tok = await cToken(); } catch (e) { tok = SB_KEY; } }
+    if (CU.sess) body.customer_name = CU.sess.name;
+    const r = await fetch(`${SB_URL}/rest/v1/rpc/place_order`, { method: "POST", headers: { apikey: SB_KEY, Authorization: "Bearer " + tok, "Content-Type": "application/json" }, body: JSON.stringify({ p: body }) });
+    if (r.ok) return { ok: true };
+    const j = await r.json().catch(() => ({})), m = String(j.message || "");
+    if (/STOCK:/.test(m)) return { ok: false, msg: "អស់ស្តុក៖ " + m.split("STOCK:")[1].trim() + " សូមកែចំនួនក្នុងកន្ត្រក" };
+    if (/COUPON:/.test(m)) return { ok: false, msg: m.split("COUPON:")[1].trim() };
+    if (r.status === 404) {                      // មិនទាន់ run SQL ថ្មី → រក្សាទុកតាមវិធីចាស់
+      saveOrderRemote({ product_no: f.n, product: body.product, size: body.size, price: P.sub - P.disc, phone: body.phone, location: body.location, map_link: body.map_link, pay_method: payMethod, receipt_url: rpath, order_code: code });
+      return { ok: true };
+    }
+    return { ok: false, msg: `បញ្ជូនការកម្មង់មិនបាន (${r.status})` };
+  } catch (e) { return { ok: false, msg: "បញ្ជូនការកម្មង់មិនបាន សូមពិនិត្យអ៊ីនធឺណិត" }; }
+}
 payGo.addEventListener("click", async () => {
   if (!pending || payGo.disabled) return;
+  const err = document.getElementById("pay-err"); err.textContent = "";
   let rpath = null;
   if (payMethod === "qr" && sbReady()) {
     payGo.disabled = true; payGo.textContent = "កំពុងផ្ញើបង្កាន់ដៃ...";
     try { rpath = await uploadReceipt(receiptFile); }
-    catch (err) { rcName.style.color = "#B8213F"; rcName.textContent = "ផ្ញើបង្កាន់ដៃមិនបាន (" + (err && err.message || "network") + ") សូមព្យាយាមម្តងទៀត"; updatePay(); return; }
+    catch (e) { rcName.style.color = "#B8213F"; rcName.textContent = "ផ្ញើបង្កាន់ដៃមិនបាន (" + (e && e.message || "network") + ") សូមព្យាយាមម្តងទៀត"; updatePay(); return; }
   }
-  const { item, i, btn, size, contact } = pending; pending = null;
-  paySheet.classList.remove("open");
-  const code = sbReady() ? newCode() : null;
-  saveOrderRemote({ product_no: i + 1, product: item.name, size: size || null, price: finalPrice(item), phone: contact.phone, location: contact.isLink ? null : contact.loc, map_link: contact.link, pay_method: payMethod, receipt_url: rpath, order_code: code });
-  orderDone(btn, code, contact.phone);
+  const P = pending, code = sbReady() ? newCode() : null;
+  if (sbReady()) {
+    payGo.disabled = true; payGo.textContent = "កំពុងបញ្ជូនការកម្មង់...";
+    const r = await placeOrder(P, code, rpath);
+    if (!r.ok) { err.textContent = r.msg; updatePay(); return; }
+  }
+  pending = null; paySheet.classList.remove("open");
+  if (P.cart) { cart = []; saveCart(); cartCoupon = null; renderCartUI(); }
+  orderDone(P.btn, code, P.contact.phone);
 });
 document.addEventListener("keydown", (e) => { if (e.key === "Escape") { closeSizeSheet(); paySheet.classList.remove("open"); } });
 
 
+
+
+// ================= កន្ត្រក · ចូលចិត្ត · លេខកូដ =================
+const $c = (id) => document.getElementById(id);
+let favOnly = false, cart = [], cartCoupon = null;
+try { cart = JSON.parse(localStorage.getItem("cart") || "[]"); if (!Array.isArray(cart)) cart = []; } catch (e) { cart = []; }
+const saveCart = () => { try { localStorage.setItem("cart", JSON.stringify(cart)); } catch (e) {} };
+const getFavs = () => { try { return JSON.parse(localStorage.getItem("favs") || "[]"); } catch (e) { return []; } };
+const isFav = (n) => getFavs().includes(n);
+function toggleFav(n) {
+  const f = getFavs(), k = f.indexOf(n);
+  if (k >= 0) f.splice(k, 1); else f.push(n);
+  try { localStorage.setItem("favs", JSON.stringify(f)); } catch (e) {}
+  return k < 0;
+}
+let toastT;
+function toast(t) { const el = $c("toast"); el.textContent = t; el.classList.add("show"); clearTimeout(toastT); toastT = setTimeout(() => el.classList.remove("show"), 1800); }
+function cartLines() {
+  const hid = hiddenSet();
+  return cart.map((c) => {
+    const p = PRODUCTS[c.n - 1];
+    return p && !hid.has(c.n) ? { ...c, name: p.name, price: finalPrice({ ...p, idx: c.n - 1 }), stock: stockOf(c.n - 1) } : null;
+  }).filter(Boolean);
+}
+function cartTotals() {
+  const L = cartLines(), sub = L.reduce((s, l) => s + l.price * l.qty, 0), disc = cartCoupon ? Math.min(cartCoupon.discount, sub) : 0;
+  return { L, sub, disc, total: sub - disc, qty: L.reduce((s, l) => s + l.qty, 0) };
+}
+function addToCart(n, size) {
+  const st = stockOf(n - 1), ex = cart.find((c) => c.n === n && (c.size || "") === (size || ""));
+  const have = cart.filter((c) => c.n === n).reduce((s, c) => s + c.qty, 0);
+  if (st !== null && have + 1 > st) { toast("ស្តុកមិនគ្រប់"); return; }
+  if (ex) ex.qty++; else cart.push({ n, size: size || "", qty: 1 });
+  saveCart(); cartCoupon = null; renderCartUI(); toast("✓ បានដាក់ក្នុងកន្ត្រក");
+}
+function renderCartUI() {
+  const T = cartTotals(), b = $c("cart-badge");
+  b.hidden = !T.qty; b.textContent = T.qty;
+  if (!$c("cartsheet").classList.contains("open")) return;
+  $c("cart-list").innerHTML = T.L.length ? T.L.map((l, k) => `<div class="ci"><img src="${photoOf(l.n)}" alt="" onerror="this.style.visibility='hidden'">
+    <div><b>${esc(l.name)}</b><div class="cs">${l.size ? esc(l.size) + " · " : ""}${formatRiel(l.price)}</div>
+    <div class="qty"><button type="button" data-q="-1" data-k="${k}">−</button><b>${l.qty}</b><button type="button" data-q="1" data-k="${k}">＋</button><button type="button" data-q="x" data-k="${k}" style="margin-left:6px;color:#B8213F">🗑</button></div></div></div>`).join("")
+    : `<div class="of-hint" style="padding:16px 0">កន្ត្រកទទេ</div>`;
+  $c("cart-sum").innerHTML = `<div><span>តម្លៃសរុប</span><span>${formatRiel(T.sub)}</span></div>${T.disc ? `<div style="color:#3F7D5C"><span>បញ្ចុះ (${esc(cartCoupon.code)})</span><span>−${formatRiel(T.disc)}</span></div>` : ""}<div class="tot"><span>ត្រូវបង់</span><span>${formatRiel(T.total)}</span></div>`;
+  $c("cart-go").disabled = !T.L.length;
+}
+function openCart() { $c("cartsheet").classList.add("open"); renderCartUI(); }
+$c("tb-cart").addEventListener("click", (e) => { e.preventDefault(); openCart(); });
+$c("cart-close").onclick = () => $c("cartsheet").classList.remove("open");
+$c("cartsheet").addEventListener("click", (e) => { if (e.target.id === "cartsheet") e.target.classList.remove("open"); });
+$c("cart-clear").onclick = () => { cart = []; saveCart(); cartCoupon = null; $c("cp-msg").textContent = ""; renderCartUI(); };
+$c("cart-list").addEventListener("click", (e) => {
+  const b = e.target.closest("[data-q]"); if (!b) return;
+  const l = cartLines()[+b.dataset.k]; if (!l) return;
+  const c = cart.find((x) => x.n === l.n && (x.size || "") === (l.size || "")); if (!c) return;
+  if (b.dataset.q === "x") cart.splice(cart.indexOf(c), 1);
+  else {
+    const q = c.qty + +b.dataset.q, others = cart.filter((x) => x.n === c.n && x !== c).reduce((s, x) => s + x.qty, 0);
+    if (q <= 0) cart.splice(cart.indexOf(c), 1);
+    else if (l.stock !== null && q + others > l.stock) { toast("ស្តុកមិនគ្រប់"); return; }
+    else c.qty = q;
+  }
+  saveCart(); if (cartCoupon) applyCoupon(cartCoupon.code, true); else renderCartUI();
+});
+async function applyCoupon(code, silent) {
+  const msg = $c("cp-msg"), T = cartTotals();
+  if (!code) { msg.textContent = ""; return; }
+  if (!sbReady()) { msg.textContent = "មិនអាចប្រើលេខកូដបាន"; return; }
+  try {
+    const r = await fetch(`${SB_URL}/rest/v1/rpc/check_coupon`, { method: "POST", headers: { apikey: SB_KEY, Authorization: "Bearer " + SB_KEY, "Content-Type": "application/json" }, body: JSON.stringify({ p_code: code, p_total: T.sub }) });
+    const j = await r.json(), o = Array.isArray(j) ? j[0] : j;
+    if (r.ok && o && o.ok) { cartCoupon = { code: code.trim().toUpperCase(), discount: o.discount }; msg.style.color = "#3F7D5C"; msg.textContent = "✓ " + o.message; }
+    else { cartCoupon = null; msg.style.color = "#B8213F"; msg.textContent = (o && o.message) || "លេខកូដមិនត្រឹមត្រូវ"; }
+  } catch (e) { cartCoupon = null; msg.style.color = "#B8213F"; msg.textContent = "ពិនិត្យលេខកូដមិនបាន"; }
+  renderCartUI();
+}
+$c("cp-go").onclick = () => applyCoupon($c("cp-code").value);
+function openCheckout() {
+  const T = cartTotals(); if (!T.L.length) return;
+  sheetCtx = { cart: true, btn: null }; chosenSize = ""; needSize = false;
+  try { const c = JSON.parse(localStorage.getItem("orderContact") || "{}"); ofPhone.value = c.phone || ""; ofLoc.value = c.loc || ""; } catch (e) {}
+  ofHint.textContent = "";
+  $c("size-block").style.display = "none";
+  $c("sheet-name").textContent = `កន្ត្រកទំនិញ (${T.qty} មុខ)`;
+  const si = $c("sheet-img"); si.style.visibility = "hidden";
+  $c("sheet-price").textContent = formatRiel(T.total) + (T.disc ? ` (បញ្ចុះ ${formatRiel(T.disc)})` : "");
+  updateConfirm(); sheet.classList.add("open");
+}
+$c("cart-go").onclick = () => {
+  $c("cartsheet").classList.remove("open");
+  if (needLogin()) { afterAuth = openCheckout; openAuth("login", "ត្រូវមានគណនីដើម្បីបន្តការទិញ"); return; }
+  openCheckout();
+};
+function openAddSheet(item, i, sizes) {
+  $c("add-name").textContent = item.name;
+  const box = $c("add-sizes"); box.innerHTML = "";
+  sizes.forEach((sz) => {
+    const b = document.createElement("button"); b.type = "button"; b.className = "size-chip"; b.textContent = sz;
+    b.onclick = () => { $c("addsheet").classList.remove("open"); addToCart(i + 1, sz); };
+    box.appendChild(b);
+  });
+  $c("addsheet").classList.add("open");
+}
+$c("add-close").onclick = () => $c("addsheet").classList.remove("open");
+$c("addsheet").addEventListener("click", (e) => { if (e.target.id === "addsheet") e.target.classList.remove("open"); });
+$c("tb-fav").addEventListener("click", (e) => {
+  e.preventDefault(); favOnly = !favOnly;
+  e.currentTarget.classList.toggle("on", favOnly); e.currentTarget.firstElementChild.className = (favOnly ? "fa-solid" : "fa-regular") + " fa-heart";
+  render();
+  const el = document.getElementById("all-products"); if (favOnly && el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+});
+
+
+// ================= គណនីអតិថិជន =================
+const CU = { sess: null };
+try { CU.sess = JSON.parse(localStorage.getItem("custSess") || "null"); } catch (e) {}
+let auMode = "login", afterAuth = null, myT;
+function needLogin() { return sbReady() && Number(settings.requireLogin) === 1 && !CU.sess; }
+const jwtData = (t) => { try { return JSON.parse(decodeURIComponent(escape(atob(t.split(".")[1].replace(/-/g, "+").replace(/_/g, "/"))))); } catch (e) { return {}; } };
+function setSess(j) {
+  const p = jwtData(j.access_token);
+  CU.sess = { at: j.access_token, rt: j.refresh_token, exp: Date.now() + (j.expires_in - 60) * 1000, email: p.email, name: (p.user_metadata && p.user_metadata.name) || String(p.email || "").split("@")[0] };
+  try { localStorage.setItem("custSess", JSON.stringify(CU.sess)); } catch (e) {}
+  accBtn();
+}
+function accBtn() { const b = $c("tb-acc"); b.classList.toggle("on", !!CU.sess); b.firstElementChild.className = (CU.sess ? "fa-solid" : "fa-regular") + " fa-user"; b.style.display = sbReady() ? "" : "none"; }
+async function cReq(path, body) {
+  const r = await fetch(`${SB_URL}/auth/v1/${path}`, { method: "POST", headers: { apikey: SB_KEY, "Content-Type": "application/json" }, body: JSON.stringify(body) });
+  const j = await r.json();
+  if (!r.ok) throw new Error(j.error_description || j.msg || j.message || "error");
+  return j;
+}
+async function cToken() {
+  if (!CU.sess) throw new Error("login");
+  if (Date.now() > CU.sess.exp) {
+    try { setSess(await cReq("token?grant_type=refresh_token", { refresh_token: CU.sess.rt })); }
+    catch (e) { CU.sess = null; try { localStorage.removeItem("custSess"); } catch (x) {} accBtn(); throw e; }
+  }
+  return CU.sess.at;
+}
+function openAuth(mode, sub) {
+  auMode = mode;
+  $c("au-title").textContent = mode === "login" ? "ចូលគណនី" : "បង្កើតគណនី";
+  $c("au-name").style.display = mode === "login" ? "none" : "";
+  $c("au-go").textContent = mode === "login" ? "ចូល" : "បង្កើតគណនី";
+  $c("au-switch").textContent = mode === "login" ? "មិនទាន់មានគណនី? បង្កើតគណនី" : "មានគណនីហើយ? ចូល";
+  if (sub !== undefined) $c("au-sub").textContent = sub;
+  $c("au-err").textContent = ""; $c("authsheet").classList.add("open");
+}
+$c("au-switch").onclick = () => openAuth(auMode === "login" ? "signup" : "login");
+$c("au-close").onclick = () => { $c("authsheet").classList.remove("open"); afterAuth = null; };
+$c("authsheet").addEventListener("click", (e) => { if (e.target.id === "authsheet") $c("au-close").onclick(); });
+$c("au-go").onclick = async () => {
+  const email = $c("au-email").value.trim(), pw = $c("au-pw").value, name = $c("au-name").value.trim(), er = $c("au-err");
+  er.style.color = "#B8213F"; er.textContent = "";
+  if (!email || pw.length < 6) { er.textContent = "សូមបំពេញអ៊ីមែល និងពាក្យសម្ងាត់ (យ៉ាងតិច ៦ តួ)"; return; }
+  if (auMode === "signup" && !name) { er.textContent = "សូមបំពេញឈ្មោះ"; return; }
+  $c("au-go").disabled = true;
+  try {
+    let j;
+    if (auMode === "signup") {
+      j = await cReq("signup", { email, password: pw, data: { name } });
+      if (!j.access_token) { er.style.color = "#2E7D52"; er.textContent = "បានបង្កើតគណនី! សូមបើកអ៊ីមែលដើម្បីបញ្ជាក់ រួចចូលម្តងទៀត។"; openAuth("login"); er.textContent = "បានបង្កើតគណនី! សូមបើកអ៊ីមែលដើម្បីបញ្ជាក់ រួចចូលម្តងទៀត។"; er.style.color = "#2E7D52"; return; }
+    } else j = await cReq("token?grant_type=password", { email, password: pw });
+    setSess(j); $c("authsheet").classList.remove("open"); $c("au-pw").value = "";
+    const f = afterAuth; afterAuth = null; if (f) f(); else toast("✓ ចូលគណនីរួចរាល់");
+  } catch (e) {
+    er.textContent = /invalid login/i.test(e.message) ? "អ៊ីមែល ឬពាក្យសម្ងាត់មិនត្រឹមត្រូវ" : /already/i.test(e.message) ? "អ៊ីមែលនេះមានគណនីរួចហើយ សូមចូល" : /confirm/i.test(e.message) ? "សូមបញ្ជាក់អ៊ីមែលជាមុន" : e.message;
+  } finally { $c("au-go").disabled = false; }
+};
+$c("au-pw").addEventListener("keydown", (e) => { if (e.key === "Enter") $c("au-go").click(); });
+async function loadMine() {
+  const box = $c("my-list");
+  try {
+    const t = await cToken();
+    const r = await fetch(`${SB_URL}/rest/v1/orders?select=*&order=created_at.desc&limit=30`, { headers: { apikey: SB_KEY, Authorization: "Bearer " + t }, cache: "no-store" });
+    if (!r.ok) throw new Error(r.status);
+    const rows = await r.json();
+    box.innerHTML = rows.length ? rows.map((o) => {
+      const k = STEPS.findIndex((s) => s[0] === o.status), d = new Date(o.created_at).toLocaleDateString("en-GB", { timeZone: "Asia/Phnom_Penh", day: "2-digit", month: "short" });
+      const prog = o.status === "cancel" ? `<div style="color:#B8213F;font-weight:700">❌ បានបោះបង់</div>` : `<div class="mo-prog">${STEPS.map((s, n) => `<span class="${n <= k ? "on" : ""}"><i></i>${s[1]}</span>`).join("")}</div>`;
+      return `<div class="mo"><b>${esc(o.product)}${o.size ? " · " + esc(o.size) : ""}</b><div class="mo-s">${formatRiel(o.price || 0)} · ${d}${o.order_code ? " · " + esc(o.order_code) : ""}</div>${prog}
+        ${o.tracking_note ? `📍 ${esc(o.tracking_note)}<br>` : ""}${o.courier_no ? `🚚 ${esc(o.courier || "")} <b>${esc(o.courier_no)}</b> <button type="button" class="of-btn" data-copy="${esc(o.courier_no)}" style="flex:none;padding:3px 9px">ចម្លង</button>` : ""}</div>`;
+    }).join("") : `<div class="of-hint">មិនទាន់មានការកម្មង់</div>`;
+  } catch (e) { box.innerHTML = `<div class="of-hint">ទាញទិន្នន័យមិនបាន សូមចូលម្តងទៀត</div>`; }
+}
+function closeMine() { $c("mysheet").classList.remove("open"); clearInterval(myT); }
+$c("tb-acc").addEventListener("click", (e) => {
+  e.preventDefault();
+  if (!sbReady()) return;
+  if (!CU.sess) { afterAuth = null; openAuth("login", ""); return; }
+  $c("my-name").textContent = `${CU.sess.name} · ${CU.sess.email}`;
+  $c("mysheet").classList.add("open"); loadMine(); clearInterval(myT); myT = setInterval(loadMine, 30000);
+});
+$c("mysheet").addEventListener("click", (e) => { if (e.target.id === "mysheet") closeMine(); const c = e.target.closest("[data-copy]"); if (c) copyText(c.dataset.copy, c); });
+$c("my-close").onclick = closeMine;
+$c("my-out").onclick = () => { CU.sess = null; try { localStorage.removeItem("custSess"); } catch (e) {} accBtn(); closeMine(); toast("បានចាកចេញ"); };
+$c("my-del").onclick = async (e) => {
+  const b = e.currentTarget;
+  if (b.dataset.sure !== "1") {
+    b.dataset.sure = "1"; b.textContent = "ចុចម្តងទៀតដើម្បីលុបជាអចិន្ត្រៃយ៍";
+    setTimeout(() => { if (b.dataset.sure === "1") { b.dataset.sure = ""; b.textContent = "🗑 លុបគណនីរបស់ខ្ញុំ"; } }, 4000); return;
+  }
+  b.disabled = true;
+  try {
+    const t = await cToken();
+    const r = await fetch(`${SB_URL}/rest/v1/rpc/delete_my_account`, { method: "POST", headers: { apikey: SB_KEY, Authorization: "Bearer " + t, "Content-Type": "application/json" }, body: "{}" });
+    if (!r.ok) throw new Error(r.status);
+    CU.sess = null; try { localStorage.removeItem("custSess"); } catch (x) {} accBtn(); closeMine(); toast("គណនីត្រូវបានលុប");
+  } catch (err) { b.textContent = "លុបមិនបាន សូមព្យាយាមម្តងទៀត"; }
+  b.disabled = false; b.dataset.sure = "";
+};
+accBtn();
+// ចូលមួយដង → បំពេញលេខទូរស័ព្ទដែលបានប្រើចុងក្រោយ (មានស្រាប់ក្នុង orderContact)
 
 // ---------- ជួរទំនិញបញ្ចុះតម្លៃ រត់ស្វ័យប្រវត្តិ ----------
 let autoRaf = null;
@@ -1865,12 +2184,13 @@ function renderCatNav() {
 
 function render() {
   const hidden = hiddenSet();
-  const all = PRODUCTS.map((p, idx) => ({ ...p, idx })).filter((p) => !hidden.has(p.idx + 1));
+  const fvs = favOnly ? new Set(getFavs()) : null;
+  const all = PRODUCTS.map((p, idx) => ({ ...p, idx })).filter((p) => !hidden.has(p.idx + 1) && (!fvs || fvs.has(p.idx + 1)));
   const saleGrid = document.getElementById("sale-grid");
   const title = document.getElementById("all-title");
   const grid = document.getElementById("grid");
   const q = query.trim().toLowerCase();
-  if (activeCat === "all" && !q) {
+  if (activeCat === "all" && !q && !favOnly) {
     const onSale = all.filter((p) => saleOf(p) > 0);
     const rest = all.filter((p) => saleOf(p) === 0);
     title.textContent = "ខោអាវផ្សេងទៀត";
@@ -1883,12 +2203,12 @@ function render() {
   } else {
     const base = activeCat === "all" ? all : activeCat === "sale" ? all.filter((p) => saleOf(p) > 0) : all.filter((p) => catOf(p) === activeCat);
     const list = sortList(base.filter((p) => !q || p.name.toLowerCase().includes(q)));
-    title.textContent = q ? `ស្វែងរក "${query.trim()}"` : (CATS.find((c) => c[0] === activeCat) || [0, ""])[1];
+    title.textContent = favOnly ? "ទំនិញដែលចូលចិត្ត ♥" : q ? `ស្វែងរក "${query.trim()}"` : (CATS.find((c) => c[0] === activeCat) || [0, ""])[1];
     document.getElementById("count").textContent = `${list.length} ទំនិញ`;
     document.getElementById("sale-section").style.display = "none";
     startAutoScroll(saleGrid, 0);
     fillGrid(grid, list, false);
-    if (!list.length) grid.innerHTML = `<div class="empty-cat">${q ? "រកមិនឃើញទំនិញដែលអ្នកស្វែងរក" : "មិនទាន់មានទំនិញក្នុងប្រភេទនេះ"}</div>`;
+    if (!list.length) grid.innerHTML = `<div class="empty-cat">${favOnly ? "មិនទាន់មានទំនិញដែលចូលចិត្ត ចុចរូបបេះដូងលើទំនិញ" : q ? "រកមិនឃើញទំនិញដែលអ្នកស្វែងរក" : "មិនទាន់មានទំនិញក្នុងប្រភេទនេះ"}</div>`;
   }
 }
 
@@ -1906,6 +2226,7 @@ function fillGrid(grid, list, instant) {
       if (ev.propertyName === "opacity") card.style.transitionDelay = "";
     });
     card.innerHTML = `
+      <button class="fav-btn${isFav(i + 1) ? " on" : ""}" type="button" aria-label="ចូលចិត្ត"><i class="${isFav(i + 1) ? "fa-solid" : "fa-regular"} fa-heart"></i></button>
       <div class="photo-slot">
         <img class="preview-img" src="${photoOf(i + 1)}" alt="${item.name}" ${useData() && adminImages[i + 1] ? "" : 'loading="lazy"'} decoding="async"
              onload="this.parentElement.style.animation='none'"
@@ -1922,15 +2243,18 @@ function fillGrid(grid, list, instant) {
           <span class="price"><b>${finalPrice(item).toLocaleString("en-US")}</b><small>៛</small></span>
           ${saleOf(item) ? `<span class="old">${item.price.toLocaleString("en-US")} ៛</span>` : ""}
         </div>
-        <button class="buy-btn"${stock === 0 ? " disabled" : ""}>
-          <i class="fa-solid ${stock === 0 ? "fa-ban" : "fa-comment-dots"}"></i>
-          <span class="label">${stock === 0 ? "អស់ស្តុក" : "ទិញ"}</span>
-        </button>
+        <div class="btnrow">
+          <button class="buy-btn"${stock === 0 ? " disabled" : ""}>
+            <i class="fa-solid ${stock === 0 ? "fa-ban" : "fa-bolt"}"></i>
+            <span class="label">${stock === 0 ? "អស់ស្តុក" : "ទិញ"}</span>
+          </button>
+          <button class="cart-add" type="button" aria-label="ដាក់ក្នុងកន្ត្រក"${stock === 0 ? " disabled" : ""}><i class="fa-solid fa-cart-plus"></i></button>
+        </div>
       </div>
     `;
 
     card.addEventListener("click", (e) => {
-      if (e.target.closest(".buy-btn")) return;
+      if (e.target.closest(".buy-btn, .cart-add, .fav-btn")) return;
       openLightbox(baseList, basePos);
     });
 
@@ -1941,7 +2265,23 @@ function fillGrid(grid, list, instant) {
       track("order", i + 1);
       ripple(buyBtn, e);
       const sizes = sizesOf(item.place);
-      openSizeSheet(item, i, sizes, buyBtn);
+      const go = () => openSizeSheet(item, i, sizes, buyBtn);
+      if (needLogin()) { afterAuth = go; openAuth("login", "ត្រូវមានគណនីដើម្បីបន្តការទិញ"); return; }
+      go();
+    });
+
+    card.querySelector(".fav-btn").addEventListener("click", (e) => {
+      e.stopPropagation();
+      const on = toggleFav(i + 1), b = e.currentTarget;
+      b.classList.toggle("on", on); b.firstElementChild.className = (on ? "fa-solid" : "fa-regular") + " fa-heart";
+      if (favOnly && !on) render();
+    });
+    card.querySelector(".cart-add").addEventListener("click", (e) => {
+      e.stopPropagation();
+      if (stockOf(i) === 0) return;
+      track("order", i + 1);
+      const sizes = sizesOf(item.place);
+      if (sizes.length) openAddSheet(item, i, sizes); else { addToCart(i + 1, ""); }
     });
 
     grid.appendChild(card);

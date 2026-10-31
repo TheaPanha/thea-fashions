@@ -357,6 +357,7 @@ const SETTINGS = {        // ការកំណត់រចនា និងហ�
   showFlash: true,
   saleCount: 16,
   saleHours: 4,
+  requireLogin: 0,
   payAccount: "",
   statsUrl: "",             // URL របស់ Worker ស្ថិតិ (ទទេ = មិនប្រើ)
   showPromo: true,          // បង្ហាញផ្ទាំងផ្សព្វផ្សាយធំ
@@ -374,6 +375,7 @@ const ADMIN_HASH = "240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c7
 // ---------- Supabase ----------
 const SB_URL = "https://jbdxyxypgmdldxktixyd.supabase.co";   // ← ដាក់ Project URL
 const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpiZHh5eHlwZ21kbGR4a3RpeHlkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMzMjAzNzYsImV4cCI6MjEwODg5NjM3Nn0.3vvF45w20T_giyk66jXKqEoAd9bylA7Py4O89JAtfE0";                // ← ដាក់ anon public key
+window.__sd = new Set();   // ស្តុកដែលម្ចាស់ហាងទើបកែ (មិនទាន់ push)
 const OWNER_EMAIL = "rabbitbot85@gmail.com";             // ← អ៊ីមែលម្ចាស់ហាងក្នុង Supabase Auth
 const sbOn = () => /^https:\/\/[a-z0-9]+\.supabase\.co$/.test(SB_URL) && !SB_KEY.startsWith("YOUR");
 let sbSess = null; try { sbSess = JSON.parse(localStorage.getItem("sbSess") || "null"); } catch (e) {}
@@ -401,8 +403,17 @@ function sbPush() {
   pushT = setTimeout(async () => {
     try {
       const t = await sbToken();
+      try {                                                   // យកស្តុកថ្មីពី server (ការកម្មង់កាត់ស្តុកស្វ័យប្រវត្តិ)
+        const rd = await sbPull();
+        if (rd && rd.stock) {
+          const st = { ...adminData.stock };
+          new Set([...Object.keys(st), ...Object.keys(rd.stock)]).forEach((k) => { if (!window.__sd.has(String(k))) { if (rd.stock[k] === undefined) delete st[k]; else st[k] = rd.stock[k]; } });
+          adminData.stock = st; try { localStorage.setItem("adminData", JSON.stringify(adminData)); } catch (e) {}
+        }
+      } catch (e) {}
       const r = await fetch(`${SB_URL}/rest/v1/shop?on_conflict=id`, { method: "POST", headers: { apikey: SB_KEY, Authorization: "Bearer " + t, "Content-Type": "application/json", Prefer: "resolution=merge-duplicates" }, body: JSON.stringify({ id: 1, data: { ...adminData, imgs: adminImages } }) });
       if (!r.ok) throw new Error("HTTP " + r.status);
+      window.__sd.clear();
     } catch (e) { alert("រក្សាទុកលើ server មិនបាន៖ " + e.message); }
   }, 500);
 }
@@ -705,17 +716,69 @@ function wireStats(box) {
     const nNew = orders.filter((o) => o.status === "new").length, bd = $("od-badge");
     if (bd) { bd.hidden = !nNew; bd.textContent = nNew; }
     $("od-stats").innerHTML = `<div class="od-stat"><b>${nNew}</b><span>ថ្មី</span></div><div class="od-stat"><b>${td.length}</b><span>ថ្ងៃនេះ</span></div><div class="od-stat"><b>${money(td.reduce((s, o) => s + (o.price || 0), 0))}</b><span>សរុបថ្ងៃនេះ</span></div>`;
+    $("od-rev").innerHTML = revBox();
     $("od-chips").innerHTML = [["all", "ទាំងអស់", orders.length], ...Object.entries(ST).map(([k, v]) => [k, v, orders.filter((o) => o.status === k).length])].map(([k, v, c]) => `<button class="od-sm${flt === k ? " on" : ""}" data-f="${k}" type="button">${v} (${c})</button>`).join("");
     const rows = orders.filter((o) => flt === "all" || o.status === flt);
     $("od-list").innerHTML = rows.length ? rows.map((o) => `<div class="od-card ${e2(o.status)}" data-id="${o.id}">
       <div class="od-top"><div class="od-name">${e2(o.product)}${o.size ? " · " + e2(o.size) : ""}</div><div class="od-time">${when(o.created_at)}</div></div>
       <div class="od-meta"><span class="od-price">${money(o.price)}</span> · #${e2(o.product_no)}${o.order_code ? " · 🔖 <b>" + e2(o.order_code) + "</b>" : ""}${o.pay_method ? " · " + (o.pay_method === "qr" ? "💳 បង់ឥឡូវ" : "🚚 បង់ពេលទទួល") : ""}<br>
-        📞 <a href="tel:${e2(String(o.phone).replace(/[^\d+]/g, ""))}">${e2(o.phone)}</a><br>${o.location ? "📍 " + e2(o.location) + "<br>" : ""}${/^https?:\/\//.test(o.map_link || "") ? `🗺 <a href="${e2(o.map_link)}" target="_blank" rel="noopener">បើក Google Map</a>` : ""}</div>
+        ${Array.isArray(o.items) && o.items.length ? o.items.map((it) => "• " + e2(it.name) + (it.size ? " · " + e2(it.size) : "") + " ×" + it.qty + " — " + money(it.price * it.qty)).join("<br>") + "<br>" : ""}${o.coupon ? "🎟️ " + e2(o.coupon) + " −" + money(o.discount) + "<br>" : ""}${o.customer_name ? "👤 " + e2(o.customer_name) + " (គណនី)<br>" : ""}📞 <a href="tel:${e2(String(o.phone).replace(/[^\d+]/g, ""))}">${e2(o.phone)}</a><br>${o.location ? "📍 " + e2(o.location) + "<br>" : ""}${/^https?:\/\//.test(o.map_link || "") ? `🗺 <a href="${e2(o.map_link)}" target="_blank" rel="noopener">បើក Google Map</a>` : ""}</div>
       ${payBox(o)}
       <div class="od-box"><div class="od-row"><input data-courier value="${e2(o.courier)}" placeholder="ក្រុមហ៊ុនដឹក"><input data-trackno value="${e2(o.courier_no)}" placeholder="លេខតាមដាន"></div>
         <div class="od-row" style="margin-top:6px"><input data-note value="${e2(o.tracking_note)}" placeholder="ដឹកដល់ណាហើយ?"><button class="od-sm" data-savetrack="1" type="button">រក្សា</button></div></div>
       <div class="od-acts">${o.receipt_url ? `<button class="od-sm" data-rc="${e2(o.receipt_url)}" type="button" style="border-color:#3F7D5C;color:#3F7D5C">🧾 មើលបង្កាន់ដៃ</button>` : ""}${Object.entries(ST).filter(([k]) => k !== o.status).map(([k, v]) => `<button class="od-sm" data-s="${k}" type="button">${v}</button>`).join("")}<button class="od-sm" data-del="1" type="button" style="color:#B8213F">🗑</button></div>
     </div>`).join("") : `<div class="od-empty">មិនទាន់មានការបញ្ជាទិញ</div>`;
+  }
+  // ----- លេខកូដបញ្ចុះតម្លៃ -----
+  let coupons = [];
+  function cpDraw() {
+    const box = $("cp-box"); if (!box) return;
+    box.innerHTML = `<div class="ad-label" style="margin-top:6px">🎟️ លេខកូដបញ្ចុះតម្លៃ</div>
+      <div class="od-box"><div class="od-row"><input id="cp-c" placeholder="លេខកូដ ឧ. NEW10" autocapitalize="characters"><select id="cp-k" class="ad-input" style="margin:0;max-width:84px"><option value="percent">%</option><option value="amount">៛</option></select><input id="cp-v" inputmode="numeric" placeholder="តម្លៃ" style="max-width:90px"></div>
+        <div class="od-row" style="margin-top:6px"><input id="cp-m" inputmode="numeric" placeholder="ទិញយ៉ាងតិច ៛ (ទទេ=គ្មាន)"><input id="cp-u" inputmode="numeric" placeholder="ប្រើបានចំនួន (ទទេ=គ្មានកំណត់)"></div>
+        <button class="od-sm" id="cp-add" type="button" style="margin-top:8px;background:var(--ink);color:#fff">＋ បង្កើតលេខកូដ</button><div class="od-stat2" id="cp-err" style="color:#B8213F"></div></div>
+      ${coupons.length ? coupons.map((c) => `<div class="od-card ${c.active ? "done" : "cancel"}" data-cp="${e2(c.code)}"><div class="od-top"><div class="od-name">${e2(c.code)}</div><div class="od-time">ប្រើ ${c.uses}${c.max_uses != null ? "/" + c.max_uses : ""}</div></div>
+        <div class="od-meta">${c.kind === "percent" ? "−" + c.value + "%" : "−" + money(c.value)}${c.min_total ? " · ទិញយ៉ាងតិច " + money(c.min_total) : ""}</div>
+        <div class="od-acts"><button class="od-sm" data-cpt="1" type="button">${c.active ? "⏸ បិទ" : "▶ បើក"}</button><button class="od-sm" data-cpd="1" type="button" style="color:#B8213F">🗑</button></div></div>`).join("") : `<div class="od-empty">មិនទាន់មានលេខកូដ</div>`}`;
+  }
+  window.cpLoad = async function () {
+    if (!sbOn()) { const b = $("cp-box"); if (b) b.innerHTML = `<div class="od-empty">មិនទាន់ភ្ជាប់ Supabase</div>`; return; }
+    try { coupons = await api("coupons?select=*&order=code", { headers: { Prefer: "" } }); } catch (e) { coupons = []; }
+    cpDraw();
+    const box = $("cp-box");
+    box.onclick = async (ev) => {
+      const b = ev.target.closest("button"); if (!b) return;
+      try {
+        if (b.id === "cp-add") {
+          const code = $("cp-c").value.trim().toUpperCase(), v = parseAmount($("cp-v").value), er = $("cp-err");
+          if (!/^[A-Z0-9_-]{3,20}$/.test(code) || !v) { er.textContent = "ត្រូវមានលេខកូដ (៣-២០ តួ A-Z/0-9) និងតម្លៃ"; return; }
+          const kind = $("cp-k").value; if (kind === "percent" && v > 100) { er.textContent = "ភាគរយមិនអាចលើស ១០០"; return; }
+          await api("coupons", { method: "POST", body: JSON.stringify({ code, kind, value: v, min_total: parseAmount($("cp-m").value) || 0, max_uses: parseAmount($("cp-u").value) }) });
+          return cpLoad();
+        }
+        const card = b.closest("[data-cp]"); if (!card) return; const code = card.dataset.cp, c = coupons.find((x) => x.code === code);
+        if (b.dataset.cpt) { await api(`coupons?code=eq.${encodeURIComponent(code)}`, { method: "PATCH", body: JSON.stringify({ active: !c.active }) }); return cpLoad(); }
+        if (b.dataset.cpd) {
+          if (b.dataset.sure !== "1") { b.dataset.sure = "1"; b.textContent = "ចុចម្តងទៀត"; setTimeout(() => { if (b.isConnected) { b.dataset.sure = ""; b.textContent = "🗑"; } }, 3000); return; }
+          await api(`coupons?code=eq.${encodeURIComponent(code)}`, { method: "DELETE" }); cpLoad();
+        }
+      } catch (err) { alert("មិនបាន៖ " + err.message + " (ត្រូវ run SQL ថ្មីក្នុង Supabase)"); }
+    };
+  };
+  // ----- ចំណូលលក់ -----
+  let rng = "today";
+  function revBox() {
+    const keyAgo = (k) => dayKey(new Date(Date.now() - k * 864e5)), today = keyAgo(0), live = orders.filter((o) => o.status !== "cancel");
+    const inR = (o) => { const k = dayKey(o.created_at); return rng === "today" ? k === today : rng === "7" ? k >= keyAgo(6) : rng === "month" ? k.slice(0, 7) === today.slice(0, 7) : true; };
+    const sel = live.filter(inR), rev = sel.reduce((s, o) => s + (o.price || 0), 0), days = [6, 5, 4, 3, 2, 1, 0].map((k) => { const d = keyAgo(k); return [d.slice(5), live.filter((o) => dayKey(o.created_at) === d).reduce((s, o) => s + (o.price || 0), 0)]; });
+    const mx = Math.max(1, ...days.map((d) => d[1])), top = {};
+    sel.forEach((o) => (Array.isArray(o.items) && o.items.length ? o.items : [{ name: o.product, qty: 1 }]).forEach((it) => { top[it.name] = (top[it.name] || 0) + (it.qty || 1); }));
+    const tp = Object.entries(top).sort((x, y) => y[1] - x[1]).slice(0, 3), R = [["today", "ថ្ងៃនេះ"], ["7", "៧ ថ្ងៃ"], ["month", "ខែនេះ"], ["all", "ទាំងអស់"]];
+    return `<div class="od-box" style="background:var(--card);margin-top:0"><div class="od-chips" style="margin:0 0 8px">${R.map(([k, v]) => `<button class="od-sm${rng === k ? " on" : ""}" data-rg="${k}" type="button">${v}</button>`).join("")}</div>
+      <div style="font-size:12px;color:var(--muted)">ចំណូល (មិនរាប់ការបោះបង់)</div><div style="font-size:24px;font-weight:700;color:var(--clay-dark)">${money(rev)}</div>
+      <div style="font-size:13px;color:var(--muted)">${sel.length} ការកម្មង់ · មធ្យម ${money(sel.length ? Math.round(rev / sel.length) : 0)}</div>
+      <div style="display:flex;gap:4px;align-items:flex-end;height:54px;margin:10px 0 2px">${days.map(([d, v]) => `<div style="flex:1;text-align:center;font-size:9px;color:var(--muted)"><div style="height:${Math.max(3, Math.round((v / mx) * 40))}px;background:var(--clay);border-radius:4px 4px 0 0;opacity:${v ? 1 : .25}"></div>${d}</div>`).join("")}</div>
+      ${tp.length ? `<div style="font-size:12px;margin-top:8px;color:var(--muted)">លក់ដាច់៖ ${tp.map(([n, q]) => e2(n) + " ×" + q).join(" · ")}</div>` : ""}</div>`;
   }
   window.odLoad = async function () {
     if (!ready) return;
@@ -727,8 +790,9 @@ function wireStats(box) {
   window.odInit = function () {
     const root = $("od-root"); if (!root) return;
     if (!sbOn()) { root.innerHTML = `<div class="od-empty">មិនទាន់ភ្ជាប់ Supabase</div>`; return; }
-    root.innerHTML = `<div class="od-stats" id="od-stats"></div><div class="od-chips" id="od-chips"></div><div id="od-list"><div class="od-empty">កំពុងទាញ...</div></div>`;
+    root.innerHTML = `<div class="od-stats" id="od-stats"></div><div id="od-rev"></div><div class="od-chips" id="od-chips"></div><div id="od-list"><div class="od-empty">កំពុងទាញ...</div></div>`;
     ready = true; odLoad(); clearInterval(timer); timer = setInterval(() => { if (!document.hidden) odLoad(); }, 30000);
+    $("od-rev").onclick = (e) => { const b = e.target.closest("[data-rg]"); if (b) { rng = b.dataset.rg; draw(); } };
     $("od-chips").onclick = (e) => { const b = e.target.closest("[data-f]"); if (b) { flt = b.dataset.f; draw(); } };
     $("rcv-x").onclick = () => { $("rcv").style.display = "none"; $("rcv-img").removeAttribute("src"); };
     $("od-list").onclick = async (e) => {
@@ -857,6 +921,7 @@ function openAdminPanel() {
         </div>`).join("")}
     </div>
 
+    <div class="ad-panel" data-tab="promo" style="display:none"><div id="cp-box"></div></div>
     <div class="ad-panel" data-tab="stats" style="display:none">
       <div id="st-body"><div class="ad-empty">កំពុងផ្ទុក...</div></div>
     </div>
@@ -872,6 +937,11 @@ function openAdminPanel() {
           ${[1, 2, 3, 4, 6, 8, 12, 24].map((h) => `<option value="${h}"${settings.saleHours === h ? " selected" : ""}>${h} ម៉ោង</option>`).join("")}
         </select></label>
       <div class="ad-hint">ម៉ោងគិតតាមម៉ោងកម្ពុជា ចាប់ពី 00:00</div>
+      <label class="ad-field">ត្រូវចូលគណនីមុនទិញ?
+        <select class="ad-input" data-s="requireLogin" data-num="1">
+          <option value="0"${Number(settings.requireLogin) === 1 ? "" : " selected"}>ទេ (ភ្ញៀវទិញបានដោយមិនចាំបាច់ចូល)</option>
+          <option value="1"${Number(settings.requireLogin) === 1 ? " selected" : ""}>បាទ/ចាស (ត្រូវចូលគណនីមុន)</option>
+        </select></label>
       <label class="ad-field">គណនីទទួលប្រាក់ (ឈ្មោះ + លេខ ACLEDA)<input class="ad-input" data-s="payAccount" value="${esc(settings.payAccount)}" placeholder="ឧ. ACLEDA 0000 0000 0000 · SOK DARA" /></label>
       <div class="ad-hint">ដាក់រូប QR ឈ្មោះ KHQR.jpg ទៅជាមួយ index.html ដើម្បីបង្ហាញលើទំព័របង់ប្រាក់។</div>
       <label class="ad-field">URL Worker ស្ថិតិ (ទទេ = រាប់លើឧបករណ៍នេះប៉ុណ្ណោះ)<input class="ad-input" data-s="statsUrl" value="${esc(settings.statsUrl)}" placeholder="https://stats.xxx.workers.dev" /></label>
@@ -905,6 +975,7 @@ function openAdminPanel() {
     else if (f === "stock") {
       if (el.value === "") delete adminData.stock[n];
       else adminData.stock[n] = Math.max(0, Math.round(Number(el.value) || 0));
+      window.__sd.add(String(n));
     }
     else if (f === "sale") {
       const v = Math.round(Number(el.value) || 0);
@@ -954,7 +1025,7 @@ function openAdminPanel() {
         setTimeout(() => { if (del.isConnected) { del.dataset.sure = ""; del.textContent = "🗑 លុបប្រអប់"; del.style.background = ""; del.style.color = ""; } }, 3000);
         return;
       }
-      delete adminImages[n]; delete adminData.stock[n]; delete adminData.sale[n];
+      delete adminImages[n]; delete adminData.stock[n]; delete adminData.sale[n]; window.__sd.add(String(n));
       adminData.hidden = adminData.hidden.filter((x) => x !== n);
       if (n === PRODUCTS.length && n > ORIG_PRODUCTS.length) PRODUCTS.pop();      // ទំនិញថ្មីចុងក្រោយ → លុបពិត
       else adminData.deleted = [...new Set([...(adminData.deleted || []), n])];  // ផ្សេងទៀត → លាក់ជាអចិន្ត្រៃយ៍
@@ -968,7 +1039,7 @@ function openAdminPanel() {
     if (!btn) return;
     const row = btn.closest(".ad-row"), n = Number(row.dataset.n), price = PRODUCTS[n - 1].price;
     if (btn.dataset.p === "soldout") {
-      adminData.stock[n] = 0;
+      adminData.stock[n] = 0; window.__sd.add(String(n));
       row.querySelector('[data-f="stock"]').value = 0;
       saveAdmin(); refreshSite(); stats();
       return;
@@ -991,6 +1062,14 @@ function openAdminPanel() {
     body.querySelectorAll(".ad-panel").forEach((pn) => (pn.style.display = pn.dataset.tab === t.dataset.tab ? "" : "none"));
     if (t.dataset.tab === "stats") renderStats();
     if (t.dataset.tab === "orders") odLoad();
+    if (t.dataset.tab === "promo") window.cpLoad && cpLoad();
+    if (t.dataset.tab === "products" && sbOn() && window.__sd.size === 0) {
+      sbPull().then((rd) => {
+        if (!rd || !rd.stock || JSON.stringify(rd.stock) === JSON.stringify(adminData.stock)) return;
+        adminData.stock = rd.stock; try { localStorage.setItem("adminData", JSON.stringify(adminData)); } catch (e) {}
+        const l = document.getElementById("ad-list"), s = document.getElementById("ad-search"); if (l) l.innerHTML = adminRows(s ? s.value : "");
+      }).catch(() => {});
+    }
     const st = document.getElementById("ad-stats"); if (st) st.style.display = t.dataset.tab === "products" ? "" : "none";
   }));
 
