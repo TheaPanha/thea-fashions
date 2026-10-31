@@ -245,6 +245,19 @@
   #rcv { position: fixed; inset: 0; z-index: 99; background: rgba(0,0,0,.9); align-items: center; justify-content: center; flex-direction: column; padding: 16px; gap: 12px; }
   #rcv-x { position: absolute; top: calc(env(safe-area-inset-top) + 12px); right: 12px; padding: 8px 14px; border: none; border-radius: 999px; background: #fff; font: 600 13px inherit; }
   #rcv-msg, #rcv-open { color: #fff; font-size: 14px; } #rcv-img { display: none; max-width: 100%; max-height: 78vh; border-radius: 12px; background: #fff; } #rcv-open { display: none; }
+
+  /* ===== Pro UI v2 · admin polish ===== */
+  :focus-visible { outline: 2px solid var(--clay); outline-offset: 2px; }
+  #admin-app > .ad-top { background: #1F1813; box-shadow: none; border-bottom: 1px solid rgba(255,255,255,.08); }
+  .ad-row, .od-card, .od-stat, .od-box { box-shadow: none !important; }
+  .ad-row, .od-card { border-radius: 14px; }
+  .od-card { padding: 14px 14px 12px; }
+  .od-sm { min-height: 36px; border-radius: 10px; }
+  .od-row input, .ad-input { min-height: 40px; border-radius: 10px; }
+  .od-stat b { font-size: 18px; }
+  .ad-tabs { box-shadow: none; border-top: 1px solid var(--border); background: rgba(255,255,255,.96); }
+  .ad-tab.active { background: rgba(var(--clay-rgb), .1); }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; } }
 </style>
 </head>
 <body>
