@@ -1282,25 +1282,11 @@
       <div id="done-codewrap" style="display:none">
         <div class="of-hint" style="margin-bottom:0">លេខសម្គាល់ការកម្មង់របស់អ្នក</div>
         <div class="code-box"><b id="done-code"></b><button type="button" class="of-btn" id="done-copy" style="flex:none;padding:8px 12px">ចម្លង</button></div>
-        <p class="of-hint">សូមរក្សាទុកលេខនេះ ដើម្បីតាមដានទំនិញ ឬប្រាប់ក្រុមហ៊ុនដឹកជញ្ជូន</p>
+        <p class="of-hint">សូមរក្សាទុកលេខនេះ។ ចូលគណនីដើម្បីមើលការដឹកជញ្ជូន និងចម្លងលេខតាមដានពីហាង</p>
       </div>
       <p class="of-hint" style="margin-bottom:14px">សូមអរគុណ! យើងនឹងទំនាក់ទំនងអ្នកតាមលេខទូរស័ព្ទ ដើម្បីបញ្ជាក់ និងដឹកជញ្ជូនទំនិញ។</p>
-      <button class="sheet-confirm" id="done-track" type="button" style="display:none">🔎 តាមដានការកម្មង់</button>
+      <button class="sheet-confirm" id="done-track" type="button" style="display:none">🔎 តាមដានការដឹកជញ្ជូន (ចូលគណនី)</button>
       <button class="sheet-cancel" id="done-ok" type="button">បិទ</button>
-    </div>
-  </div>
-
-  <div class="sheet-backdrop" id="tracksheet">
-    <div class="sheet" role="dialog" aria-modal="true">
-      <div class="sheet-handle"></div>
-      <h3 style="margin:6px 0 2px">តាមដានការកម្មង់</h3>
-      <p class="of-hint">វាយលេខសម្គាល់ និងលេខទូរស័ព្ទដែលបានកម្មង់</p>
-      <input class="of-input" id="tk-code" type="text" placeholder="លេខសម្គាល់ ឧ. TF-7K3Q9A" autocapitalize="characters" autocomplete="off" />
-      <input class="of-input" id="tk-phone" type="tel" inputmode="tel" placeholder="លេខទូរស័ព្ទ" autocomplete="tel" />
-      <div class="of-hint" id="tk-err" style="color:#B8213F"></div>
-      <div id="tk-res"></div>
-      <button class="sheet-confirm" id="tk-go" type="button">ពិនិត្យ</button>
-      <button class="sheet-cancel" id="tk-close" type="button">បិទ</button>
     </div>
   </div>
 
@@ -1312,6 +1298,9 @@
       <button type="button" class="of-btn" id="au-google" style="width:100%;display:flex;align-items:center;justify-content:center;gap:10px;padding:12px;font-size:15px;margin-bottom:10px">
         <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.9 2.4 30.4 0 24 0 14.6 0 6.5 5.4 2.6 13.2l7.9 6.1C12.4 13.6 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8c4.4-4.1 7.1-10.1 7.1-17.5z"/><path fill="#FBBC05" d="M10.5 28.7a14.5 14.5 0 0 1 0-9.4l-7.9-6.1a24 24 0 0 0 0 21.6l7.9-6.1z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.5-5.8c-2.1 1.4-4.9 2.3-8.4 2.3-6.3 0-11.6-4.1-13.5-9.8l-7.9 6.1C6.5 42.6 14.6 48 24 48z"/></svg>
         បន្តជាមួយ Google</button>
+      <button type="button" class="of-btn" id="au-facebook" style="width:100%;display:flex;align-items:center;justify-content:center;gap:10px;padding:12px;font-size:15px;margin-bottom:10px;background:#1877F2;border-color:#1877F2;color:#fff">
+        <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path fill="#fff" d="M24 12.07C24 5.4 18.63 0 12 0S0 5.4 0 12.07C0 18.1 4.39 23.1 10.13 24v-8.44H7.08v-3.49h3.05V9.41c0-3.02 1.79-4.69 4.53-4.69 1.31 0 2.69.24 2.69.24v2.97h-1.51c-1.49 0-1.96.93-1.96 1.89v2.25h3.33l-.53 3.49h-2.8V24C19.61 23.1 24 18.1 24 12.07z"/></svg>
+        បន្តជាមួយ Facebook</button>
       <div class="of-hint" id="au-err" style="color:#B8213F;text-align:center"></div>
       <button class="sheet-cancel" id="au-close" type="button">បិទ</button>
     </div>
@@ -1510,6 +1499,10 @@ const SETTINGS = {        // ការកំណត់រចនា និងហ�
   showFlash: true,
   saleCount: 16,
   saleHours: 4,
+  logoText: "",            // អក្សរ Logo (ទទេ = អក្សរដំបូងនៃឈ្មោះហាង)
+  logoImg: "",             // រូប Logo (URL)
+  qrImg: "",               // រូប QR ទូទាត់ (URL · ទទេ = KHQR.jpg)
+  showTimer: 1,            // 1 = បង្ហាញម៉ោងរាប់ថយក្រោយបញ្ចុះតម្លៃ
   requireLogin: 0,         // 1 = ភ្ញៀវត្រូវចូលគណនីមុនទិញ
   payAccount: "",          // គណនីទទួលប្រាក់ (ACLEDA) · ដាក់រូប KHQR ឈ្មោះ KHQR.jpg
   statsUrl: "",             // URL របស់ Worker ស្ថិតិ (ទទេ = មិនប្រើ)
@@ -1842,6 +1835,7 @@ sheetConfirm.addEventListener("click", () => {
   document.getElementById("pay-total").textContent = (items.length === 1 ? `${f.name}${f.size ? " · " + f.size : ""}${f.qty > 1 ? " ×" + f.qty : ""}` : `${items.length} មុខ`) + ` · ${formatRiel(sub - disc)}` + (disc ? ` (បញ្ចុះ ${formatRiel(disc)})` : "");
   receiptFile = null; document.getElementById("rc-file").value = ""; rcName.textContent = "";
   setPay(acc ? "qr" : "cod");
+  if (!acc) { payGo.click(); return; }      // មានតែបង់ពេលទទួលអីវ៉ាន់ → បញ្ជាក់ការកម្មង់ភ្លាម
   paySheet.classList.add("open");
 });
 document.querySelectorAll(".pay-opt").forEach((b) => b.addEventListener("click", () => setPay(b.dataset.m)));
@@ -1853,39 +1847,22 @@ document.getElementById("done-ok").addEventListener("click", () => document.getE
 document.getElementById("donesheet").addEventListener("click", (e) => { if (e.target.id === "donesheet") e.target.classList.remove("open"); });
 const $t = (id) => document.getElementById(id);
 const STEPS = [["new", "បានទទួលការកម្មង់"], ["contacted", "កំពុងរៀបចំ"], ["shipping", "កំពុងដឹកជញ្ជូន"], ["done", "ដឹកដល់ហើយ"]];
-function openTrack(code, phone) {
-  $t("tk-code").value = code || ""; $t("tk-phone").value = phone || ""; $t("tk-err").textContent = ""; $t("tk-res").innerHTML = "";
-  $t("tracksheet").classList.add("open");
-  if (code && phone) $t("tk-go").click();
-}
-$t("tb-track").addEventListener("click", (e) => {
-  e.preventDefault();
-  let l = lastOrder; try { l = l || JSON.parse(localStorage.getItem("lastOrder") || "null"); } catch (x) {}
-  document.getElementById("tracksheet").dataset.fresh = "1";
-  openTrack(l && l.code, l && l.phone);
-});
-$t("done-track").onclick = () => { $t("donesheet").classList.remove("open"); openTrack(lastOrder.code, lastOrder.phone); };
 $t("done-copy").onclick = (e) => copyText($t("done-code").textContent, e.currentTarget);
-$t("tk-close").onclick = () => $t("tracksheet").classList.remove("open");
-$t("tracksheet").addEventListener("click", (e) => { if (e.target.id === "tracksheet") e.target.classList.remove("open"); const c = e.target.closest("[data-copy]"); if (c) copyText(c.dataset.copy, c); });
-$t("tk-go").onclick = async () => {
-  const code = $t("tk-code").value.trim(), phone = $t("tk-phone").value.trim(), er = $t("tk-err"), res = $t("tk-res");
-  er.textContent = ""; res.innerHTML = "";
-  if (!code || phone.replace(/\D/g, "").length < 8) { er.textContent = "សូមវាយលេខសម្គាល់ និងលេខទូរស័ព្ទឱ្យគ្រប់"; return; }
-  $t("tk-go").disabled = true;
+// ការតាមដានការដឹកជញ្ជូន ត្រូវចូលគណនីសិន
+async function claimLast() {
+  if (!lastOrder || !CU.sess) return;
   try {
-    const r = await fetch(`${SB_URL}/rest/v1/rpc/track_order`, { method: "POST", headers: { apikey: SB_KEY, Authorization: "Bearer " + SB_KEY, "Content-Type": "application/json" }, body: JSON.stringify({ p_code: code, p_phone: phone }) });
-    if (!r.ok) throw new Error(r.status);
-    const rows = await r.json();
-    if (!rows.length) { er.textContent = "រកមិនឃើញ សូមពិនិត្យលេខសម្គាល់ និងលេខទូរស័ព្ទម្តងទៀត"; return; }
-    const o = rows[0], k = STEPS.findIndex((s) => s[0] === o.status);
-    const prog = o.status === "cancel" ? `<div style="color:#B8213F;font-weight:700">❌ បានបោះបង់</div>` : `<div class="mo-prog">${STEPS.map((s, n) => `<span class="${n <= k ? "on" : ""}"><i></i>${s[1]}</span>`).join("")}</div>`;
-    res.innerHTML = `<div class="tk-box"><b>${esc(o.product)}${o.size ? " · " + esc(o.size) : ""}</b>${prog}
-      ${o.tracking_note ? `📍 ${esc(o.tracking_note)}<br>` : ""}
-      ${o.courier_no ? `🚚 ${esc(o.courier || "ក្រុមហ៊ុនដឹកជញ្ជូន")}៖ <b>${esc(o.courier_no)}</b> <button type="button" class="of-btn" data-copy="${esc(o.courier_no)}" style="flex:none;padding:4px 10px;margin-left:6px">ចម្លង</button><div class="of-hint">ចម្លងលេខនេះទៅឱ្យក្រុមហ៊ុនដឹកជញ្ជូន ដើម្បីមើលទំនិញដល់ណាហើយ</div>` : `<div class="of-hint">មិនទាន់មានលេខតាមដានពីក្រុមហ៊ុនដឹកជញ្ជូនទេ</div>`}</div>`;
-  } catch (e) { er.textContent = "ពិនិត្យមិនបាន សូមព្យាយាមម្តងទៀត"; }
-  finally { $t("tk-go").disabled = false; }
-};
+    const t = await cToken();
+    await fetch(`${SB_URL}/rest/v1/rpc/claim_order`, { method: "POST", headers: { apikey: SB_KEY, Authorization: "Bearer " + t, "Content-Type": "application/json" }, body: JSON.stringify({ p_code: lastOrder.code, p_phone: lastOrder.phone }) });
+  } catch (e) {}
+}
+function openTracking(claim) {
+  const go = async () => { if (claim) await claimLast(); openMine(); };
+  if (!CU.sess) { afterAuth = go; openAuth("login", "ចូលគណនីដើម្បីមើលការដឹកជញ្ជូន និងចម្លងលេខតាមដាន"); return; }
+  go();
+}
+$t("tb-track").addEventListener("click", (e) => { e.preventDefault(); openTracking(false); });
+$t("done-track").onclick = () => { $t("donesheet").classList.remove("open"); openTracking(true); };
 document.getElementById("pay-back").addEventListener("click", () => { paySheet.classList.remove("open"); sheet.classList.add("open"); });
 paySheet.addEventListener("click", (e) => { if (e.target === paySheet) paySheet.classList.remove("open"); });
 async function placeOrder(P, code, rpath) {
@@ -1919,7 +1896,7 @@ payGo.addEventListener("click", async () => {
   if (sbReady()) {
     payGo.disabled = true; payGo.textContent = "កំពុងបញ្ជូនការកម្មង់...";
     const r = await placeOrder(P, code, rpath);
-    if (!r.ok) { err.textContent = r.msg; updatePay(); return; }
+    if (!r.ok) { err.textContent = r.msg; updatePay(); paySheet.classList.add("open"); return; }
   }
   pending = null; paySheet.classList.remove("open");
   if (P.cart) { cart = []; saveCart(); cartCoupon = null; renderCartUI(); }
@@ -2071,13 +2048,15 @@ async function cToken() {
 }
 function openAuth(mode, sub) {
   $c("au-title").textContent = "ចូលគណនី";
-  $c("au-sub").textContent = sub || "ចូលដោយគណនី Google របស់អ្នក";
+  $c("au-sub").textContent = sub || "ចូលដោយគណនី Google ឬ Facebook របស់អ្នក";
   $c("au-err").textContent = ""; $c("authsheet").classList.add("open");
 }
-$c("au-google").onclick = () => {
+function oauth(provider) {
   try { sessionStorage.setItem("authResume", afterAuth === openCheckout ? "cart" : ""); } catch (e) {}
-  location.href = `${SB_URL}/auth/v1/authorize?provider=google&redirect_to=${encodeURIComponent(location.origin + location.pathname)}`;
-};
+  location.href = `${SB_URL}/auth/v1/authorize?provider=${provider}&redirect_to=${encodeURIComponent(location.origin + location.pathname)}`;
+}
+$c("au-google").onclick = () => oauth("google");
+$c("au-facebook").onclick = () => oauth("facebook");
 $c("au-close").onclick = () => { $c("authsheet").classList.remove("open"); afterAuth = null; };
 $c("authsheet").addEventListener("click", (e) => { if (e.target.id === "authsheet") $c("au-close").onclick(); });
 async function loadMine() {
@@ -2096,12 +2075,15 @@ async function loadMine() {
   } catch (e) { box.innerHTML = `<div class="of-hint">ទាញទិន្នន័យមិនបាន សូមចូលម្តងទៀត</div>`; }
 }
 function closeMine() { $c("mysheet").classList.remove("open"); clearInterval(myT); }
+function openMine() {
+  $c("my-name").textContent = CU.sess.name;
+  $c("mysheet").classList.add("open"); pfFill(); loadProfile(); loadMine(); clearInterval(myT); myT = setInterval(loadMine, 30000);
+}
 $c("tb-acc").addEventListener("click", (e) => {
   e.preventDefault();
   if (!sbReady()) return;
   if (!CU.sess) { afterAuth = null; openAuth("login", ""); return; }
-  $c("my-name").textContent = CU.sess.name;
-  $c("mysheet").classList.add("open"); pfFill(); loadProfile(); loadMine(); clearInterval(myT); myT = setInterval(loadMine, 30000);
+  openMine();
 });
 $c("mysheet").addEventListener("click", (e) => { if (e.target.id === "mysheet") closeMine(); const c = e.target.closest("[data-copy]"); if (c) copyText(c.dataset.copy, c); });
 $c("my-close").onclick = closeMine;
@@ -2183,10 +2165,10 @@ loadProfile();
   try { history.replaceState(null, "", location.pathname + location.search); } catch (e) {}
   if (p.get("access_token")) {
     setSess({ access_token: p.get("access_token"), refresh_token: p.get("refresh_token"), expires_in: +p.get("expires_in") || 3600 });
-    toast("✓ ចូលគណនីតាម Google រួចរាល់"); loadProfile();
+    toast("✓ ចូលគណនីរួចរាល់"); loadProfile();
     let r = ""; try { r = sessionStorage.getItem("authResume") || ""; sessionStorage.removeItem("authResume"); } catch (e) {}
     if (r === "cart") setTimeout(openCart, 500);
-  } else toast("ចូលតាម Google មិនបាន");
+  } else toast("ចូលគណនីមិនបាន");
 })();
 // ចូលមួយដង → បំពេញលេខទូរស័ព្ទដែលបានប្រើចុងក្រោយ (មានស្រាប់ក្នុង orderContact)
 
@@ -2532,7 +2514,14 @@ function applySettings() {
   const an = document.getElementById("announce");
   if (an) { setText("#announce-text", S.announce || ""); an.style.display = S.announce ? "" : "none"; }
   document.querySelectorAll(".brand-line").forEach((el) => (el.textContent = S.name));
-  setText("#logo-mark", (String(S.name).trim()[0] || "T").toUpperCase());
+  const lm = document.getElementById("logo-mark");
+  if (lm) {
+    if (S.logoImg) { lm.textContent = ""; lm.style.backgroundImage = `url("${S.logoImg}")`; lm.style.backgroundSize = "cover"; lm.style.backgroundPosition = "center"; }
+    else { lm.style.backgroundImage = ""; lm.textContent = (String(S.logoText || "").trim()[0] || String(S.name).trim()[0] || "T").toUpperCase(); }
+  }
+  const noTimer = String(S.showTimer) === "0";
+  ["timer", "flash-sub"].forEach((id) => { const el = document.getElementById(id); if (el) el.style.display = noTimer ? "none" : ""; });
+  const qi = document.getElementById("pay-img"); if (qi) { qi.src = S.qrImg || "KHQR.jpg"; qi.style.display = ""; }
   setText("#ft-year", String(khNow().getUTCFullYear()));
   setText("#eyebrow", S.eyebrow); setText("#tagline", S.tagline);
   setText("#flash-title", S.flashTitle);
