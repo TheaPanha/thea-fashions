@@ -2157,18 +2157,29 @@ pfEl("pf-gps").onclick = () => {
 };
 accBtn();
 loadProfile();
-// ត្រឡប់មកពី Google → Supabase ដាក់ token ក្នុង #hash
+// ត្រឡប់មកពី Google/Facebook → Supabase ដាក់ token ក្នុង #hash (កំហុសអាចមកក្នុង #hash ឬ ?query)
 (function () {
-  const h = location.hash;
-  if (!/access_token=|error_description=/.test(h)) return;
-  const p = new URLSearchParams(h.slice(1));
+  const q = new URLSearchParams(location.search), hp = new URLSearchParams(location.hash.slice(1));
+  const errMsg = q.get("error_description") || hp.get("error_description") || q.get("error") || hp.get("error");
+  if (errMsg) {
+    try { history.replaceState(null, "", location.pathname); } catch (e) {}
+    const m = String(errMsg).replace(/\+/g, " ");
+    const kh = /provider is not enabled|Unsupported provider/i.test(m) ? "ការចូលតាមវិធីនេះមិនទាន់បើកក្នុង Supabase (ត្រូវបើក Provider)"
+      : /getting user email/i.test(m) ? "គណនីនេះមិនមានអ៊ីមែល ឬមិនបានអនុញ្ញាតចែករំលែកអ៊ីមែល"
+      : /redirect/i.test(m) ? "តំណ Redirect មិនត្រូវគ្នា (ពិនិត្យ URL Configuration ក្នុង Supabase)"
+      : /access_denied|denied|permission/i.test(m) ? "អ្នកបានបដិសេធការចូល ឬគណនីមិនមានសិទ្ធិសាកល្បង (កម្មវិធីនៅក្នុងរបៀប Development)"
+      : "ចូលគណនីមិនបាន";
+    setTimeout(() => { openAuth("login", ""); const er = $c("au-err"); er.style.color = "#B8213F"; er.textContent = kh + " · " + m.slice(0, 120); }, 400);
+    return;
+  }
+  if (!/access_token=/.test(location.hash)) return;
   try { history.replaceState(null, "", location.pathname + location.search); } catch (e) {}
-  if (p.get("access_token")) {
-    setSess({ access_token: p.get("access_token"), refresh_token: p.get("refresh_token"), expires_in: +p.get("expires_in") || 3600 });
+  if (hp.get("access_token")) {
+    setSess({ access_token: hp.get("access_token"), refresh_token: hp.get("refresh_token"), expires_in: +hp.get("expires_in") || 3600 });
     toast("✓ ចូលគណនីរួចរាល់"); loadProfile();
     let r = ""; try { r = sessionStorage.getItem("authResume") || ""; sessionStorage.removeItem("authResume"); } catch (e) {}
     if (r === "cart") setTimeout(openCart, 500);
-  } else toast("ចូលគណនីមិនបាន");
+  }
 })();
 // ចូលមួយដង → បំពេញលេខទូរស័ព្ទដែលបានប្រើចុងក្រោយ (មានស្រាប់ក្នុង orderContact)
 
