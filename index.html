@@ -558,7 +558,6 @@
   .pay-opt { padding: 13px; border: 1.5px solid var(--border); border-radius: 12px; background: #fff; color: var(--ink); font-family: inherit; font-size: 15px; font-weight: 600; text-align: left; cursor: pointer; }
   .pay-opt.on { border-color: var(--clay); background: rgba(var(--clay-rgb),0.08); }
   #pay-qr { text-align: center; margin-bottom: 14px; }
-  #pay-img { max-width: 300px; width: 80%; border-radius: 12px; margin-bottom: 8px; background: #fff; }
   #pay-acc { font-weight: 700; font-size: 17px; margin-bottom: 8px; word-break: break-all; }
   .of-input {
     width: 100%; padding: 12px 14px; margin-bottom: 12px; border: 1.5px solid var(--border); border-radius: 12px;
@@ -1355,47 +1354,6 @@
   </div>
   <div id="toast"></div>
 
-  <div class="sheet-backdrop" id="bksheet">
-    <div class="sheet" role="dialog" aria-modal="true" style="text-align:center">
-      <div class="sheet-handle"></div>
-      <h3 style="margin:6px 0 2px">ស្កេនដើម្បីបង់ប្រាក់</h3>
-      <div class="of-hint" id="bk-amt" style="margin-bottom:0"></div>
-      <div id="bk-qr" style="display:none;margin:10px auto;padding:10px;background:#fff;border:1px solid #EEE8DF;border-radius:12px;width:fit-content"></div>
-      <div class="of-hint" id="bk-msg">កំពុងបង្កើត QR...</div>
-      <div id="bk-fb" style="display:none;text-align:left;border-top:1px solid #EEE8DF;margin-top:8px;padding-top:10px">
-        <div class="of-hint">ប្រព័ន្ធមិនអាចផ្ទៀងផ្ទាត់ស្វ័យប្រវត្តិបានភ្លាម។ បង់រួចសូមផ្ញើរូបបង្កាន់ដៃ ដើម្បីឱ្យហាងបញ្ជាក់៖</div>
-        <label class="of-btn" style="display:block;text-align:center;cursor:pointer;border-color:var(--clay)"><input type="file" id="bk-file" accept="image/*" hidden />🧾 ផ្ញើរូបបង្កាន់ដៃ</label>
-        <div class="of-hint" id="bk-fbmsg" style="margin-top:6px"></div>
-      </div>
-      <button class="sheet-cancel" id="bk-close" type="button">បិទ</button>
-    </div>
-  </div>
-
-  <div class="sheet-backdrop" id="paysheet">
-    <div class="sheet" role="dialog" aria-modal="true">
-      <div class="sheet-handle"></div>
-      <h3 style="margin:6px 0 2px">ទូទាត់ប្រាក់</h3>
-      <p class="sheet-price" id="pay-total"></p>
-      <div class="pay-opts" id="pay-opts">
-        <button type="button" class="pay-opt" data-m="bk">⚡ Bakong KHQR (ផ្ទៀងផ្ទាត់ស្វ័យប្រវត្តិ)</button>
-        <button type="button" class="pay-opt" data-m="qr">💳 បង់ឥឡូវ (ACLEDA / KHQR)</button>
-        <button type="button" class="pay-opt" data-m="cod">🚚 បង់ពេលទទួលអីវ៉ាន់</button>
-      </div>
-      <div id="pay-qr">
-        <img id="pay-img" src="KHQR.jpg" alt="" onerror="this.style.display='none'" />
-        <div id="pay-acc"></div>
-        <button type="button" class="of-btn" id="pay-copy" style="width:100%">ចម្លងលេខគណនី</button>
-        <label class="of-btn" style="display:block;margin-top:10px;cursor:pointer;border-color:var(--clay)"><input type="file" id="rc-file" accept="image/*" hidden />🧾 ផ្ញើរូបបង្កាន់ដៃ (ចាំបាច់)</label>
-        <div class="of-hint" id="rc-name" style="margin-top:6px"></div>
-        <div class="of-hint" style="margin-top:8px">បង់រួច សូមថតអេក្រង់បង្កាន់ដៃ ហើយផ្ញើនៅទីនេះ ទើបអាចបញ្ជាក់ការទិញបាន</div>
-      </div>
-      <div id="pay-bk" class="of-hint" style="display:none">ទទួល QR ដែលមានទឹកប្រាក់ត្រឹមត្រូវ ស្កេនបង់តាមកម្មវិធីធនាគារណាក៏បាន ហើយប្រព័ន្ធបញ្ជាក់ស្វ័យប្រវត្តិ។</div>
-      <div id="pay-cod" class="of-hint" style="display:none">អីវ៉ាន់ដឹកដល់ដៃអ្នក ហើយបង់ប្រាក់ជូនអ្នកដឹកពេលទទួល។</div>
-      <div class="of-hint" id="pay-err" style="color:#B8213F"></div>
-      <button class="sheet-confirm" id="pay-go" type="button">បញ្ជាក់ការទិញ</button>
-      <button class="sheet-cancel" id="pay-back" type="button">ថយក្រោយ</button>
-    </div>
-  </div>
 
   <div class="sheet-backdrop" id="sheet">
     <div class="sheet" role="dialog" aria-modal="true">
@@ -1415,6 +1373,7 @@
         <button type="button" class="of-btn" id="of-map">🔍 ស្វែងរកលើ Google Map</button>
       </div>
       <div class="of-hint" id="of-hint"></div>
+      <div class="of-hint" style="text-align:center;margin:0 0 8px">🚚 បង់ប្រាក់ជូនអ្នកដឹកពេលទទួលអីវ៉ាន់</div>
       <button class="sheet-confirm" id="sheet-confirm" type="button" disabled>សូមជ្រើសរើសទំហំសិន</button>
       <button class="sheet-cancel" id="sheet-cancel" type="button">បោះបង់</button>
     </div>
@@ -1519,11 +1478,8 @@ const SETTINGS = {        // ការកំណត់រចនា និងហ�
   saleHours: 4,
   logoText: "",            // អក្សរ Logo (ទទេ = អក្សរដំបូងនៃឈ្មោះហាង)
   logoImg: "",             // រូប Logo (URL)
-  qrImg: "",               // រូប QR ទូទាត់ (URL · ទទេ = KHQR.jpg)
   showTimer: 1,            // 1 = បង្ហាញម៉ោងរាប់ថយក្រោយបញ្ចុះតម្លៃ
-  bakongOn: 0,             // 1 = បើក Bakong KHQR (ផ្ទៀងផ្ទាត់ស្វ័យប្រវត្តិ)
   requireLogin: 0,         // 1 = ភ្ញៀវត្រូវចូលគណនីមុនទិញ
-  payAccount: "",          // គណនីទទួលប្រាក់ (ACLEDA) · ដាក់រូប KHQR ឈ្មោះ KHQR.jpg
   statsUrl: "",             // URL របស់ Worker ស្ថិតិ (ទទេ = មិនប្រើ)
   showPromo: true,          // បង្ហាញផ្ទាំងផ្សព្វផ្សាយធំ
   banners: [                // ផ្ទាំងផ្សព្វផ្សាយធំ 3 · target៖ all / sale / top / bottom / dress / set / acc ឬ តំណ https://...
@@ -1741,11 +1697,11 @@ function updateConfirm() {
   if (needSize && !chosenSize) t = "សូមជ្រើសរើសទំហំសិន";
   else if (!phoneOk) t = "សូមបំពេញលេខទូរស័ព្ទ";
   else if (!locOk) t = "សូមបំពេញទីតាំង";
-  else { ok = true; t = chosenSize ? `បន្តទៅបង់ប្រាក់ · ទំហំ ${chosenSize}` : "បន្តទៅបង់ប្រាក់"; }
+  else { ok = true; t = chosenSize ? `បញ្ជាក់ការកម្មង់ · ទំហំ ${chosenSize}` : "បញ្ជាក់ការកម្មង់"; }
   sheetConfirm.disabled = !ok; sheetConfirm.textContent = t;
 }
 ofPhone.addEventListener("input", updateConfirm);
-ofLoc.addEventListener("input", () => { ofHint.textContent = ""; updateConfirm(); });
+ofLoc.addEventListener("input", () => { ofHint.textContent = ""; ofHint.style.color = ""; updateConfirm(); });
 document.getElementById("of-gps").addEventListener("click", () => {
   if (!navigator.geolocation) { ofHint.textContent = "ឧបករណ៍នេះមិនគាំទ្រទីតាំង សូមវាយដោយដៃ"; return; }
   ofHint.textContent = "កំពុងរកទីតាំង...";
@@ -1764,7 +1720,7 @@ function openSizeSheet(item, i, sizes, btn) {
   sheetCtx = { item, i, btn };
   chosenSize = ""; needSize = sizes.length > 0;
   try { const c = JSON.parse(localStorage.getItem("orderContact") || "{}"); ofPhone.value = c.phone || (PF && PF.phone) || ""; ofLoc.value = c.loc || (PF && PF.address) || ""; } catch (e) {}
-  ofHint.textContent = "";
+  ofHint.textContent = ""; ofHint.style.color = "";
   document.getElementById("size-block").style.display = needSize ? "" : "none";
   document.getElementById("sheet-name").textContent = item.name;
   const si = document.getElementById("sheet-img"); si.style.visibility = ""; si.src = photoOf(i + 1);
@@ -1791,28 +1747,6 @@ function openSizeSheet(item, i, sizes, btn) {
 function closeSizeSheet() { sheet.classList.remove("open"); }
 document.getElementById("sheet-cancel").addEventListener("click", closeSizeSheet);
 sheet.addEventListener("click", (e) => { if (e.target === sheet) closeSizeSheet(); });
-let pending = null, payMethod = "cod";
-const paySheet = document.getElementById("paysheet");
-function setPay(m) {
-  payMethod = m;
-  document.querySelectorAll(".pay-opt").forEach((b) => b.classList.toggle("on", b.dataset.m === m));
-  document.getElementById("pay-qr").style.display = m === "qr" ? "" : "none";
-  document.getElementById("pay-cod").style.display = m === "cod" ? "" : "none";
-  document.getElementById("pay-bk").style.display = m === "bk" ? "" : "none";
-  updatePay();
-}
-let receiptFile = null;
-const payGo = document.getElementById("pay-go"), rcName = document.getElementById("rc-name");
-function updatePay() {
-  const need = payMethod === "qr" && !receiptFile;
-  payGo.disabled = need;
-  payGo.textContent = need ? "សូមផ្ញើរូបបង្កាន់ដៃសិន" : payMethod === "bk" ? "បន្តទៅបង់ជាមួយ Bakong" : "បញ្ជាក់ការទិញ";
-}
-document.getElementById("rc-file").addEventListener("change", (e) => {
-  receiptFile = e.target.files[0] || null;
-  rcName.style.color = ""; rcName.textContent = receiptFile ? "✓ " + receiptFile.name : "";
-  updatePay();
-});
 function shrink(file, max = 1200) {
   return new Promise((res, rej) => {
     const u = URL.createObjectURL(file), im = new Image();
@@ -1826,44 +1760,26 @@ function shrink(file, max = 1200) {
     im.src = u;
   });
 }
-async function uploadReceipt(file) {
-  let blob; try { blob = await shrink(file); } catch (e) { blob = file; }      // បើបង្រួមមិនបាន ប្រើរូបដើម
-  const path = `${Date.now()}-${Math.random().toString(36).slice(2, 10)}.jpg`;
-  const r = await fetch(`${SB_URL}/storage/v1/object/receipts/${path}`, { method: "POST", headers: { apikey: SB_KEY, Authorization: "Bearer " + SB_KEY, "Content-Type": blob.type || "image/jpeg" }, body: blob });
-  if (!r.ok) {
-    let m = ""; try { const j = await r.json(); m = j.message || j.error || ""; } catch (e) {}
-    throw new Error(`${r.status} ${m}`.trim());
-  }
-  return path;
-}
-sheetConfirm.addEventListener("click", () => {
-  if (!sheetCtx || sheetConfirm.disabled) return;
+let submitting = false;
+sheetConfirm.addEventListener("click", async () => {
+  if (!sheetCtx || sheetConfirm.disabled || submitting) return;
   const loc = ofLoc.value.trim(), phone = ofPhone.value.trim();
   try { localStorage.setItem("orderContact", JSON.stringify({ phone, loc })); } catch (e) {}
   const items = sheetCtx.cart
     ? cartLines().map((l) => ({ n: l.n, name: l.name, size: l.size || "", qty: l.qty, price: l.price }))
     : [{ n: sheetCtx.i + 1, name: sheetCtx.item.name, size: chosenSize || "", qty: 1, price: finalPrice(sheetCtx.item) }];
   const sub = items.reduce((s, x) => s + x.price * x.qty, 0), disc = sheetCtx.cart && cartCoupon ? Math.min(cartCoupon.discount, sub) : 0;
-  pending = { items, sub, disc, coupon: sheetCtx.cart && cartCoupon ? cartCoupon.code : null, btn: sheetCtx.btn, cart: !!sheetCtx.cart, contact: { phone, loc, isLink: isUrl(loc), link: mapLinkOf(loc) } };
+  const P = { items, sub, disc, coupon: sheetCtx.cart && cartCoupon ? cartCoupon.code : null, btn: sheetCtx.btn, cart: !!sheetCtx.cart, contact: { phone, loc, isLink: isUrl(loc), link: mapLinkOf(loc), name: CU.sess ? CU.sess.name : "" } };
+  const code = sbReady() ? newCode() : null;
+  if (sbReady()) {
+    submitting = true; sheetConfirm.disabled = true; sheetConfirm.textContent = "កំពុងបញ្ជូនការកម្មង់...";
+    const r = await placeOrder(P, code);
+    submitting = false;
+    if (!r.ok) { ofHint.style.color = "#B8213F"; ofHint.textContent = r.msg; updateConfirm(); return; }
+  }
   closeSizeSheet();
-  const acc = String(settings.payAccount || "").trim();
-  const bkOk = sbReady() && Number(settings.bakongOn) === 1;
-  document.querySelector('.pay-opt[data-m="bk"]').style.display = bkOk ? "" : "none";
-  document.querySelector('.pay-opt[data-m="qr"]').style.display = acc ? "" : "none";
-  document.getElementById("pay-acc").textContent = acc;
-  document.getElementById("pay-img").style.display = "";
-  document.getElementById("pay-err").textContent = "";
-  const f = items[0];
-  document.getElementById("pay-total").textContent = (items.length === 1 ? `${f.name}${f.size ? " · " + f.size : ""}${f.qty > 1 ? " ×" + f.qty : ""}` : `${items.length} មុខ`) + ` · ${formatRiel(sub - disc)}` + (disc ? ` (បញ្ចុះ ${formatRiel(disc)})` : "");
-  receiptFile = null; document.getElementById("rc-file").value = ""; rcName.textContent = "";
-  setPay(bkOk ? "bk" : acc ? "qr" : "cod");
-  if (!bkOk && !acc) { payGo.click(); return; }      // មានតែបង់ពេលទទួលអីវ៉ាន់ → បញ្ជាក់ការកម្មង់ភ្លាម
-  paySheet.classList.add("open");
-});
-document.querySelectorAll(".pay-opt").forEach((b) => b.addEventListener("click", () => setPay(b.dataset.m)));
-document.getElementById("pay-copy").addEventListener("click", (e) => {
-  try { navigator.clipboard.writeText(String(settings.payAccount || "")).catch(() => {}); } catch (err) {}
-  e.target.textContent = "ចម្លងហើយ ✓"; setTimeout(() => { e.target.textContent = "ចម្លងលេខគណនី"; }, 1500);
+  if (P.cart) { cart = []; saveCart(); cartCoupon = null; renderCartUI(); }
+  orderDone(P.btn, code, P.contact.phone);
 });
 document.getElementById("done-ok").addEventListener("click", () => document.getElementById("donesheet").classList.remove("open"));
 document.getElementById("donesheet").addEventListener("click", (e) => { if (e.target.id === "donesheet") e.target.classList.remove("open"); });
@@ -1885,56 +1801,9 @@ function openTracking(claim) {
 }
 $t("tb-track").addEventListener("click", (e) => { e.preventDefault(); openTracking(false); });
 $t("done-track").onclick = () => { $t("donesheet").classList.remove("open"); openTracking(true); };
-document.getElementById("pay-back").addEventListener("click", () => { paySheet.classList.remove("open"); sheet.classList.add("open"); });
-paySheet.addEventListener("click", (e) => { if (e.target === paySheet) paySheet.classList.remove("open"); });
-// ----- Bakong KHQR (ស្វ័យប្រវត្តិ) -----
-let bkPoll, bkClock, qrLibP;
-const gid = (id) => document.getElementById(id);
-const loadQRLib = () => qrLibP || (qrLibP = new Promise((res, rej) => {
-  if (window.QRCode) return res();
-  const s = document.createElement("script"); s.src = "https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js";
-  s.onload = res; s.onerror = () => { qrLibP = null; rej(new Error("qrlib")); }; document.head.appendChild(s);
-}));
-const bkFn = async (action, code) => {
-  const r = await fetch(`${SB_URL}/functions/v1/bakong-pay`, { method: "POST", headers: { apikey: SB_KEY, Authorization: "Bearer " + SB_KEY, "Content-Type": "application/json" }, body: JSON.stringify({ action, order_code: code }) });
-  return r.json();
-};
-function stopBk() { clearInterval(bkPoll); clearInterval(bkClock); bkPoll = bkClock = null; }
-gid("bk-close").onclick = () => { stopBk(); gid("bksheet").classList.remove("open"); toast("ការកម្មង់ត្រូវបានរក្សាទុក · បង់រួចប្រព័ន្ធនឹងបញ្ជាក់ស្វ័យប្រវត្តិ"); };
-async function startBk(code, P) {
-  const msg = gid("bk-msg"), box = gid("bk-qr"), fb = gid("bk-fb");
-  stopBk(); box.innerHTML = ""; box.style.display = "none"; fb.style.display = "none"; gid("bk-fbmsg").textContent = "";
-  gid("bk-amt").textContent = `${code} · ${formatRiel(P.sub - P.disc)}`; msg.style.color = ""; msg.textContent = "កំពុងបង្កើត QR..."; gid("bksheet").classList.add("open");
-  const done = (t) => { stopBk(); gid("bksheet").classList.remove("open"); orderDone(P.btn, code, P.contact.phone); toast(t || "✓ បានទទួលការបង់ប្រាក់"); };
-  gid("bk-file").onchange = async (e) => {
-    const f = e.target.files[0]; e.target.value = ""; if (!f) return;
-    const m = gid("bk-fbmsg"); m.style.color = ""; m.textContent = "កំពុងផ្ញើ...";
-    try {
-      const path = await uploadReceipt(f);
-      const r = await fetch(`${SB_URL}/rest/v1/rpc/attach_receipt`, { method: "POST", headers: { apikey: SB_KEY, Authorization: "Bearer " + SB_KEY, "Content-Type": "application/json" }, body: JSON.stringify({ p_code: code, p_path: path }) });
-      if (!r.ok) throw new Error(r.status);
-      done("✓ បានផ្ញើបង្កាន់ដៃ ហាងនឹងបញ្ជាក់ឆាប់ៗ");
-    } catch (err) { m.style.color = "#B8213F"; m.textContent = "ផ្ញើមិនបាន (" + err.message + ") សូមព្យាយាមម្តងទៀត"; }
-  };
-  let j; try { j = await bkFn("create", code); } catch (e) { j = { error: "ភ្ជាប់ម៉ាស៊ីនបម្រើមិនបាន" }; }
-  if (j.paid) return done();
-  if (!j.qr) { msg.style.color = "#B8213F"; msg.textContent = (j.error || "បង្កើត QR មិនបាន") + " · ការកម្មង់ត្រូវបានរក្សាទុក សូមទាក់ទងហាង"; return; }
-  try { await loadQRLib(); box.style.display = "block"; new window.QRCode(box, { text: j.qr, width: 240, height: 240, correctLevel: window.QRCode.CorrectLevel.M }); }
-  catch (e) { msg.style.color = "#B8213F"; msg.textContent = "បង្ហាញ QR មិនបាន សូមពិនិត្យអ៊ីនធឺណិត រួចបិទ-បើកម្តងទៀត"; return; }
-  const end = j.expires_at ? new Date(j.expires_at).getTime() : Date.now() + 30 * 60000;
-  const tick = () => { const s = Math.max(0, Math.round((end - Date.now()) / 1000)); msg.style.color = ""; msg.textContent = s ? `រង់ចាំការបង់... ផុតកំណត់ក្នុង ${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}` : "QR ផុតកំណត់ ការកម្មង់ត្រូវបានរក្សាទុក សូមទាក់ទងហាង"; if (!s) stopBk(); };
-  tick(); bkClock = setInterval(tick, 1000);
-  bkPoll = setInterval(async () => {
-    try {
-      const r = await bkFn("check", code);
-      if (r.paid) return done();
-      if (r.blocked) { fb.style.display = "block"; clearInterval(bkPoll); bkPoll = null; }     // ផ្ទៀងផ្ទាត់ស្វ័យប្រវត្តិមិនបាន → ឱ្យផ្ញើបង្កាន់ដៃ
-    } catch (e) { fb.style.display = "block"; }
-  }, 3000);
-}
-async function placeOrder(P, code, rpath) {
+async function placeOrder(P, code) {
   const f = P.items[0];
-  const body = { order_code: code, product_no: f.n, product: P.items.length > 1 ? `${f.name} +${P.items.length - 1}` : f.name, size: P.items.length === 1 ? (f.size || null) : null, phone: P.contact.phone, location: P.contact.isLink ? null : P.contact.loc, map_link: P.contact.link, pay_method: payMethod, receipt_url: rpath, items: P.items, coupon: P.coupon };
+  const body = { order_code: code, product_no: f.n, product: P.items.length > 1 ? `${f.name} +${P.items.length - 1}` : f.name, size: P.items.length === 1 ? (f.size || null) : null, phone: P.contact.phone, location: P.contact.isLink ? null : P.contact.loc, map_link: P.contact.link, pay_method: "cod", receipt_url: null, items: P.items, coupon: P.coupon };
   try {
     let tok = SB_KEY; if (CU.sess) { try { tok = await cToken(); } catch (e) { tok = SB_KEY; } }
     if (CU.sess) body.customer_name = CU.sess.name;
@@ -1944,33 +1813,13 @@ async function placeOrder(P, code, rpath) {
     if (/STOCK:/.test(m)) return { ok: false, msg: "អស់ស្តុក៖ " + m.split("STOCK:")[1].trim() + " សូមកែចំនួនក្នុងកន្ត្រក" };
     if (/COUPON:/.test(m)) return { ok: false, msg: m.split("COUPON:")[1].trim() };
     if (r.status === 404) {                      // មិនទាន់ run SQL ថ្មី → រក្សាទុកតាមវិធីចាស់
-      saveOrderRemote({ product_no: f.n, product: body.product, size: body.size, price: P.sub - P.disc, phone: body.phone, location: body.location, map_link: body.map_link, pay_method: payMethod, receipt_url: rpath, order_code: code });
+      saveOrderRemote({ product_no: f.n, product: body.product, size: body.size, price: P.sub - P.disc, phone: body.phone, location: body.location, map_link: body.map_link, pay_method: "cod", receipt_url: null, order_code: code });
       return { ok: true };
     }
     return { ok: false, msg: `បញ្ជូនការកម្មង់មិនបាន (${r.status})` };
   } catch (e) { return { ok: false, msg: "បញ្ជូនការកម្មង់មិនបាន សូមពិនិត្យអ៊ីនធឺណិត" }; }
 }
-payGo.addEventListener("click", async () => {
-  if (!pending || payGo.disabled) return;
-  const err = document.getElementById("pay-err"); err.textContent = "";
-  let rpath = null;
-  if (payMethod === "qr" && sbReady()) {
-    payGo.disabled = true; payGo.textContent = "កំពុងផ្ញើបង្កាន់ដៃ...";
-    try { rpath = await uploadReceipt(receiptFile); }
-    catch (e) { rcName.style.color = "#B8213F"; rcName.textContent = "ផ្ញើបង្កាន់ដៃមិនបាន (" + (e && e.message || "network") + ") សូមព្យាយាមម្តងទៀត"; updatePay(); return; }
-  }
-  const P = pending, code = sbReady() ? newCode() : null;
-  if (sbReady()) {
-    payGo.disabled = true; payGo.textContent = "កំពុងបញ្ជូនការកម្មង់...";
-    const r = await placeOrder(P, code, rpath);
-    if (!r.ok) { err.textContent = r.msg; updatePay(); paySheet.classList.add("open"); return; }
-  }
-  pending = null; paySheet.classList.remove("open");
-  if (P.cart) { cart = []; saveCart(); cartCoupon = null; renderCartUI(); }
-  if (payMethod === "bk") { startBk(code, P); return; }
-  orderDone(P.btn, code, P.contact.phone);
-});
-document.addEventListener("keydown", (e) => { if (e.key === "Escape") { closeSizeSheet(); paySheet.classList.remove("open"); } });
+document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeSizeSheet(); });
 
 
 
@@ -2054,7 +1903,7 @@ function openCheckout() {
   const T = cartTotals(); if (!T.L.length) return;
   sheetCtx = { cart: true, btn: null }; chosenSize = ""; needSize = false;
   try { const c = JSON.parse(localStorage.getItem("orderContact") || "{}"); ofPhone.value = c.phone || (PF && PF.phone) || ""; ofLoc.value = c.loc || (PF && PF.address) || ""; } catch (e) {}
-  ofHint.textContent = "";
+  ofHint.textContent = ""; ofHint.style.color = "";
   $c("size-block").style.display = "none";
   $c("sheet-name").textContent = `កន្ត្រកទំនិញ (${T.qty} មុខ)`;
   const si = $c("sheet-img"); si.style.visibility = "hidden";
@@ -2600,7 +2449,6 @@ function applySettings() {
   }
   const noTimer = String(S.showTimer) === "0";
   ["timer", "flash-sub"].forEach((id) => { const el = document.getElementById(id); if (el) el.style.display = noTimer ? "none" : ""; });
-  const qi = document.getElementById("pay-img"); if (qi) { qi.src = S.qrImg || "KHQR.jpg"; qi.style.display = ""; }
   setText("#ft-year", String(khNow().getUTCFullYear()));
   setText("#eyebrow", S.eyebrow); setText("#tagline", S.tagline);
   setText("#flash-title", S.flashTitle);
