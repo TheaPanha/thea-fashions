@@ -1182,6 +1182,195 @@
     .wrap > header .cta { padding: 11px 20px !important; font-size: 14px !important; }
     #sheet-name, #sheet-price { text-align: left !important; }
   }
+
+  /* ===== Boutique UI v3 (បន្ថែមក្រោយគេ) ===== */
+  :root { --bg: #FBF8F4; --line: #ECE3D8; --sale: #C8223F; --lift: 0 2px 4px rgba(60,30,20,.04), 0 16px 34px rgba(60,30,20,.10); }
+  body { background: var(--bg) !important; }
+  .wrap { max-width: 1180px; }
+  .lightbox { z-index: 120; }
+
+  /* top bar */
+  .announce { background: var(--ink); font-size: 12.5px; letter-spacing: 0; }
+  .topbar { background: rgba(251,248,244,.94); border-bottom: 1px solid var(--line); }
+  .tb-search input { background: #F3EDE4; border: 1px solid transparent; border-radius: 14px; }
+  .tb-search input:focus { background: #fff; border-color: var(--clay); box-shadow: 0 0 0 3px rgba(var(--clay-rgb), .14); }
+  .catnav { gap: 8px; padding: 4px 20px 12px; border-top: none; }
+  .catnav button { border: 1px solid var(--line); border-radius: 999px; padding: 8px 16px; margin: 0; font-size: 13.5px; background: #fff; }
+  .catnav button:hover { border-color: var(--clay); color: var(--clay); }
+  .catnav button.on { background: var(--ink); border-color: var(--ink); color: #fff; }
+  .catnav button.sale { color: var(--sale); border-color: rgba(200,34,63,.28); }
+  .catnav button.sale.on { background: var(--sale); border-color: var(--sale); color: #fff; }
+
+  /* hero */
+  .wrap > header { position: relative; overflow: hidden; text-align: left; padding: 60px 52px 56px; margin-bottom: 14px; border-radius: 28px;
+    background: linear-gradient(125deg, #24151C 0%, #4A2335 58%, var(--clay-dark) 135%); }
+  .wrap > header::before { width: 460px; height: 460px; left: auto; right: -100px; top: -150px; filter: none; animation: none;
+    background: radial-gradient(circle, rgba(var(--clay-rgb), .5), transparent 68%); }
+  .wrap > header::after { width: 320px; height: 320px; left: auto; right: 190px; bottom: -190px; filter: none; animation: none;
+    background: radial-gradient(circle, rgba(185,138,62,.38), transparent 70%); }
+  .wrap > header .eyebrow { background: none; border: none; padding: 0; margin-bottom: 16px; color: rgba(255,255,255,.72); font-size: 12px; letter-spacing: .14em; }
+  .wrap > header h1 { font-size: clamp(42px, 6vw, 66px); line-height: 1.12; letter-spacing: -.01em; font-weight: 600; margin-bottom: 14px; }
+  .wrap > header .tagline { font-size: 16px; line-height: 1.8; max-width: 470px; color: rgba(255,255,255,.82); }
+  .wrap > header .cta { margin-top: 26px; padding: 14px 28px; border-radius: 14px; background: #fff; color: var(--ink); font-size: 15px; }
+  .wrap > header .cta:hover { background: var(--clay); color: #fff; }
+
+  /* perks */
+  .perks { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 0 0 28px; }
+  .perks > div { display: flex; align-items: center; gap: 12px; background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 14px 16px; }
+  .perks i { flex: none; width: 42px; height: 42px; border-radius: 13px; display: grid; place-items: center; background: rgba(var(--clay-rgb), .10); color: var(--clay); font-size: 17px; }
+  .perks b { display: block; font-size: 14px; font-weight: 600; }
+  .perks small { display: block; margin-top: 2px; font-size: 12px; color: var(--muted); line-height: 1.4; }
+
+  /* sections */
+  .section-head h2 { font-family: "Playfair Display", "Noto Serif Khmer", Georgia, serif; font-size: 26px; font-weight: 600; }
+  .section-head .count, .sale-count { background: none; border: none; padding: 0; color: var(--muted); font-size: 13px; font-weight: 500; }
+  .flash { border-radius: 20px; box-shadow: none; }
+  .flash::after { display: none; }
+  .flash-icon { animation: none; }
+
+  /* product cards */
+  .grid { gap: 20px 16px; }
+  .card { cursor: pointer; background: #fff; border: 1px solid var(--line); border-radius: 20px; padding: 8px; box-shadow: none; }
+  .card:hover { border-color: #E0D2C1; transform: translateY(-3px); box-shadow: var(--lift); }
+  .card .photo-slot { border-radius: 14px; }
+  .card .photo-slot img { transition: transform .6s ease; }
+  .card:hover .photo-slot img { transform: scale(1.05); }
+  .card .body { padding: 12px 6px 4px; }
+  .card .body h3 { font-size: 14.5px; font-weight: 600; line-height: 1.45; }
+  .card .place { display: inline-flex; align-self: flex-start; padding: 3px 10px; margin: 0 0 10px; border-radius: 999px; background: #F5EEE5; color: #7A6558; font-size: 11.5px; }
+  .card .price { font-size: 17px; }
+  .card .pricebox.on-sale .price { color: var(--sale); }
+  .card .old { font-size: 12px; }
+  .fav-btn { top: 14px; right: 14px; width: 34px; height: 34px; background: rgba(255,255,255,.95); border: none; box-shadow: 0 2px 8px rgba(0,0,0,.12); }
+  .disc { top: 14px; left: 14px; padding: 4px 10px; border-radius: 999px; background: var(--sale); font-size: 12px; }
+  .lowstock { top: auto; right: auto; left: 14px; bottom: 14px; padding: 4px 10px; border-radius: 999px; background: rgba(255,255,255,.95); color: var(--sale); font-size: 11.5px; }
+  .card .body .buy-btn { height: 42px; min-height: 42px; padding: 0 10px; font-size: 13.5px; border-radius: 12px; background: var(--ink); }
+  .card .body .buy-btn:hover { background: var(--clay); }
+  .card .cart-add { width: 46px; height: 42px; border-radius: 12px; border: 1.5px solid var(--line); color: var(--ink); background: #fff; }
+  .card .cart-add:hover { border-color: var(--clay); color: var(--clay); }
+  #sale-grid .card { width: 236px; }
+
+  /* sheets (ទូទៅ) */
+  .sheet { border-radius: 26px 26px 0 0; }
+  .sheet-confirm { background: var(--clay); }
+  footer { border-radius: 28px; }
+
+  /* ===== Product detail ===== */
+  .dt-track { display: flex; height: 100%; overflow-x: auto; scroll-snap-type: x mandatory; overscroll-behavior-x: contain; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+  .dt-track::-webkit-scrollbar { display: none; }
+  .dt-slide { flex: 0 0 100%; height: 100%; scroll-snap-align: center; scroll-snap-stop: always; }
+  .dt-nav { position: absolute; top: 50%; transform: translateY(-50%); z-index: 3; width: 38px; height: 38px; border-radius: 50%; border: none; background: rgba(255,255,255,.92); color: var(--ink); font-size: 14px; cursor: pointer; box-shadow: 0 2px 10px rgba(0,0,0,.16); }
+  .dt-nav[hidden], .dt-count[hidden] { display: none; }
+  .dt-prev { left: 12px; } .dt-next { right: 12px; }
+  .dt-count { position: absolute; right: 14px; bottom: 14px; z-index: 2; background: rgba(26,26,26,.6); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); color: #fff; font-size: 12px; font-weight: 600; padding: 6px 12px; border-radius: 999px; pointer-events: none; }
+  .dt-thumbs { display: flex; gap: 8px; padding: 12px 20px 0; overflow-x: auto; scrollbar-width: none; }
+  .dt-thumbs::-webkit-scrollbar { display: none; }
+  .dt-th { flex: 0 0 auto; width: 56px; height: 72px; padding: 0; border: 2px solid transparent; border-radius: 12px; overflow: hidden; background: #EFE7DC; cursor: pointer; opacity: .65; transition: opacity .15s, border-color .15s; }
+  .dt-th img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .dt-th.on { opacity: 1; border-color: var(--ink); }
+  @media (max-width: 640px) { .dt-nav { display: none; } }
+  #detailsheet .sheet.dt { padding: 0 !important; max-width: 520px; height: min(94vh, 880px); max-height: 94vh; display: flex; flex-direction: column; overflow: hidden; background: #fff; border-radius: 26px 26px 0 0; }
+  @media (min-width: 641px) { #detailsheet .sheet.dt { border-radius: 26px; } }
+  .dt-scroll { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
+  .dt-photo { position: relative; height: min(54vh, 112vw); background: #EFE7DC; cursor: zoom-in; overflow: hidden; }
+  .dt-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .dt-round { position: absolute; top: 14px; z-index: 3; width: 42px; height: 42px; border-radius: 50%; border: none; cursor: pointer; background: rgba(255,255,255,.95); color: var(--ink); font-size: 16px; display: grid; place-items: center; box-shadow: 0 2px 10px rgba(0,0,0,.14); }
+  .dt-x { right: 14px; } .dt-fav { right: 64px; } .dt-fav.on { color: #E0245E; }
+  .dt-disc { top: 16px; left: 16px; }
+  .dt-zoom { position: absolute; left: 14px; bottom: 14px; background: rgba(26,26,26,.6); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); color: #fff; font-size: 12px; padding: 6px 12px; border-radius: 999px; pointer-events: none; }
+  .dt-body { padding: 20px 20px 30px; }
+  .dt-cat { font-size: 13px; font-weight: 600; color: var(--clay); margin-bottom: 6px; }
+  .dt-body h2 { font-family: "Playfair Display", "Noto Serif Khmer", Georgia, serif; font-size: 24px; line-height: 1.45; font-weight: 600; margin: 0 0 10px; }
+  .dt-price { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 12px; }
+  .dt-now { font-family: "Playfair Display", Georgia, serif; font-size: 30px; font-weight: 700; font-variant-numeric: lining-nums; }
+  .dt-price s { color: var(--muted); font-size: 15px; }
+  .dt-save { background: rgba(200,34,63,.10); color: var(--sale); font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 999px; }
+  .dt-stock { margin-top: 10px; display: inline-flex; align-items: center; gap: 7px; font-size: 13px; font-weight: 600; }
+  .dt-stock::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+  .dt-stock.in { color: #3F7D5C; } .dt-stock.low { color: #B7791F; } .dt-stock.out { color: var(--sale); }
+  .dt-sec { margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--line); }
+  .dt-h { font-size: 15px; font-weight: 700; margin-bottom: 12px; }
+  .dt-sec .sizes { margin-bottom: 10px; }
+  .sizes.nudge { animation: nudge .5s ease; }
+  @keyframes nudge { 20% { transform: translateX(-6px); } 40% { transform: translateX(6px); } 60% { transform: translateX(-4px); } 80% { transform: translateX(4px); } }
+  .dt-guide { margin-top: 4px; font-size: 13px; }
+  .dt-guide summary { cursor: pointer; color: var(--clay); font-weight: 600; padding: 4px 0; }
+  .dt-guide table { width: 100%; border-collapse: collapse; margin: 8px 0; }
+  .dt-guide th, .dt-guide td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); }
+  .dt-guide th { color: var(--muted); font-weight: 600; font-size: 12px; }
+  .dt-guide p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.6; }
+  .dt-desc { margin: 0; font-size: 15px; line-height: 1.85; color: #3A2E26; }
+  .dt-specs { margin: 0; }
+  .dt-specs > div { display: grid; grid-template-columns: 92px 1fr; gap: 12px; padding: 11px 0; border-bottom: 1px solid var(--line); font-size: 14px; line-height: 1.6; }
+  .dt-specs > div:last-child { border-bottom: none; }
+  .dt-specs dt { color: var(--muted); }
+  .dt-specs dd { margin: 0; font-weight: 500; }
+  .dt-perks { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+  .dt-perks li { display: flex; gap: 12px; align-items: flex-start; font-size: 14px; line-height: 1.65; }
+  .dt-perks i { flex: none; width: 32px; height: 32px; border-radius: 10px; display: grid; place-items: center; background: rgba(var(--clay-rgb), .10); color: var(--clay); font-size: 14px; }
+  .dt-rel { display: flex; gap: 12px; overflow-x: auto; margin: 0 -20px; padding: 0 20px 4px; scrollbar-width: none; }
+  .dt-rel::-webkit-scrollbar { display: none; }
+  .rel { flex: 0 0 120px; text-align: left; background: none; border: none; padding: 0; cursor: pointer; font-family: inherit; color: var(--ink); }
+  .rel img { width: 120px; height: 152px; object-fit: cover; border-radius: 12px; background: #EFE7DC; display: block; }
+  .rel b { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin-top: 8px; font-size: 12.5px; font-weight: 500; line-height: 1.45; }
+  .rel span { display: block; margin-top: 2px; font-size: 13px; font-weight: 700; }
+  .dt-bar { display: flex; gap: 10px; padding: 12px 16px calc(12px + env(safe-area-inset-bottom, 0px)); border-top: 1px solid var(--line); background: #fff; }
+  .dt-cart, .dt-buy { height: 52px; border-radius: 14px; font-family: inherit; font-size: 15px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; }
+  .dt-cart { flex: none; padding: 0 20px; border: 1.5px solid var(--ink); background: #fff; color: var(--ink); }
+  .dt-buy { flex: 1; border: none; background: var(--clay); color: #fff; }
+  .dt-cart:active, .dt-buy:active { transform: scale(.98); }
+  .dt-cart:disabled, .dt-buy:disabled { background: #E4DED6; border-color: #E4DED6; color: #9A8F84; cursor: not-allowed; }
+
+  @media (max-width: 900px) { .perks > div { padding: 12px; } .perks small { display: none; } }
+  @media (max-width: 640px) {
+    .wrap > header { padding: 30px 22px 28px !important; border-radius: 22px !important; }
+    .wrap > header h1 { font-size: 36px !important; }
+    .wrap > header .tagline { font-size: 14px !important; max-width: none; }
+    .perks { display: flex; overflow-x: auto; gap: 10px; margin: 0 -10px 20px; padding: 0 10px; scrollbar-width: none; }
+    .perks::-webkit-scrollbar { display: none; }
+    .perks > div { flex: 0 0 auto; padding: 10px 14px; }
+    .perks i { width: 34px; height: 34px; font-size: 15px; }
+    .catnav { padding: 2px 10px 10px; }
+    .section-head h2 { font-size: 21px; }
+    .grid { gap: 14px 10px !important; }
+    .card { padding: 6px; border-radius: 16px; }
+    .card .body { padding: 8px 3px 2px !important; }
+    .card .body h3 { font-size: 13.5px !important; }
+    .card .place { font-size: 10.5px; padding: 2px 8px; margin-bottom: 6px; }
+    .card .price { font-size: 15px; }
+    .card .old { font-size: 11px; }
+    .card .body .buy-btn { height: 38px; min-height: 38px; font-size: 13px; border-radius: 10px; }
+    .card .cart-add { width: 40px; height: 38px; border-radius: 10px; }
+    .fav-btn { top: 10px; right: 10px; width: 30px; height: 30px; }
+    .disc { top: 10px; left: 10px; font-size: 11px; padding: 3px 8px; }
+    .lowstock { left: 10px; bottom: 10px; font-size: 10.5px; }
+    #sale-grid .card { width: 158px; }
+    .dt-body h2 { font-size: 21px; }
+    .dt-now { font-size: 27px; }
+  }
+
+
+  /* ===== Sheets · cart · auth · orders polish ===== */
+  #ordsheet .mo { background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 14px; margin-bottom: 10px; box-shadow: 0 1px 2px rgba(60,30,20,.04); line-height: 1.7; }
+  #ordsheet .mo > b { font-size: 15px; }
+  #ordsheet .mo-s { color: var(--muted); font-size: 12.5px; margin-bottom: 8px; }
+  .sheet { background: #fff; padding: 12px 20px 24px; box-shadow: 0 -20px 60px rgba(40,20,15,.22); }
+  .sheet-handle { width: 40px; height: 4px; border-radius: 999px; background: #E3D8CA; margin: 0 auto 14px; }
+  .sheet h3 { font-family: "Playfair Display", "Noto Serif Khmer", Georgia, serif; font-size: 21px; font-weight: 600; }
+  .sheet-prod { padding: 12px; border-radius: 16px; background: #FBF8F4; border: 1px solid var(--line); gap: 14px; }
+  .sheet-thumb { border-radius: 12px; }
+  .sheet-label { font-size: 13px; font-weight: 700; color: var(--ink); }
+  .sizes { gap: 10px; }
+  .size-chip { min-width: 56px; padding: 11px 16px; border-radius: 12px; border: 1.5px solid #E3D8CA; background: #fff; font-weight: 600; font-size: 14.5px; transition: all .15s ease; }
+  .size-chip:hover { border-color: var(--ink); }
+  .size-chip.active { background: var(--ink); border-color: var(--ink); color: #fff; }
+  .sheet-confirm { border-radius: 14px; background: var(--clay); box-shadow: 0 8px 20px rgba(var(--clay-rgb), .28); padding: 15px; }
+  .sheet-confirm:not(:disabled):hover { background: var(--clay-dark); }
+  .sheet-cancel { color: var(--muted); }
+  .sheet input, .sheet select, .sheet textarea { border-radius: 12px; border: 1px solid var(--line); background: #FBF8F4; }
+  .sheet input:focus, .sheet select:focus, .sheet textarea:focus { background: #fff; border-color: var(--clay); outline: none; box-shadow: 0 0 0 3px rgba(var(--clay-rgb), .14); }
+  .toast { border-radius: 14px; }
+
 </style>
 </head>
 <body>
@@ -1198,7 +1387,7 @@
       <a id="tb-acc" href="#" aria-label="គណនី"><i class="fa-regular fa-user"></i></a>
       <a id="tb-fav" href="#" aria-label="ចូលចិត្ត"><i class="fa-regular fa-heart"></i></a>
       <a id="tb-cart" href="#" aria-label="កន្ត្រកទំនិញ" style="position:relative"><i class="fa-solid fa-cart-shopping"></i><b class="cbadge" id="cart-badge" hidden></b></a>
-      <a id="tb-track" href="#" aria-label="តាមដានការកម្មង់"><i class="fa-solid fa-truck-fast"></i></a>
+      <a id="tb-track" href="#" aria-label="ការកម្មង់របស់ខ្ញុំ" title="ការកម្មង់របស់ខ្ញុំ"><i class="fa-solid fa-bag-shopping"></i></a>
       <a id="tb-call" href="tel:0968782682" aria-label="ហៅទូរស័ព្ទ"><i class="fa-solid fa-phone"></i></a>
       <a id="tb-tg" href="https://t.me/theapanha04042004" target="_blank" rel="noopener" aria-label="Telegram"><i class="fa-brands fa-telegram"></i></a>
       <a id="tb-msg" href="https://www.facebook.com/share/1MQPrStX8p/?mibextid=wwXIfr" target="_blank" rel="noopener" aria-label="Messenger"><i class="fa-brands fa-facebook-messenger"></i></a>
@@ -1220,6 +1409,11 @@
       <div class="rule"><i></i></div>
       <a class="cta" href="#products">មើលខោអាវ <i class="fa-solid fa-arrow-down"></i></a>
     </header>
+    <div class="perks" aria-label="ការបម្រើសេវា">
+      <div><i class="fa-solid fa-hand-holding-dollar"></i><span><b>បង់ប្រាក់ពេលទទួល</b><small>មិនបាច់បង់មុន</small></span></div>
+      <div><i class="fa-solid fa-truck-fast"></i><span><b>តាមដានការដឹកជញ្ជូន</b><small>មើលស្ថានភាពបានគ្រប់ពេល</small></span></div>
+      <div><i class="fa-regular fa-comments"></i><span><b>សួរហាងបានភ្លាមៗ</b><small>Telegram · Messenger · ទូរស័ព្ទ</small></span></div>
+    </div>
     <div class="marquee"><div class="track" id="mq-track"><span>THEA FASHION</span><i>✦</i><span>NEW COLLECTION</span><i>✦</i><span>ខោអាវទាន់សម័យ</span><i>✦</i><span>THEA FASHION</span><i>✦</i><span>NEW COLLECTION</span><i>✦</i><span>ខោអាវទាន់សម័យ</span><i>✦</i><span>THEA FASHION</span><i>✦</i><span>NEW COLLECTION</span><i>✦</i><span>ខោអាវទាន់សម័យ</span><i>✦</i><span>THEA FASHION</span><i>✦</i><span>NEW COLLECTION</span><i>✦</i><span>ខោអាវទាន់សម័យ</span><i>✦</i></div></div>
     <div class="flash" id="flash">
       <div class="flash-icon"><i class="fa-solid fa-bolt"></i></div>
@@ -1273,6 +1467,68 @@
     <div class="lb-cap"><div><b id="lb-name"></b><span id="lb-price"></span></div><small id="lb-count"></small></div>
   </div>
 
+  <div class="sheet-backdrop" id="detailsheet">
+    <div class="sheet dt" role="dialog" aria-modal="true" aria-labelledby="dt-name">
+      <div class="dt-scroll" id="dt-scroll">
+        <div class="dt-photo" id="dt-photo">
+          <div class="dt-track" id="dt-track"></div>
+          <button class="dt-nav dt-prev" id="dt-prev" type="button" aria-label="រូបមុន" hidden><i class="fa-solid fa-chevron-left"></i></button>
+          <button class="dt-nav dt-next" id="dt-next" type="button" aria-label="រូបបន្ទាប់" hidden><i class="fa-solid fa-chevron-right"></i></button>
+          <span class="dt-count" id="dt-count" hidden></span>
+          <span class="disc dt-disc" id="dt-disc" hidden></span>
+          <button class="dt-round dt-x" id="dt-close" type="button" aria-label="បិទ"><i class="fa-solid fa-xmark"></i></button>
+          <button class="dt-round dt-fav" id="dt-fav" type="button" aria-label="ចូលចិត្ត"><i class="fa-regular fa-heart"></i></button>
+          <span class="dt-zoom"><i class="fa-solid fa-magnifying-glass-plus"></i> ចុចមើលរូបធំ</span>
+        </div>
+        <div class="dt-thumbs" id="dt-thumbs"></div>
+        <div class="dt-body">
+          <div class="dt-cat" id="dt-cat"></div>
+          <h2 id="dt-name"></h2>
+          <div class="dt-price" id="dt-price"></div>
+          <div class="dt-stock" id="dt-stock"></div>
+
+          <div class="dt-sec" id="dt-size-sec">
+            <div class="dt-h">ជ្រើសរើសទំហំ</div>
+            <div class="sizes" id="dt-sizes"></div>
+            <details class="dt-guide" id="dt-guide">
+              <summary>តារាងទំហំណែនាំ</summary>
+              <table><thead><tr><th>ទំហំ</th><th>ទម្ងន់ខ្លួន (គ.ក្រ)</th></tr></thead><tbody id="dt-guide-rows"></tbody></table>
+              <p>ជាការប៉ាន់ស្មានប៉ុណ្ណោះ បើមិនប្រាកដ សូមសួរហាងមុនកម្មង់។</p>
+            </details>
+          </div>
+
+          <div class="dt-sec">
+            <div class="dt-h">អំពីទំនិញនេះ</div>
+            <p class="dt-desc" id="dt-desc"></p>
+          </div>
+
+          <div class="dt-sec">
+            <div class="dt-h">ព័ត៌មានលម្អិត</div>
+            <dl class="dt-specs" id="dt-specs"></dl>
+          </div>
+
+          <div class="dt-sec">
+            <div class="dt-h">ការទិញ និងការដឹកជញ្ជូន</div>
+            <ul class="dt-perks">
+              <li><i class="fa-solid fa-hand-holding-dollar"></i><span>បង់ប្រាក់ជូនអ្នកដឹកពេលទទួលអីវ៉ាន់</span></li>
+              <li><i class="fa-solid fa-truck-fast"></i><span>បន្ទាប់ពីកម្មង់ អាចតាមដានស្ថានភាពក្នុង «ការកម្មង់របស់ខ្ញុំ»</span></li>
+              <li><i class="fa-regular fa-comments"></i><span>មានសំណួរអំពីទំហំ ឬពណ៌ សូមសួរហាងបានគ្រប់ពេល</span></li>
+            </ul>
+          </div>
+
+          <div class="dt-sec" id="dt-rel-sec">
+            <div class="dt-h">ទំនិញស្រដៀងគ្នា</div>
+            <div class="dt-rel" id="dt-rel"></div>
+          </div>
+        </div>
+      </div>
+      <div class="dt-bar">
+        <button class="dt-cart" id="dt-cart" type="button"><i class="fa-solid fa-cart-plus"></i><span>ដាក់កន្ត្រក</span></button>
+        <button class="dt-buy" id="dt-buy" type="button"><i class="fa-solid fa-bolt"></i><span id="dt-buy-t">ទិញឥឡូវ</span></button>
+      </div>
+    </div>
+  </div>
+
   <div class="sheet-backdrop" id="donesheet">
     <div class="sheet" role="dialog" aria-modal="true" style="text-align:center">
       <div class="sheet-handle"></div>
@@ -1321,11 +1577,19 @@
         <button class="sheet-confirm" id="pf-save" type="button" style="margin-top:2px">រក្សាទុកព័ត៌មាន</button>
         <div class="of-hint" id="pf-msg" style="text-align:center;margin:8px 0 0"></div>
       </div>
-      <div class="of-hint" style="margin:0 0 6px;font-weight:700;color:var(--ink)">ការកម្មង់របស់ខ្ញុំ</div>
-      <div id="my-list"></div>
       <button class="sheet-cancel" id="my-out" type="button">ចេញពីគណនី</button>
       <button class="sheet-cancel" id="my-del" type="button" style="color:#B8213F">🗑 លុបគណនីរបស់ខ្ញុំ</button>
       <button class="sheet-cancel" id="my-close" type="button">បិទ</button>
+    </div>
+  </div>
+
+  <div class="sheet-backdrop" id="ordsheet">
+    <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="ord-title">
+      <div class="sheet-handle"></div>
+      <h3 id="ord-title" style="margin:6px 0 2px">🧾 ការកម្មង់របស់ខ្ញុំ</h3>
+      <p class="of-hint" id="ord-sub">ស្ថានភាព និងលេខតាមដានការដឹកជញ្ជូន</p>
+      <div id="my-list"></div>
+      <button class="sheet-cancel" id="ord-close" type="button">បិទ</button>
     </div>
   </div>
 
@@ -1507,7 +1771,7 @@ function loadAdminData() {
   } catch (e) {}
   try { adminImages = JSON.parse(localStorage.getItem("adminImages") || "{}") || {}; } catch (e) { adminImages = {}; }
   Object.entries(adminData.edits).forEach(([k, v]) => { if (PRODUCTS[k]) Object.assign(PRODUCTS[k], v); });
-  (adminData.added || []).forEach((a) => PRODUCTS.push({ name: a.name, place: a.place, price: a.price }));
+  (adminData.added || []).forEach((a) => PRODUCTS.push({ name: a.name, place: a.place, price: a.price, desc: a.desc || "" }));
 }
 if (adminOn) loadAdminData();
 let settings = { ...SETTINGS, ...(useData() ? adminData.settings : {}) };
@@ -1522,11 +1786,11 @@ async function saveOrderRemote(o) {
 function applyShared(d) {
   if (!d) return;
   PRODUCTS.length = ORIG_PRODUCTS.length;
-  PRODUCTS.forEach((p, k) => Object.assign(p, ORIG_PRODUCTS[k]));
+  PRODUCTS.forEach((p, k) => { delete p.desc; Object.assign(p, ORIG_PRODUCTS[k]); });
   adminData = { edits: d.edits || {}, hidden: d.hidden || [], sale: d.sale || {}, stock: d.stock || { ...STOCK }, settings: d.settings || {}, added: d.added || [], deleted: d.deleted || [] };
   adminImages = d.imgs || {};
   Object.entries(adminData.edits).forEach(([k, v]) => { if (PRODUCTS[k]) Object.assign(PRODUCTS[k], v); });
-  adminData.added.forEach((a) => PRODUCTS.push({ name: a.name, place: a.place, price: a.price }));
+  adminData.added.forEach((a) => PRODUCTS.push({ name: a.name, place: a.place, price: a.price, desc: a.desc || "" }));
   shared = true; rebuildSettings();
 }
 try { applyShared(JSON.parse(localStorage.getItem("sharedCache") || "null")); } catch (e) {}
@@ -1795,8 +2059,9 @@ async function claimLast() {
   } catch (e) {}
 }
 function openTracking(claim) {
-  const go = async () => { if (claim) await claimLast(); openMine(); };
-  if (!CU.sess) { afterAuth = go; openAuth("login", "ចូលគណនីដើម្បីមើលការដឹកជញ្ជូន និងចម្លងលេខតាមដាន"); return; }
+  const go = async () => { if (claim) await claimLast(); openOrd(); };
+  go.ord = true;
+  if (!CU.sess) { afterAuth = go; openAuth("login", "ចូលគណនីដើម្បីមើលការកម្មង់ និងលេខតាមដានការដឹកជញ្ជូន"); return; }
   go();
 }
 $t("tb-track").addEventListener("click", (e) => { e.preventDefault(); openTracking(false); });
@@ -1969,7 +2234,7 @@ function openAuth(mode, sub) {
   $c("au-err").textContent = ""; $c("authsheet").classList.add("open");
 }
 function oauth(provider) {
-  try { sessionStorage.setItem("authResume", afterAuth === openCheckout ? "cart" : ""); } catch (e) {}
+  try { sessionStorage.setItem("authResume", afterAuth === openCheckout ? "cart" : (afterAuth && afterAuth.ord ? "ord" : "")); } catch (e) {}
   location.href = `${SB_URL}/auth/v1/authorize?provider=${provider}&redirect_to=${encodeURIComponent(location.origin + location.pathname)}`;
 }
 $c("au-google").onclick = () => oauth("google");
@@ -1994,8 +2259,17 @@ async function loadMine() {
 function closeMine() { $c("mysheet").classList.remove("open"); clearInterval(myT); }
 function openMine() {
   $c("my-name").textContent = CU.sess.name;
-  $c("mysheet").classList.add("open"); pfFill(); loadProfile(); loadMine(); clearInterval(myT); myT = setInterval(loadMine, 30000);
+  $c("mysheet").classList.add("open"); pfFill(); loadProfile();
 }
+let ordT;
+function closeOrd() { $c("ordsheet").classList.remove("open"); clearInterval(ordT); }
+function openOrd() {
+  if (!CU.sess) { afterAuth = null; openAuth("login", "ចូលគណនីដើម្បីមើលការកម្មង់របស់អ្នក"); return; }
+  $c("my-list").innerHTML = `<div class="of-hint">កំពុងទាញទិន្នន័យ…</div>`;
+  $c("ordsheet").classList.add("open"); loadMine(); clearInterval(ordT); ordT = setInterval(loadMine, 30000);
+}
+$c("ord-close").onclick = closeOrd;
+$c("ordsheet").addEventListener("click", (e) => { if (e.target.id === "ordsheet") closeOrd(); const c = e.target.closest("[data-copy]"); if (c) copyText(c.dataset.copy, c); });
 $c("tb-acc").addEventListener("click", (e) => {
   e.preventDefault();
   if (!sbReady()) return;
@@ -2096,6 +2370,7 @@ loadProfile();
     toast("✓ ចូលគណនីរួចរាល់"); loadProfile();
     let r = ""; try { r = sessionStorage.getItem("authResume") || ""; sessionStorage.removeItem("authResume"); } catch (e) {}
     if (r === "cart") setTimeout(openCart, 500);
+    else if (r === "ord") setTimeout(openOrd, 600);
   }
 })();
 // ចូលមួយដង → បំពេញលេខទូរស័ព្ទដែលបានប្រើចុងក្រោយ (មានស្រាប់ក្នុង orderContact)
@@ -2133,11 +2408,11 @@ let lbList = [], lbPos = 0;
 function showLightbox() {
   const it = lbList[lbPos], n = it.idx + 1;
   const img = document.getElementById("lightbox-img");
-  img.src = photoOf(n);
+  img.src = it.src || photoOf(n);
   img.alt = it.name;
   img.style.animation = "none"; void img.offsetWidth; img.style.animation = "";
   const dl = document.getElementById("lightbox-download");
-  dl.href = photoOf(n);
+  dl.href = it.src || photoOf(n);
   dl.setAttribute("download", `${it.name}.jpg`);
   document.getElementById("lb-name").textContent = it.name;
   const sale = saleOf(it);
@@ -2290,7 +2565,7 @@ function fillGrid(grid, list, instant) {
 
     card.addEventListener("click", (e) => {
       if (e.target.closest(".buy-btn, .cart-add, .fav-btn")) return;
-      openLightbox(baseList, basePos);
+      openDetail(i);
     });
 
     const buyBtn = card.querySelector(".buy-btn");
@@ -2323,6 +2598,156 @@ function fillGrid(grid, list, instant) {
     (io && !instant) ? io.observe(card) : card.classList.add("in");
   });
 }
+
+
+// ================= ព័ត៌មានទំនិញលម្អិត =================
+const CAT_LABEL = { top: "អាវ", bottom: "ខោ", dress: "សំពត់ · រ៉ូប", set: "ឈុត", acc: "គ្រឿងបន្ថែម" };
+const CAT_INFO = {
+  top:    { tip: "ស្លៀកស្រួល ងាយផ្គូផ្គងជាមួយខោ ឬសំពត់ សមសម្រាប់ស្លៀកប្រចាំថ្ងៃ។", care: "បោកដោយទឹកត្រជាក់ ហើយហាលក្នុងម្លប់ ដើម្បីរក្សាពណ៌ឲ្យបានយូរ" },
+  bottom: { tip: "ស្លៀកស្រួល រក្សាទ្រង់ទ្រាយល្អ ផ្គូផ្គងបានជាមួយអាវច្រើនបែប។", care: "បោកដោយប្រែខាងក្នុងចេញ និងទឹកត្រជាក់ ដើម្បីកុំឲ្យស្រអាប់ពណ៌" },
+  dress:  { tip: "ស្អាតទាន់សម័យ សមសម្រាប់ទៅធ្វើការ ដើរលេង ឬចូលរួមកម្មវិធី។", care: "បោកដោយដៃ ឬម៉ាស៊ីនក្នុងមុខងារស្រាល ហើយហាលក្នុងម្លប់" },
+  set:    { tip: "ឈុតស្រេច ស្លៀកតែមួយក៏ស្អាត មិនបាច់ខំគិតផ្គូផ្គង។", care: "លើកដំបូងសូមបោកដាច់ដោយឡែក ដោយទឹកត្រជាក់" },
+  acc:    { tip: "គ្រឿងបន្ថែមតូចៗ ដែលធ្វើឲ្យការស្លៀកពាក់ពេញលក្ខណៈជាងមុន។", care: "រក្សាទុកក្នុងកន្លែងស្ងួត ជៀសវាងប៉ះទឹកយូរ" }
+};
+const MATERIALS = [["កប្បាស", "កប្បាស (Cotton)"], ["ខូវប៊យ", "ក្រណាត់ខូវប៊យ (Denim)"], ["សូត្រ", "សូត្រ"], ["ស្បែក", "ស្បែក"], ["ក្រណាត់ទន់", "ក្រណាត់ទន់"], ["ក្រណាត់រឹង", "ក្រណាត់រឹង"], ["ក្រណាត់ត្បាញ", "ក្រណាត់ត្បាញ"]];
+const SIZE_GUIDE = [["XS", "40 – 46"], ["S", "46 – 52"], ["M", "52 – 60"], ["L", "60 – 68"], ["XL", "68 – 76"], ["XXL", "76 – 85"]];
+const dt$ = (id) => document.getElementById(id);
+let dtI = -1, dtSize = "", dtFavTouched = false, dtGal = [], dtSlide = 0;
+const galleryOf = (n) => [photoOf(n), ...((useData() && Array.isArray(adminImages["g" + n])) ? adminImages["g" + n] : [])];
+function syncDt() {
+  const multi = dtGal.length > 1, c = dt$("dt-count");
+  c.hidden = !multi; c.textContent = `${dtSlide + 1} / ${dtGal.length}`;
+  dt$("dt-prev").hidden = !multi || dtSlide === 0; dt$("dt-next").hidden = !multi || dtSlide >= dtGal.length - 1;
+  dt$("dt-thumbs").querySelectorAll(".dt-th").forEach((b, k) => b.classList.toggle("on", k === dtSlide));
+}
+function dtGo(k) { const t = dt$("dt-track"); t.scrollTo({ left: Math.max(0, Math.min(dtGal.length - 1, k)) * t.clientWidth, behavior: "smooth" }); }
+const itemAt = (i) => ({ ...PRODUCTS[i], idx: i });
+
+function dtAudience(name) {
+  if (name.includes("ក្មេង")) return "ក្មេង";
+  if (name.includes("គូស្នេហ៍")) return "គូស្នេហ៍";
+  if (name.includes("ស្ត្រី")) return "ស្ត្រី";
+  return "";
+}
+function dtMaterial(name) {
+  const m = MATERIALS.find((x) => name.includes(x[0]));
+  if (name.includes("ភ្លៀង")) return "ការពារទឹកភ្លៀង";
+  return m ? m[1] : "";
+}
+function openDetail(i) {
+  const p = PRODUCTS[i]; if (!p) return;
+  const item = itemAt(i), n = i + 1, cat = catOf(p), info = CAT_INFO[cat] || CAT_INFO.acc;
+  const sizes = sizesOf(p.place), stock = stockOf(i), sale = saleOf(item);
+  dtI = i; dtSize = ""; dtFavTouched = false;
+  dtGal = galleryOf(n); dtSlide = 0;
+  const trk = dt$("dt-track"); trk.scrollLeft = 0;
+  trk.innerHTML = dtGal.map((u, k) => `<div class="dt-slide"><img src="${u}" alt="${esc(p.name)}"${k ? ' loading="lazy"' : ""} onerror="this.style.visibility='hidden'"></div>`).join("");
+  dt$("dt-thumbs").innerHTML = dtGal.length > 1 ? dtGal.map((u, k) => `<button type="button" class="dt-th${k ? "" : " on"}" data-k="${k}" aria-label="រូបទី ${k + 1}"><img src="${u}" alt="" loading="lazy" onerror="this.style.visibility='hidden'"></button>`).join("") : "";
+  dt$("dt-thumbs").style.display = dtGal.length > 1 ? "" : "none";
+  syncDt();
+  dt$("dt-cat").textContent = CAT_LABEL[cat] || "";
+  dt$("dt-name").textContent = p.name;
+  dt$("dt-price").innerHTML = sale
+    ? `<b class="dt-now">${formatRiel(finalPrice(item))}</b><s>${formatRiel(p.price)}</s><span class="dt-save">សន្សំ ${saveText(item)}</span>`
+    : `<b class="dt-now">${formatRiel(p.price)}</b>`;
+  const dsc = dt$("dt-disc");
+  dsc.hidden = !sale; if (sale) dsc.textContent = "-" + Math.max(1, Math.round((sale / p.price) * 100)) + "%";
+  const st = dt$("dt-stock");
+  if (stock === 0) { st.textContent = "អស់ស្តុក"; st.className = "dt-stock out"; }
+  else if (stock !== null && stock <= 5) { st.textContent = `នៅសល់ ${stock} ប៉ុណ្ណោះ`; st.className = "dt-stock low"; }
+  else { st.textContent = "មានលក់"; st.className = "dt-stock in"; }
+  // ទំហំ
+  dt$("dt-size-sec").style.display = sizes.length ? "" : "none";
+  const box = dt$("dt-sizes"); box.innerHTML = "";
+  sizes.forEach((sz) => {
+    const b = document.createElement("button"); b.type = "button"; b.className = "size-chip"; b.textContent = sz;
+    b.addEventListener("click", () => {
+      dtSize = dtSize === sz ? "" : sz;
+      box.querySelectorAll(".size-chip").forEach((x) => x.classList.toggle("active", x.textContent === dtSize));
+      updateDtBuy();
+    });
+    box.appendChild(b);
+  });
+  const guided = sizes.length && sizes.every((s) => SIZE_GUIDE.some((g) => g[0] === s));
+  dt$("dt-guide").style.display = guided ? "" : "none"; dt$("dt-guide").open = false;
+  dt$("dt-guide-rows").innerHTML = SIZE_GUIDE.filter((g) => sizes.includes(g[0])).map((g) => `<tr><td>${g[0]}</td><td>${g[1]}</td></tr>`).join("");
+  // ពិពណ៌នា
+  const custom = (p.desc || "").trim();
+  dt$("dt-desc").innerHTML = esc(custom || `${p.name} ទំហំ ${p.place}។ ${info.tip}`).replace(/\n/g, "<br>");
+  // ព័ត៌មានលម្អិត
+  const mat = dtMaterial(p.name), who = dtAudience(p.name);
+  const rows = [["ប្រភេទ", CAT_LABEL[cat]], ["ទំហំ", p.place]];
+  if (mat) rows.push(["ក្រណាត់", mat]);
+  if (who) rows.push(["សម្រាប់", who]);
+  rows.push(["ថែរក្សា", info.care]);
+  dt$("dt-specs").innerHTML = rows.map((r) => `<div><dt>${r[0]}</dt><dd>${esc(r[1])}</dd></div>`).join("");
+  // ទំនិញស្រដៀងគ្នា
+  const hid = hiddenSet();
+  const rel = PRODUCTS.map((q, j) => ({ q, j })).filter((o) => o.j !== i && !hid.has(o.j + 1) && catOf(o.q) === cat).slice(0, 8);
+  dt$("dt-rel-sec").style.display = rel.length ? "" : "none";
+  dt$("dt-rel").innerHTML = rel.map((o) => `<button type="button" class="rel" data-r="${o.j}"><img src="${photoOf(o.j + 1)}" alt="" loading="lazy" onerror="this.style.visibility='hidden'"><b>${esc(o.q.name)}</b><span>${formatRiel(finalPrice(itemAt(o.j)))}</span></button>`).join("");
+  // ប៊ូតុង
+  const fb = dt$("dt-fav"), on = isFav(n);
+  fb.classList.toggle("on", on); fb.firstElementChild.className = (on ? "fa-solid" : "fa-regular") + " fa-heart";
+  dt$("dt-cart").disabled = stock === 0; dt$("dt-buy").disabled = stock === 0;
+  updateDtBuy();
+  dt$("dt-scroll").scrollTop = 0;
+  dt$("detailsheet").classList.add("open");
+  track("view", n);
+}
+function updateDtBuy() {
+  const stock = stockOf(dtI), t = dt$("dt-buy-t");
+  t.textContent = stock === 0 ? "អស់ស្តុក" : dtSize ? `ទិញឥឡូវ · ${dtSize}` : "ទិញឥឡូវ";
+}
+function closeDetail() {
+  dt$("detailsheet").classList.remove("open");
+  if (dtFavTouched) { dtFavTouched = false; render(); }
+}
+function dtNeedSize() {
+  const sizes = sizesOf(PRODUCTS[dtI].place);
+  if (sizes.length && !dtSize) {
+    toast("សូមជ្រើសរើសទំហំសិន");
+    const b = dt$("dt-sizes"); b.classList.remove("nudge"); void b.offsetWidth; b.classList.add("nudge");
+    b.scrollIntoView({ behavior: "smooth", block: "center" });
+    return true;
+  }
+  return false;
+}
+dt$("dt-close").onclick = closeDetail;
+dt$("detailsheet").addEventListener("click", (e) => { if (e.target.id === "detailsheet") closeDetail(); });
+dt$("dt-photo").addEventListener("click", (e) => {
+  if (e.target.closest(".dt-round, .dt-nav")) return;
+  const base = itemAt(dtI);
+  openLightbox(dtGal.map((src) => ({ ...base, src })), dtSlide);
+});
+dt$("dt-track").addEventListener("scroll", () => {
+  const t = dt$("dt-track"), k = Math.round(t.scrollLeft / (t.clientWidth || 1));
+  if (k !== dtSlide && k >= 0 && k < dtGal.length) { dtSlide = k; syncDt(); }
+}, { passive: true });
+dt$("dt-prev").onclick = (e) => { e.stopPropagation(); dtGo(dtSlide - 1); };
+dt$("dt-next").onclick = (e) => { e.stopPropagation(); dtGo(dtSlide + 1); };
+dt$("dt-thumbs").addEventListener("click", (e) => { const b = e.target.closest("[data-k]"); if (b) dtGo(+b.dataset.k); });
+dt$("dt-fav").onclick = (e) => {
+  const on = toggleFav(dtI + 1), b = e.currentTarget; dtFavTouched = true;
+  b.classList.toggle("on", on); b.firstElementChild.className = (on ? "fa-solid" : "fa-regular") + " fa-heart";
+};
+dt$("dt-rel").addEventListener("click", (e) => { const b = e.target.closest("[data-r]"); if (b) openDetail(+b.dataset.r); });
+dt$("dt-cart").onclick = () => {
+  if (stockOf(dtI) === 0 || dtNeedSize()) return;
+  track("order", dtI + 1); addToCart(dtI + 1, dtSize);
+};
+dt$("dt-buy").onclick = () => {
+  if (stockOf(dtI) === 0 || dtNeedSize()) return;
+  const i = dtI, item = itemAt(i), sizes = sizesOf(item.place), sz = dtSize;
+  track("order", i + 1);
+  const go = () => {
+    closeDetail(); openSizeSheet(item, i, sizes, null);
+    if (sz) { const c = Array.from(sizesBox.children).find((b) => b.textContent === sz); if (c) c.click(); }
+  };
+  if (needLogin()) { afterAuth = go; openAuth("login", "ត្រូវមានគណនីដើម្បីបន្តការទិញ"); return; }
+  go();
+};
+document.addEventListener("keydown", (e) => { if (e.key === "Escape" && dt$("detailsheet").classList.contains("open")) closeDetail(); });
 
 renderCatNav();
 render();

@@ -260,6 +260,85 @@
   .ad-tabs { box-shadow: none; border-top: 1px solid var(--border); background: rgba(255,255,255,.96); }
   .ad-tab.active { background: rgba(var(--clay-rgb), .1); }
   @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; } }
+  .ad-desc { height: auto !important; min-height: 74px; padding: 10px 14px !important; line-height: 1.6; resize: vertical; font-family: inherit; }
+  .ad-sizes { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted, #8A7468); }
+  .ad-sizes select.ad-input { flex: 1; min-width: 0; height: 40px; padding: 0 8px; }
+
+  /* ===== Admin UI v3 ===== */
+  :root { --line: #ECE3D8; --ink: #211812; }
+  body { background: #F7F2EB !important; }
+  #admin-app > .ad-top { background: var(--ink); padding: calc(12px + env(safe-area-inset-top)) 16px 12px; }
+  #admin-app > .ad-top h1 { font-family: "Playfair Display", "Noto Serif Khmer", Georgia, serif; font-size: 18px; font-weight: 600; letter-spacing: .02em; }
+  .ad-logo { width: 34px; height: 34px; border-radius: 11px; }
+  .ad-site, .ad-out { border-radius: 12px; padding: 8px 12px; background: rgba(255,255,255,.10); }
+  .ad-out { background: rgba(200,34,63,.5); }
+  .ad-wrap { max-width: 780px; padding: 18px 14px 120px; }
+  .ad-tabs { padding: 8px 8px calc(8px + env(safe-area-inset-bottom)); background: rgba(255,255,255,.96); border-top: 1px solid var(--line); box-shadow: 0 -8px 28px rgba(60,30,20,.07); }
+  .ad-tab { border-radius: 14px; padding: 7px 2px; font-size: 11px; }
+  .ad-tab.active { background: var(--ink); color: #fff; }
+  .ad-tab .ic { font-size: 18px; }
+  .ad-login { background: linear-gradient(135deg, #1D1318, #4A2335 70%, #7B3550); }
+  .ad-card { border-radius: 26px; padding: 30px 24px 22px; box-shadow: 0 30px 70px rgba(0,0,0,.45); }
+  .ad-card h1 { font-size: 30px; font-weight: 600; }
+
+  /* inputs + buttons */
+  .ad-input { background: #FBF8F4; border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; }
+  .ad-input:focus { background: #fff; }
+  .ad-label { font-size: 12.5px; letter-spacing: .02em; }
+  .sheet-confirm { background: var(--clay); box-shadow: 0 8px 20px rgba(var(--clay-rgb), .28); border-radius: 14px; }
+  .ad-btn { border-radius: 12px; padding: 10px 16px; border-width: 1px; border-color: var(--line); background: #fff; }
+  .ad-btn:hover { background: var(--ink); border-color: var(--ink); }
+  .ad-btn.danger { border-color: rgba(200,34,63,.35); }
+  .ad-foot button { border-radius: 14px; background: var(--ink); }
+  .ad-addbtn { border-radius: 14px; background: var(--clay); border: none; font-size: 14.5px; padding: 14px; }
+  .ad-addbtn:hover { background: var(--clay-dark); }
+  .ad-addform { border-radius: 20px; padding: 16px; border-color: var(--line); }
+  .ad-note { border-radius: 14px; }
+  .ad-saved.show { opacity: 1; }
+
+  /* product rows */
+  .ad-filters { gap: 8px; margin-bottom: 12px; overflow-x: auto; scrollbar-width: none; }
+  .ad-filters::-webkit-scrollbar { display: none; }
+  .ad-filters button { padding: 8px 16px; border-color: var(--line); white-space: nowrap; }
+  .ad-filters button.on { background: var(--ink); border-color: var(--ink); }
+  #ad-search { border-radius: 14px; background: #fff; }
+  .ad-row { border-radius: 20px !important; padding: 14px; margin-bottom: 12px; border-color: var(--line) !important; box-shadow: 0 1px 2px rgba(60,30,20,.04), 0 6px 18px rgba(60,30,20,.05); }
+  .ad-thumbwrap { border-radius: 14px; box-shadow: none; }
+  .ad-row .ad-num { font-size: 13px; color: var(--muted); letter-spacing: .08em; }
+  .ad-hide { font-size: 12.5px; color: var(--muted); }
+  .ad-q { border-radius: 10px; padding: 6px 11px; border-color: rgba(200,34,63,.35); }
+  .ad-q.stk { border-color: var(--line); }
+  .ad-photo-btn, .ad-dl, .ad-del, .ad-delimg { border-radius: 10px; }
+  .ad-photo-pick { border-radius: 16px; background-color: #FBF8F4; }
+  .ad-sizes { margin-bottom: 8px; }
+
+  /* stats */
+  .st-cards, .od-stats { gap: 10px; }
+  .st-card, .od-stat { border-radius: 18px; border-color: var(--line); padding: 14px 10px; box-shadow: 0 1px 2px rgba(60,30,20,.04); }
+  .st-card b { font-size: 26px; color: var(--ink); }
+  .st-bar { height: 7px; background: #F0E8DD; }
+  .st-bar i { background: var(--clay); }
+  .st-thumb { border-radius: 10px; }
+
+  /* orders */
+  .od-card { border-radius: 20px; border-color: var(--line); border-left-width: 5px; padding: 16px; box-shadow: 0 1px 2px rgba(60,30,20,.04), 0 8px 22px rgba(60,30,20,.06); }
+  .od-name { font-size: 16px; }
+  .od-box { border-radius: 14px; background: #FBF8F4; border-color: #DDD0C1; }
+  .od-sm { border-width: 1px; border-color: var(--line); background: #fff; }
+  .od-sm.on { background: var(--ink); border-color: var(--ink); }
+  .sheet-backdrop .sheet, .admin-sheet { border-radius: 26px 26px 0 0; }
+  @media (max-width: 640px) { .ad-wrap { padding: 14px 10px 120px; } .ad-row { padding: 12px; } }
+
+  .ad-gal { margin: 2px 0 10px; padding: 10px; border: 1px dashed #DDD0C1; border-radius: 14px; background: #FBF8F4; }
+  .ad-gal-h { font-size: 12.5px; font-weight: 700; color: var(--muted); margin-bottom: 8px; }
+  .ad-gal-row { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 2px; scrollbar-width: none; }
+  .ad-gal-row::-webkit-scrollbar { display: none; }
+  .ad-gt { position: relative; flex: 0 0 auto; width: 58px; height: 76px; border-radius: 10px; overflow: hidden; background: #E9DBC0; }
+  .ad-gt img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .ad-gx { position: absolute; top: 3px; right: 3px; min-width: 22px; height: 22px; padding: 0 5px; border: none; border-radius: 11px; background: rgba(26,26,26,.72); color: #fff; font-size: 11px; font-weight: 700; cursor: pointer; }
+  .ad-gadd { flex: 0 0 auto; width: 58px; height: 76px; border-radius: 10px; border: 1.5px dashed var(--clay); color: var(--clay); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; cursor: pointer; background: #fff; }
+  .ad-gadd span { font-size: 22px; line-height: 1; }
+  .ad-gadd small { font-size: 10px; font-weight: 600; }
 </style>
 </head>
 <body>
@@ -466,7 +545,7 @@ function loadAdminData() {
   } catch (e) {}
   try { adminImages = JSON.parse(localStorage.getItem("adminImages") || "{}") || {}; } catch (e) { adminImages = {}; }
   Object.entries(adminData.edits).forEach(([k, v]) => { if (PRODUCTS[k]) Object.assign(PRODUCTS[k], v); });
-  (adminData.added || []).forEach((a) => PRODUCTS.push({ name: a.name, place: a.place, price: a.price }));
+  (adminData.added || []).forEach((a) => PRODUCTS.push({ name: a.name, place: a.place, price: a.price, desc: a.desc || "" }));
 }
 if (adminOn) loadAdminData();
 let settings = { ...SETTINGS, ...(adminOn ? adminData.settings : {}) };
@@ -519,16 +598,30 @@ async function tryAdminLogin() {
 document.getElementById("admin-go").addEventListener("click", tryAdminLogin);
 adminPass.addEventListener("keydown", (e) => { if (e.key === "Enter") tryAdminLogin(); });
 
+function adGallery(n) {
+  const g = Array.isArray(adminImages["g" + n]) ? adminImages["g" + n] : [];
+  return `<div class="ad-gal"><div class="ad-gal-h">រូបបន្ថែម${g.length ? ` · ${g.length} សន្លឹក` : ""}</div><div class="ad-gal-row">${g.map((u, k) => `<div class="ad-gt"><img src="${u}" alt="" decoding="async" onerror="this.style.visibility='hidden'"><button type="button" class="ad-gx" data-gn="${n}" data-gk="${k}" aria-label="លុបរូប">✕</button></div>`).join("")}<label class="ad-gadd" title="ថែមរូប"><span>＋</span><small>ថែមរូប</small><input type="file" accept="image/*" multiple data-gimg="${n}" hidden></label></div></div>`;
+}
+const AD_SIZES = ["XS", "S", "M", "L", "XL", "XXL"];
+function adSizeRange(place) {
+  const m = String(place || "").match(/\b(XXL|XL|XS|S|M|L)\s*-\s*(XXL|XL|XS|S|M|L)\b/);
+  return m ? [m[1], m[2]] : ["", ""];
+}
+function adSizeSel(place) {
+  const [a, b] = adSizeRange(place);
+  const opts = (v) => `<option value="">—</option>` + AD_SIZES.map((z) => `<option value="${z}"${z === v ? " selected" : ""}>${z}</option>`).join("");
+  return `<div class="ad-sizes"><span>ទំហំអក្សរ៖</span><select class="ad-input" data-f="sizeFrom" aria-label="ពីទំហំ">${opts(a)}</select><span>ដល់</span><select class="ad-input" data-f="sizeTo" aria-label="ដល់ទំហំ">${opts(b)}</select></div>`;
+}
 function saveAdmin() {
   const edits = {};
   PRODUCTS.forEach((p, k) => {
     if (k >= ORIG_PRODUCTS.length) return;
     const o = ORIG_PRODUCTS[k], d = {};
-    ["name", "place", "price"].forEach((f) => { if (p[f] !== o[f]) d[f] = p[f]; });
+    ["name", "place", "price", "desc"].forEach((f) => { if ((p[f] || "") !== (o[f] || "")) d[f] = p[f] || ""; });
     if (Object.keys(d).length) edits[k] = d;
   });
   adminData.edits = edits;
-  adminData.added = PRODUCTS.slice(ORIG_PRODUCTS.length).map((p) => ({ name: p.name, place: p.place, price: p.price }));
+  adminData.added = PRODUCTS.slice(ORIG_PRODUCTS.length).map((p) => ({ name: p.name, place: p.place, price: p.price, desc: p.desc || "" }));
   try { localStorage.setItem("adminData", JSON.stringify(adminData)); } catch (e) {}
   flashSaved(); sbPush();
 }
@@ -606,6 +699,9 @@ function adminRows(q) {
           <label class="ad-hide"><input type="checkbox" data-f="hide" ${h ? "checked" : ""}> លាក់</label></div>
         <input class="ad-input" data-f="name" value="${esc(p.name)}" placeholder="ឈ្មោះ" />
         <input class="ad-input" data-f="place" value="${esc(p.place)}" placeholder="ទំហំ" />
+        ${adSizeSel(p.place)}
+        ${adGallery(n)}
+        <textarea class="ad-input ad-desc" data-f="desc" rows="3" placeholder="ពិពណ៌នាទំនិញ (ក្រណាត់ ទ្រង់ទ្រាយ ពណ៌...) · ទុកទទេ = ប្រើអត្ថបទស្វ័យប្រវត្តិ">${esc(p.desc || "")}</textarea>
         <div class="ad-three">
           <label>តម្លៃ ៛<input class="ad-input" data-f="price" type="number" inputmode="numeric" value="${p.price}" /></label>
           <label>បញ្ចុះ ៛<input class="ad-input" data-f="sale" type="number" inputmode="numeric" value="${adminData.sale[n] || ""}" placeholder="—" /></label>
@@ -982,6 +1078,27 @@ function openAdminPanel() {
     const el = e.target, row = el.closest(".ad-row");
     if (!row) return;
     const n = Number(row.dataset.n), f = el.dataset.f, p = PRODUCTS[n - 1];
+    if (el.dataset.gimg) {                        // រូបបន្ថែម (ច្រើនសន្លឹក)
+      const files = Array.from(el.files || []);
+      if (!files.length) return;
+      (async () => {
+        const key = "g" + n, old = adminImages[key], arr = Array.isArray(old) ? old.slice() : [];
+        for (const file of files) {
+          try {
+            let d = await processImage(file);
+            if (sbOn()) d = await sbUpload("p" + n + "_" + Date.now() + "_" + arr.length + ".jpg", d);
+            arr.push(d);
+          } catch (err) { alert("បើករូបមិនបាន (" + (err && err.message) + ")។ សូមសាកល្បងរូប JPG/PNG"); }
+        }
+        adminImages[key] = arr;
+        if (!saveImages()) { if (old) adminImages[key] = old; else delete adminImages[key]; return; }
+        flashSaved(); refreshSite();
+        const keep = list.scrollTop;
+        list.innerHTML = adminRows(document.getElementById("ad-search").value);
+        list.scrollTop = keep;
+      })();
+      return;
+    }
     if (el.dataset.img) {                         // ប្តូររូបទំនិញ
       const file = el.files && el.files[0];
       if (!file) return;
@@ -995,7 +1112,19 @@ function openAdminPanel() {
       }).catch((err) => alert("បើករូបមិនបាន (" + (err && err.message) + ")។ សូមសាកល្បងរូប JPG/PNG"));
       return;
     }
-    if (f === "name" || f === "place") p[f] = el.value.trim();
+    if (f === "sizeFrom" || f === "sizeTo") {
+      let a = row.querySelector('[data-f="sizeFrom"]').value, b = row.querySelector('[data-f="sizeTo"]').value;
+      if (!a || !b) return;
+      if (AD_SIZES.indexOf(b) < AD_SIZES.indexOf(a)) [a, b] = [b, a];
+      row.querySelector('[data-f="sizeFrom"]').value = a; row.querySelector('[data-f="sizeTo"]').value = b;
+      p.place = `ទំហំ ${a} - ${b}`;
+      row.querySelector('[data-f="place"]').value = p.place;
+    }
+    else if (f === "name" || f === "place") {
+      p[f] = el.value.trim();
+      if (f === "place") { const r = adSizeRange(p.place); row.querySelector('[data-f="sizeFrom"]').value = r[0]; row.querySelector('[data-f="sizeTo"]').value = r[1]; }
+    }
+    else if (f === "desc") p.desc = el.value.trim().slice(0, 600);
     else if (f === "price") { p.price = Math.max(0, Math.round(Number(el.value) || 0)); }
     else if (f === "stock") {
       if (el.value === "") delete adminData.stock[n];
@@ -1024,6 +1153,22 @@ function openAdminPanel() {
   }));
   // បញ្ចុះតម្លៃលឿន (-10% / -20% / -30% / លុប)
   list.addEventListener("click", (e) => {
+    const gx = e.target.closest(".ad-gx");
+    if (gx) {                                   // លុបរូបបន្ថែម (ចុចពីរដង)
+      if (gx.dataset.sure !== "1") {
+        gx.dataset.sure = "1"; gx.style.background = "#B8213F"; gx.textContent = "លុប?";
+        setTimeout(() => { if (gx.isConnected) { gx.dataset.sure = ""; gx.style.background = ""; gx.textContent = "✕"; } }, 3000);
+        return;
+      }
+      const key = "g" + Number(gx.dataset.gn), arr = (adminImages[key] || []).slice();
+      arr.splice(Number(gx.dataset.gk), 1);
+      if (arr.length) adminImages[key] = arr; else delete adminImages[key];
+      saveImages(); flashSaved(); refreshSite();
+      const keep = list.scrollTop;
+      list.innerHTML = adminRows(document.getElementById("ad-search").value);
+      list.scrollTop = keep;
+      return;
+    }
     const di = e.target.closest(".ad-delimg");
     if (di) {
       const n = Number(di.dataset.delimg);
@@ -1050,7 +1195,7 @@ function openAdminPanel() {
         setTimeout(() => { if (del.isConnected) { del.dataset.sure = ""; del.textContent = "🗑 លុបប្រអប់"; del.style.background = ""; del.style.color = ""; } }, 3000);
         return;
       }
-      delete adminImages[n]; delete adminData.stock[n]; delete adminData.sale[n]; window.__sd.add(String(n));
+      delete adminImages[n]; delete adminImages["g" + n]; delete adminData.stock[n]; delete adminData.sale[n]; window.__sd.add(String(n));
       adminData.hidden = adminData.hidden.filter((x) => x !== n);
       if (n === PRODUCTS.length && n > ORIG_PRODUCTS.length) PRODUCTS.pop();      // ទំនិញថ្មីចុងក្រោយ → លុបពិត
       else adminData.deleted = [...new Set([...(adminData.deleted || []), n])];  // ផ្សេងទៀត → លាក់ជាអចិន្ត្រៃយ៍
