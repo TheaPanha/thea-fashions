@@ -247,6 +247,9 @@
   #rcv-msg, #rcv-open { color: #fff; font-size: 14px; } #rcv-img { display: none; max-width: 100%; max-height: 78vh; border-radius: 12px; background: #fff; } #rcv-open { display: none; }
 
   /* ===== Pro UI v2 · admin polish ===== */
+  .ad-imgrow { display: flex; align-items: center; gap: 10px; margin-top: 6px; flex-wrap: wrap; }
+  .ad-logo-prev { width: 48px; height: 48px; border-radius: 50%; background: var(--clay) center/cover no-repeat; color: #fff; display: grid; place-items: center; font: 700 22px Georgia, serif; flex: none; }
+  .ad-qr-prev { width: 84px; height: 84px; object-fit: contain; border: 1px solid var(--border); border-radius: 10px; background: #fff; flex: none; }
   :focus-visible { outline: 2px solid var(--clay); outline-offset: 2px; }
   #admin-app > .ad-top { background: #1F1813; box-shadow: none; border-bottom: 1px solid rgba(255,255,255,.08); }
   .ad-row, .od-card, .od-stat, .od-box { box-shadow: none !important; }
@@ -370,6 +373,11 @@ const SETTINGS = {        // ការកំណត់រចនា និងហ�
   showFlash: true,
   saleCount: 16,
   saleHours: 4,
+  logoText: "",
+  logoImg: "",
+  qrImg: "",
+  showTimer: 1,
+  bakongOn: 0,
   requireLogin: 0,
   payAccount: "",
   statsUrl: "",             // URL របស់ Worker ស្ថិតិ (ទទេ = មិនប្រើ)
@@ -719,7 +727,7 @@ function wireStats(box) {
     return [`⚠️ បង់មិនទាន់គ្រប់ · ខ្វះ ${money(-df)}`, "#B8213F"];
   }
   function payBox(o) {
-    if (o.pay_method !== "qr") return "";
+    if (o.pay_method !== "qr" && o.pay_method !== "bk") return "";
     const [t, c] = payState(o), short = o.paid_amount != null && o.paid_amount < (o.price || 0);
     return `<div class="od-box"><div class="od-row"><input data-payer value="${e2(o.payer_name)}" placeholder="ឈ្មោះអ្នកបង់ (លើបង្កាន់ដៃ)"><input data-paid type="text" inputmode="decimal" value="${o.paid_amount == null ? "" : o.paid_amount}" placeholder="ទឹកប្រាក់ ៛"><button class="od-sm" data-savepay="1" type="button">រក្សា</button></div>
       <div class="od-stat2" style="color:${c}">${t}</div>${short ? `<button class="od-sm" data-sms="1" type="button" style="margin-top:8px;border-color:#B8213F;color:#B8213F">📩 ប្រាប់ភ្ញៀវថាបង់មិនទាន់គ្រប់</button>` : ""}</div>`;
@@ -734,7 +742,7 @@ function wireStats(box) {
     const rows = orders.filter((o) => flt === "all" || o.status === flt);
     $("od-list").innerHTML = rows.length ? rows.map((o) => `<div class="od-card ${e2(o.status)}" data-id="${o.id}">
       <div class="od-top"><div class="od-name">${e2(o.product)}${o.size ? " · " + e2(o.size) : ""}</div><div class="od-time">${when(o.created_at)}</div></div>
-      <div class="od-meta"><span class="od-price">${money(o.price)}</span> · #${e2(o.product_no)}${o.order_code ? " · 🔖 <b>" + e2(o.order_code) + "</b>" : ""}${o.pay_method ? " · " + (o.pay_method === "qr" ? "💳 បង់ឥឡូវ" : "🚚 បង់ពេលទទួល") : ""}<br>
+      <div class="od-meta"><span class="od-price">${money(o.price)}</span> · #${e2(o.product_no)}${o.order_code ? " · 🔖 <b>" + e2(o.order_code) + "</b>" : ""}${o.pay_method ? " · " + (o.pay_method === "bk" ? "⚡ Bakong" : o.pay_method === "qr" ? "💳 បង់ឥឡូវ" : "🚚 បង់ពេលទទួល") : ""}<br>
         ${Array.isArray(o.items) && o.items.length ? o.items.map((it) => "• " + e2(it.name) + (it.size ? " · " + e2(it.size) : "") + " ×" + it.qty + " — " + money(it.price * it.qty)).join("<br>") + "<br>" : ""}${o.coupon ? "🎟️ " + e2(o.coupon) + " −" + money(o.discount) + "<br>" : ""}${o.customer_name ? "👤 " + e2(o.customer_name) + " (គណនី)<br>" : ""}📞 <a href="tel:${e2(String(o.phone).replace(/[^\d+]/g, ""))}">${e2(o.phone)}</a><br>${o.location ? "📍 " + e2(o.location) + "<br>" : ""}${/^https?:\/\//.test(o.map_link || "") ? `🗺 <a href="${e2(o.map_link)}" target="_blank" rel="noopener">បើក Google Map</a>` : ""}</div>
       ${payBox(o)}
       <div class="od-box"><div class="od-row"><input data-courier value="${e2(o.courier)}" placeholder="ក្រុមហ៊ុនដឹក"><input data-trackno value="${e2(o.courier_no)}" placeholder="លេខតាមដាន"></div>
@@ -901,6 +909,11 @@ function openAdminPanel() {
       </div>
       <label class="ad-field">ពណ៌ផ្ទាល់ខ្លួន<input type="color" data-s="accent" value="${esc(settings.accent)}" id="ad-color" /></label>
       <label class="ad-field">ឈ្មោះហាង<input class="ad-input" data-s="name" value="${esc(settings.name)}" /></label>
+      <div class="ad-field">រូបសញ្ញាហាង (Logo)
+        <div class="ad-imgrow"><span class="ad-logo-prev" id="ad-logo-prev"></span>
+          <label class="ad-btn" style="cursor:pointer"><input type="file" id="ad-logo-file" accept="image/*" hidden />📷 ដាក់រូប Logo</label>
+          <button type="button" class="ad-btn" id="ad-logo-clear">លុបរូប</button></div></div>
+      <label class="ad-field">អក្សរ Logo ១ តួ (ប្រើពេលគ្មានរូប)<input class="ad-input" data-s="logoText" maxlength="2" value="${esc(settings.logoText)}" placeholder="${esc((String(settings.name).trim()[0] || "T").toUpperCase())}" /></label>
       <label class="ad-field">ខ្សែប្រកាសខាងលើបំផុត (ទទេ = លាក់)<input class="ad-input" data-s="announce" value="${esc(settings.announce)}" /></label>
       <label class="ad-field">ស្លាកខាងលើចំណងជើង<input class="ad-input" data-s="eyebrow" value="${esc(settings.eyebrow)}" /></label>
       <label class="ad-field">ពាក្យពណ៌នា<textarea class="ad-input" data-s="tagline">${esc(settings.tagline)}</textarea></label>
@@ -945,18 +958,32 @@ function openAdminPanel() {
       <label class="ad-field">តំណ Messenger / Facebook<input class="ad-input" data-s="messenger" value="${esc(settings.messenger)}" /></label>
       <label class="ad-field">ចំណងជើងខ្សែបញ្ចុះតម្លៃ<input class="ad-input" data-s="flashTitle" value="${esc(settings.flashTitle)}" /></label>
       <label class="ad-field">ចំនួនទំនិញបញ្ចុះក្នុងមួយរង្វង់<input class="ad-input" data-s="saleCount" data-num="1" type="number" min="1" max="${PRODUCTS.length}" inputmode="numeric" value="${settings.saleCount}" /></label>
+      <label class="ad-field">ម៉ោងរាប់ថយក្រោយបញ្ចុះតម្លៃ
+        <select class="ad-input" data-s="showTimer">
+          <option value="1"${String(settings.showTimer) === "0" ? "" : " selected"}>បើក (បង្ហាញម៉ោង)</option>
+          <option value="0"${String(settings.showTimer) === "0" ? " selected" : ""}>បិទ (លាក់ម៉ោង)</option>
+        </select></label>
       <label class="ad-field">ប្តូរទំនិញបញ្ចុះរៀងរាល់ (ម៉ោង)
         <select class="ad-input" data-s="saleHours" data-num="1">
           ${[1, 2, 3, 4, 6, 8, 12, 24].map((h) => `<option value="${h}"${settings.saleHours === h ? " selected" : ""}>${h} ម៉ោង</option>`).join("")}
         </select></label>
       <div class="ad-hint">ម៉ោងគិតតាមម៉ោងកម្ពុជា ចាប់ពី 00:00</div>
+      <label class="ad-field">Bakong KHQR (ផ្ទៀងផ្ទាត់ការបង់ស្វ័យប្រវត្តិ)
+        <select class="ad-input" data-s="bakongOn">
+          <option value="0"${Number(settings.bakongOn) === 1 ? "" : " selected"}>បិទ</option>
+          <option value="1"${Number(settings.bakongOn) === 1 ? " selected" : ""}>បើក (ត្រូវដាក់ Edge Function bakong-pay រួចសិន)</option>
+        </select></label>
       <label class="ad-field">ត្រូវចូលគណនីមុនទិញ?
-        <select class="ad-input" data-s="requireLogin" data-num="1">
+        <select class="ad-input" data-s="requireLogin">
           <option value="0"${Number(settings.requireLogin) === 1 ? "" : " selected"}>ទេ (ភ្ញៀវទិញបានដោយមិនចាំបាច់ចូល)</option>
           <option value="1"${Number(settings.requireLogin) === 1 ? " selected" : ""}>បាទ/ចាស (ត្រូវចូលគណនីមុន)</option>
         </select></label>
       <label class="ad-field">គណនីទទួលប្រាក់ (ឈ្មោះ + លេខ ACLEDA)<input class="ad-input" data-s="payAccount" value="${esc(settings.payAccount)}" placeholder="ឧ. ACLEDA 0000 0000 0000 · SOK DARA" /></label>
-      <div class="ad-hint">ដាក់រូប QR ឈ្មោះ KHQR.jpg ទៅជាមួយ index.html ដើម្បីបង្ហាញលើទំព័របង់ប្រាក់។</div>
+      <div class="ad-field">រូប QR ទូទាត់ (KHQR)
+        <div class="ad-imgrow"><img id="ad-qr-prev" class="ad-qr-prev" alt="" />
+          <div style="display:flex;flex-direction:column;gap:8px;flex:1">
+            <label class="ad-btn" style="cursor:pointer;text-align:center"><input type="file" id="ad-qr-file" accept="image/*" hidden />📷 ដាក់/ប្តូររូប QR</label>
+            <button type="button" class="ad-btn" id="ad-qr-clear">ប្រើរូបដើម (KHQR.jpg)</button></div></div></div>
       <label class="ad-field">URL Worker ស្ថិតិ (ទទេ = រាប់លើឧបករណ៍នេះប៉ុណ្ណោះ)<input class="ad-input" data-s="statsUrl" value="${esc(settings.statsUrl)}" placeholder="https://stats.xxx.workers.dev" /></label>
     </div>`;
   const list = document.getElementById("ad-list");
@@ -1133,8 +1160,19 @@ function openAdminPanel() {
   });
 
   // settings (live)
+  const updPrev = () => {
+    const lp = document.getElementById("ad-logo-prev"), qp = document.getElementById("ad-qr-prev"), nm = String(settings.name || "").trim();
+    const letter = (String(settings.logoText || "").trim()[0] || nm[0] || "T").toUpperCase();
+    [lp, document.querySelector("#admin-app > .ad-top .ad-logo")].forEach((el) => {
+      if (!el) return;
+      if (settings.logoImg) { el.textContent = ""; el.style.backgroundImage = `url("${settings.logoImg}")`; el.style.backgroundSize = "cover"; el.style.backgroundPosition = "center"; }
+      else { el.style.backgroundImage = ""; el.textContent = letter; }
+    });
+    if (qp) qp.src = settings.qrImg || "KHQR.jpg";
+    const h1 = document.querySelector("#admin-app > .ad-top h1"); if (h1) h1.textContent = nm || "Admin";
+  };
   const commitSetting = (k) => {
-    rebuildSettings(); saveAdmin(); applySettings();
+    rebuildSettings(); saveAdmin(); applySettings(); updPrev();
     if (k === "saleCount" || k === "saleHours") { currentPeriod = periodKey(); refreshSite(); tickTimer(); }
   };
   body.addEventListener("input", (e) => {
@@ -1148,6 +1186,19 @@ function openAdminPanel() {
     if (k === "accent") body.querySelectorAll(".ad-sw").forEach((b) => b.classList.toggle("on", b.dataset.c.toLowerCase() === String(v).toLowerCase()));
     commitSetting(k);
   });
+  const imgSetting = async (file, key, max, name) => {
+    if (!file) return;
+    try {
+      let d = await processImage(file, max);
+      if (sbOn()) d = await sbUpload(name, d);
+      adminData.settings[key] = d; commitSetting(key);
+    } catch (e) { alert("ផ្ទុករូបមិនបាន (" + (e && e.message || "error") + ")"); }
+  };
+  document.getElementById("ad-logo-file").addEventListener("change", (e) => { imgSetting(e.target.files[0], "logoImg", 256, "logo.jpg"); e.target.value = ""; });
+  document.getElementById("ad-qr-file").addEventListener("change", (e) => { imgSetting(e.target.files[0], "qrImg", 1000, "qr.jpg"); e.target.value = ""; });
+  document.getElementById("ad-logo-clear").addEventListener("click", () => { adminData.settings.logoImg = ""; commitSetting("logoImg"); });
+  document.getElementById("ad-qr-clear").addEventListener("click", () => { adminData.settings.qrImg = ""; commitSetting("qrImg"); });
+  updPrev();
   body.querySelectorAll(".ad-sw").forEach((b) => b.addEventListener("click", () => {
     adminData.settings.accent = b.dataset.c;
     document.getElementById("ad-color").value = b.dataset.c;
