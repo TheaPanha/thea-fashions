@@ -409,6 +409,14 @@
     .ad-tabs { left: 50%; right: auto; bottom: 16px; transform: translateX(-50%); width: min(560px, calc(100% - 32px)); border: 1px solid var(--line); border-radius: 22px; box-shadow: 0 10px 30px rgba(44,24,16,.12); }
   }
 
+
+  .ad-linkbtn { display: block; width: 100%; margin-top: 12px; padding: 10px; background: none; border: none; color: var(--clay-dark); font: 600 13.5px inherit; cursor: pointer; text-align: center; }
+  .ad-linkbtn:hover { text-decoration: underline; }
+  .ad-rq-h { font-family: "Playfair Display", "Noto Serif Khmer", Georgia, serif; font-size: 20px; font-weight: 600; margin: 4px 0 6px; }
+  .ad-ok { color: #2F6B4B; font-size: 13px; margin: 6px 0 10px; line-height: 1.6; }
+  .ac-item { background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 12px 14px; margin-bottom: 10px; }
+  .ac-item b { display: block; font-size: 14.5px; } .ac-item small { display: block; color: var(--muted); font-size: 12.5px; margin-top: 2px; line-height: 1.5; }
+  .ac-acts { display: flex; gap: 8px; margin-top: 10px; }
 </style>
 </head>
 <body>
@@ -420,6 +428,18 @@
       <input id="admin-pass" class="ad-input" type="password" placeholder="ពាក្យសម្ងាត់" autocomplete="current-password" />
       <div class="ad-err" id="admin-err"></div>
       <button class="sheet-confirm" id="admin-go" type="button">ចូល</button>
+      <button class="ad-linkbtn" id="rq-open" type="button">ស្នើសុំសិទ្ធិប្រើ Admin</button>
+      <div class="ad-rq" id="rq-box" style="display:none">
+        <div class="ad-rq-h">ស្នើសុំសិទ្ធិ</div>
+        <p class="ad-hint" style="margin:0 0 10px">ម្ចាស់ហាងនឹងពិនិត្យ និងអនុម័តសំណើរបស់អ្នក។ ក្រោយអនុម័ត អ្នកអាចចូលដោយអ៊ីមែល និងពាក្យសម្ងាត់ខាងក្រោម។</p>
+        <input id="rq-name" class="ad-input" placeholder="ឈ្មោះរបស់អ្នក" style="margin-bottom:8px" />
+        <input id="rq-email" class="ad-input" type="email" placeholder="អ៊ីមែល" autocomplete="email" style="margin-bottom:8px" />
+        <input id="rq-pass" class="ad-input" type="password" placeholder="ពាក្យសម្ងាត់ថ្មី (យ៉ាងតិច ៦ តួ)" autocomplete="new-password" style="margin-bottom:8px" />
+        <input id="rq-note" class="ad-input" placeholder="មូលហេតុ ឬតួនាទី (មិនបង្ខំ)" style="margin-bottom:6px" />
+        <div class="ad-err" id="rq-msg"></div>
+        <button class="sheet-confirm" id="rq-send" type="button">ផ្ញើសំណើ</button>
+        <button class="ad-linkbtn" id="rq-back" type="button">ត្រឡប់ទៅចូល</button>
+      </div>
     </div>
   </div>
 
@@ -650,11 +670,79 @@ function openAdminLogin() {
   adminSheet.style.display = "none";
   setTimeout(() => adminPass.focus(), 60);
 }
+
+// ===== សិទ្ធិ Admin: ស្នើសុំ / អនុម័ត =====
+const acIsOwner = () => !sbOn() || (localStorage.getItem("adminEmail") || OWNER_EMAIL).trim().toLowerCase() === OWNER_EMAIL.toLowerCase();
+async function acApproved(email) {
+  if (email.trim().toLowerCase() === OWNER_EMAIL.toLowerCase()) return true;
+  try {
+    const t = await sbToken();
+    const r = await fetch(`${SB_URL}/rest/v1/admins?email=eq.${encodeURIComponent(email.trim().toLowerCase())}&select=email`, { headers: { apikey: SB_KEY, Authorization: "Bearer " + t } });
+    if (!r.ok) return false;
+    return (await r.json()).length > 0;
+  } catch (e) { return false; }
+}
+async function acApi(path, opt = {}) {
+  const t = await sbToken();
+  const r = await fetch(`${SB_URL}/rest/v1/${path}`, { ...opt, headers: { apikey: SB_KEY, Authorization: "Bearer " + t, "Content-Type": "application/json", ...(opt.headers || {}) } });
+  if (!r.ok) throw new Error("HTTP " + r.status);
+  const x = await r.text(); return x ? JSON.parse(x) : null;
+}
+(function () {
+  const $ = (id) => document.getElementById(id), card = adminLogin.querySelector(".ad-card");
+  const loginEls = () => [...card.children].filter((c) => c.id !== "rq-box");
+  const show = (rq) => { loginEls().forEach((c) => (c.style.display = rq ? "none" : "")); $("rq-box").style.display = rq ? "" : "none"; $("rq-msg").textContent = ""; $("rq-msg").className = "ad-err"; };
+  $("rq-open").addEventListener("click", () => show(true));
+  $("rq-back").addEventListener("click", () => show(false));
+  $("rq-send").addEventListener("click", async () => {
+    const msg = $("rq-msg"), name = $("rq-name").value.trim(), email = $("rq-email").value.trim().toLowerCase(), pw = $("rq-pass").value, note = $("rq-note").value.trim();
+    msg.className = "ad-err";
+    if (!sbOn()) { msg.textContent = "មុខងារនេះត្រូវការ Supabase"; return; }
+    if (!name || !/^\S+@\S+\.\S+$/.test(email)) { msg.textContent = "សូមបញ្ចូលឈ្មោះ និងអ៊ីមែលឲ្យត្រឹមត្រូវ"; return; }
+    if (pw.length < 6) { msg.textContent = "ពាក្យសម្ងាត់ត្រូវមានយ៉ាងតិច ៦ តួ"; return; }
+    const b = $("rq-send"); b.disabled = true; b.textContent = "កំពុងផ្ញើ...";
+    try {
+      const s = await fetch(`${SB_URL}/auth/v1/signup`, { method: "POST", headers: { apikey: SB_KEY, "Content-Type": "application/json" }, body: JSON.stringify({ email, password: pw }) });
+      const sj = await s.json().catch(() => ({}));
+      if (!s.ok && !/registered|exists/i.test(sj.msg || sj.error_description || "")) throw new Error(sj.msg || sj.error_description || "signup");
+      const r = await fetch(`${SB_URL}/rest/v1/admin_requests`, { method: "POST", headers: { apikey: SB_KEY, Authorization: "Bearer " + SB_KEY, "Content-Type": "application/json", Prefer: "return=minimal" }, body: JSON.stringify({ email, name, note, status: "pending" }) });
+      if (!r.ok) throw new Error("request");
+      msg.className = "ad-ok"; msg.textContent = "បានផ្ញើសំណើរួចហើយ។ សូមរង់ចាំម្ចាស់ហាងអនុម័ត រួចចូលដោយអ៊ីមែល និងពាក្យសម្ងាត់នេះ។ (បើមានអ៊ីមែលបញ្ជាក់ សូមចុចបញ្ជាក់សិន)";
+      $("rq-pass").value = "";
+    } catch (e) { msg.textContent = "ផ្ញើមិនបាន៖ " + e.message; }
+    b.disabled = false; b.textContent = "ផ្ញើសំណើ";
+  });
+})();
+async function renderAccess() {
+  const box = document.getElementById("ac-body"); if (!box) return;
+  box.innerHTML = '<div class="ad-empty">កំពុងផ្ទុក...</div>';
+  try {
+    const [reqs, adms] = await Promise.all([acApi("admin_requests?select=*&order=created_at.desc&limit=100"), acApi("admins?select=*&order=created_at.asc")]);
+    const pend = reqs.filter((r) => r.status === "pending");
+    box.innerHTML = `<div class="ad-label">សំណើរង់ចាំ (${pend.length})</div>` +
+      (pend.length ? pend.map((r) => `<div class="ac-item"><b>${esc(r.name || r.email)}</b><small>${esc(r.email)}${r.note ? " · " + esc(r.note) : ""}</small><div class="ac-acts"><button class="ad-btn" data-ok="${r.id}" data-em="${esc(r.email)}" data-nm="${esc(r.name || "")}" type="button">អនុម័ត</button><button class="ad-btn danger" data-no="${r.id}" type="button">បដិសេធ</button></div></div>`).join("") : '<div class="ad-empty">គ្មានសំណើថ្មី</div>') +
+      `<div class="ad-label" style="margin-top:20px">អ្នកមានសិទ្ធិ (${adms.length})</div>` +
+      (adms.length ? adms.map((a) => `<div class="ac-item"><b>${esc(a.name || a.email)}</b><small>${esc(a.email)}</small><div class="ac-acts"><button class="ad-btn danger" data-rm="${esc(a.email)}" type="button">ដកសិទ្ធិ</button></div></div>`).join("") : '<div class="ad-empty">មិនទាន់មាន Admin ផ្សេង</div>');
+    box.onclick = async (e) => {
+      const b = e.target.closest("button"); if (!b) return;
+      try {
+        if (b.dataset.ok) { await acApi("admins?on_conflict=email", { method: "POST", headers: { Prefer: "resolution=merge-duplicates,return=minimal" }, body: JSON.stringify({ email: b.dataset.em.toLowerCase(), name: b.dataset.nm }) }); await acApi(`admin_requests?id=eq.${b.dataset.ok}`, { method: "PATCH", headers: { Prefer: "return=minimal" }, body: JSON.stringify({ status: "approved" }) }); }
+        else if (b.dataset.no) await acApi(`admin_requests?id=eq.${b.dataset.no}`, { method: "PATCH", headers: { Prefer: "return=minimal" }, body: JSON.stringify({ status: "rejected" }) });
+        else if (b.dataset.rm) { if (!confirm("ដកសិទ្ធិអ្នកនេះ?")) return; await acApi(`admins?email=eq.${encodeURIComponent(b.dataset.rm)}`, { method: "DELETE" }); }
+        else return;
+        renderAccess();
+      } catch (err) { alert("មិនបាន៖ " + err.message); }
+    };
+  } catch (e) { box.innerHTML = '<div class="ad-empty">ផ្ទុកមិនបាន (តើបានដំណើរការ admin-access.sql ហើយឬនៅ?)</div>'; }
+}
 async function tryAdminLogin() {
   try {
     if (sbOn()) {
-      try { const em = (document.getElementById("admin-email").value || OWNER_EMAIL).trim(); await sbAuth({ email: em, password: adminPass.value }, "password"); try { localStorage.setItem("adminEmail", em); } catch (e) {} }
+      let em;
+      try { em = (document.getElementById("admin-email").value || OWNER_EMAIL).trim(); await sbAuth({ email: em, password: adminPass.value }, "password"); }
       catch (e) { adminErr.textContent = "ពាក្យសម្ងាត់មិនត្រឹមត្រូវ ឬភ្ជាប់ Supabase មិនបាន"; return; }
+      if (!(await acApproved(em))) { sbSess = null; try { localStorage.removeItem("sbSess"); } catch (e) {} adminErr.textContent = "គណនីនេះមិនទាន់ទទួលបានសិទ្ធិពីម្ចាស់ហាងទេ។ សូមរង់ចាំការអនុម័ត។"; return; }
+      try { localStorage.setItem("adminEmail", em); } catch (e) {}
     } else if ((await sha256(adminPass.value)) !== ADMIN_HASH) { adminErr.textContent = "ពាក្យសម្ងាត់មិនត្រឹមត្រូវ"; return; }
   } catch (e) { adminErr.textContent = "ត្រូវការគេហទំព័រ https ទើបចូលបាន"; return; }
   try { localStorage.setItem("adminOn", "1"); } catch (e) {}
@@ -972,6 +1060,7 @@ function openAdminPanel() {
       <button class="ad-tab" data-tab="products" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8h14l-1 12H6L5 8Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>ទំនិញ</button>
       <button class="ad-tab" data-tab="design" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18c1.2 0 2-.8 2-1.8 0-.6-.3-1-.6-1.4-.3-.4-.4-.8-.4-1.3 0-1 .8-1.8 1.8-1.8H17a4 4 0 0 0 4-4C21 6.5 17 3 12 3Z"/><circle cx="7.5" cy="11" r="1"/><circle cx="10" cy="7" r="1"/><circle cx="15" cy="7.5" r="1"/></svg>រចនា</button>
       <button class="ad-tab" data-tab="shop" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5 5.5 4h13L20 9.5"/><path d="M4 9.5a2.7 2.7 0 0 0 5.3 0 2.7 2.7 0 0 0 5.4 0 2.7 2.7 0 0 0 5.3 0"/><path d="M5 12.5V20h14v-7.5M10 20v-4.5h4V20"/></svg>ហាង</button>
+      ${sbOn() && acIsOwner() ? `<button class="ad-tab" data-tab="access" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="8" cy="15" r="4"/><path d="m11 12 9-9M16 7l3 3M14 9l2 2"/></svg> សិទ្ធិ</button>` : ""}
       <button class="ad-tab" data-tab="promo" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10v4h3l8 4V6L7 10H4Z"/><path d="M18.5 9.5a4 4 0 0 1 0 5"/></svg>ផ្សព្វផ្សាយ</button>
     </div>
     <div class="ad-panel" data-tab="orders"><div id="od-root"></div></div>
@@ -1048,6 +1137,7 @@ function openAdminPanel() {
     </div>
 
     <div class="ad-panel" data-tab="promo" style="display:none"><div id="cp-box"></div></div>
+    <div class="ad-panel" data-tab="access" style="display:none"><div id="ac-body"></div></div>
 
     <div class="ad-panel" data-tab="shop" style="display:none">
       <label class="ad-field">លេខទូរស័ព្ទ<input class="ad-input" data-s="phone" inputmode="tel" value="${esc(settings.phone)}" /></label>
@@ -1235,6 +1325,7 @@ function openAdminPanel() {
     body.querySelectorAll(".ad-tab").forEach((x) => x.classList.toggle("active", x === t));
     body.querySelectorAll(".ad-panel").forEach((pn) => (pn.style.display = pn.dataset.tab === t.dataset.tab ? "" : "none"));
     if (t.dataset.tab === "orders") odLoad();
+    if (t.dataset.tab === "access") renderAccess();
     if (t.dataset.tab === "promo") window.cpLoad && cpLoad();
     if (t.dataset.tab === "products" && sbOn() && window.__sd.size === 0) {
       sbPull().then((rd) => {
