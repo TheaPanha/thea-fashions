@@ -579,8 +579,9 @@ async function sbToken() {
   if (Date.now() > sbSess.exp) await sbAuth({ refresh_token: sbSess.rt }, "refresh_token");
   return sbSess.at;
 }
+let SHOP_ID = parseInt(localStorage.getItem("adminShop") || "1", 10) || 1;   // លេខហាងរបស់ admin នេះ (ម្ចាស់ = 1)
 async function sbPull() {
-  const r = await fetch(`${SB_URL}/rest/v1/shop?id=eq.1&select=data`, { headers: { apikey: SB_KEY, Authorization: "Bearer " + SB_KEY }, cache: "no-store" });
+  const r = await fetch(`${SB_URL}/rest/v1/shop?id=eq.${SHOP_ID}&select=data`, { headers: { apikey: SB_KEY, Authorization: "Bearer " + SB_KEY }, cache: "no-store" });
   const j = await r.json();
   return (j && j[0] && j[0].data) || null;
 }
@@ -599,13 +600,14 @@ function sbPush() {
           adminData.stock = st; try { localStorage.setItem("adminData", JSON.stringify(adminData)); } catch (e) {}
         }
       } catch (e) {}
-      const r = await fetch(`${SB_URL}/rest/v1/shop?on_conflict=id`, { method: "POST", headers: { apikey: SB_KEY, Authorization: "Bearer " + t, "Content-Type": "application/json", Prefer: "resolution=merge-duplicates" }, body: JSON.stringify({ id: 1, data: { ...adminData, imgs: adminImages } }) });
+      const r = await fetch(`${SB_URL}/rest/v1/shop?on_conflict=id`, { method: "POST", headers: { apikey: SB_KEY, Authorization: "Bearer " + t, "Content-Type": "application/json", Prefer: "resolution=merge-duplicates" }, body: JSON.stringify({ id: SHOP_ID, data: { ...adminData, imgs: adminImages } }) });
       if (!r.ok) throw new Error("HTTP " + r.status);
       window.__sd.clear();
     } catch (e) { alert("រក្សាទុកលើ server មិនបាន៖ " + e.message); }
   }, 500);
 }
 async function sbUpload(path, dataUrl) {
+  if (SHOP_ID !== 1) path = `s${SHOP_ID}/${path}`;      // រូបហាងផ្សេង ដាក់ក្នុងថតរបស់ខ្លួន
   const blob = await (await fetch(dataUrl)).blob();
   const t = await sbToken();
   const r = await fetch(`${SB_URL}/storage/v1/object/photos/${path}`, { method: "POST", headers: { apikey: SB_KEY, Authorization: "Bearer " + t, "x-upsert": "true", "Content-Type": "image/jpeg" }, body: blob });
@@ -625,6 +627,12 @@ async function syncFromRemote() {
 const ORIG_PRODUCTS = PRODUCTS.map((p) => ({ ...p }));
 let adminOn = false;
 try { adminOn = localStorage.getItem("adminOn") === "1"; } catch (e) {}
+function applyBlankShop() {                         // ហាង admin ថ្មី ចាប់ផ្តើមទទេ (មិនយកទំនិញ/ព័ត៌មានរបស់ម្ចាស់)
+  PRODUCTS.length = 0; ORIG_PRODUCTS.length = 0;
+  Object.keys(SETTINGS).forEach((k) => { if (typeof SETTINGS[k] === "string" && k !== "accent") SETTINGS[k] = ""; });
+  SETTINGS.name = "ហាងរបស់ខ្ញុំ"; SETTINGS.showPromo = false; SETTINGS.showFlash = false; SETTINGS.showMarquee = false; SETTINGS.banners = [];
+}
+if (SHOP_ID !== 1) applyBlankShop();
 let adminData = { edits: {}, hidden: [...HIDDEN], sale: { ...MANUAL_SALE }, stock: { ...STOCK }, settings: {}, added: [], deleted: [] };
 let adminImages = {};   // រូបដែលម្ចាស់ហាងដាក់ { លេខទំនិញ: dataURL } (លើឧបករណ៍នេះ)
 const photoOf = (n) => (adminOn && adminImages[n]) ? adminImages[n] : `Example${n}.jpg`;
@@ -676,15 +684,17 @@ function openAdminLogin() {
 
 // ===== សិទ្ធិ Admin: ស្នើសុំ / អនុម័ត =====
 const acIsOwner = () => !sbOn() || (localStorage.getItem("adminEmail") || "").trim().toLowerCase() === OWNER_EMAIL.toLowerCase();
-async function acApproved(email) {
-  if (email.trim().toLowerCase() === OWNER_EMAIL.toLowerCase()) return true;
+async function acApproved(email) {                    // ត្រឡប់លេខហាង (ម្ចាស់ = 1) ឬ 0 បើមិនទាន់អនុម័ត
+  if (email.trim().toLowerCase() === OWNER_EMAIL.toLowerCase()) return 1;
   try {
     const t = await sbToken();
-    const r = await fetch(`${SB_URL}/rest/v1/admins?email=eq.${encodeURIComponent(email.trim().toLowerCase())}&select=email`, { headers: { apikey: SB_KEY, Authorization: "Bearer " + t } });
-    if (!r.ok) return false;
-    return (await r.json()).length > 0;
-  } catch (e) { return false; }
+    const r = await fetch(`${SB_URL}/rest/v1/admins?email=eq.${encodeURIComponent(email.trim().toLowerCase())}&select=shop_id`, { headers: { apikey: SB_KEY, Authorization: "Bearer " + t } });
+    if (!r.ok) return 0;
+    const j = await r.json();
+    return j.length ? (parseInt(j[0].shop_id, 10) || 0) : 0;
+  } catch (e) { return 0; }
 }
+function acClearLocal() { try { ["adminOn", "sbSess", "adminShop", "adminData", "adminImages"].forEach((k) => localStorage.removeItem(k)); } catch (e) {} }
 async function acApi(path, opt = {}) {
   const t = await sbToken();
   const r = await fetch(`${SB_URL}/rest/v1/${path}`, { ...opt, headers: { apikey: SB_KEY, Authorization: "Bearer " + t, "Content-Type": "application/json", ...(opt.headers || {}) } });
@@ -725,7 +735,7 @@ async function renderAccess() {
     box.innerHTML = `<div class="ad-label">សំណើរង់ចាំ (${pend.length})</div>` +
       (pend.length ? pend.map((r) => `<div class="ac-item"><b>${esc(r.name || r.email)}</b><small>${esc(r.email)}${r.note ? " · " + esc(r.note) : ""}</small><div class="ac-acts"><button class="ad-btn" data-ok="${r.id}" data-em="${esc(r.email)}" data-nm="${esc(r.name || "")}" type="button">អនុម័ត</button><button class="ad-btn danger" data-no="${r.id}" type="button">បដិសេធ</button></div></div>`).join("") : '<div class="ad-empty">គ្មានសំណើថ្មី</div>') +
       `<div class="ad-label" style="margin-top:20px">អ្នកមានសិទ្ធិ (${adms.length})</div>` +
-      (adms.length ? adms.map((a) => `<div class="ac-item"><b>${esc(a.name || a.email)}</b><small>${esc(a.email)}</small><div class="ac-acts"><button class="ad-btn danger" data-rm="${esc(a.email)}" type="button">ដកសិទ្ធិ</button></div></div>`).join("") : '<div class="ad-empty">មិនទាន់មាន Admin ផ្សេង</div>');
+      (adms.length ? adms.map((a) => `<div class="ac-item"><b>${esc(a.name || a.email)}</b><small>${esc(a.email)} · ហាងលេខ ${esc(a.shop_id || "")}</small><div class="ac-acts"><button class="ad-btn danger" data-rm="${esc(a.email)}" type="button">ដកសិទ្ធិ</button></div></div>`).join("") : '<div class="ad-empty">មិនទាន់មាន Admin ផ្សេង</div>');
     box.onclick = async (e) => {
       const b = e.target.closest("button"); if (!b) return;
       try {
@@ -744,8 +754,11 @@ async function tryAdminLogin() {
       let em;
       try { em = (document.getElementById("admin-email").value || OWNER_EMAIL).trim(); await sbAuth({ email: em, password: adminPass.value }, "password"); }
       catch (e) { adminErr.textContent = "ពាក្យសម្ងាត់មិនត្រឹមត្រូវ ឬភ្ជាប់ Supabase មិនបាន"; return; }
-      if (!(await acApproved(em))) { sbSess = null; try { localStorage.removeItem("sbSess"); } catch (e) {} adminErr.textContent = "គណនីនេះមិនទាន់ទទួលបានសិទ្ធិពីម្ចាស់ហាងទេ។ សូមរង់ចាំការអនុម័ត។"; return; }
-      try { localStorage.setItem("adminEmail", em); } catch (e) {}
+      const sid = await acApproved(em);
+      if (!sid) { sbSess = null; acClearLocal(); adminErr.textContent = "គណនីនេះមិនទាន់ទទួលបានសិទ្ធិពីម្ចាស់ហាងទេ។ សូមរង់ចាំការអនុម័ត។"; return; }
+      if (sid !== SHOP_ID) { try { localStorage.removeItem("adminData"); localStorage.removeItem("adminImages"); } catch (e) {} }   // ប្តូរគណនី → លុបទិន្នន័យចាស់លើឧបករណ៍នេះ
+      SHOP_ID = sid; if (SHOP_ID !== 1) applyBlankShop();
+      try { localStorage.setItem("adminEmail", em); localStorage.setItem("adminShop", String(sid)); } catch (e) {}
     } else if ((await sha256(adminPass.value)) !== ADMIN_HASH) { adminErr.textContent = "ពាក្យសម្ងាត់មិនត្រឹមត្រូវ"; return; }
   } catch (e) { adminErr.textContent = "ត្រូវការគេហទំព័រ https ទើបចូលបាន"; return; }
   try { localStorage.setItem("adminOn", "1"); } catch (e) {}
@@ -956,7 +969,7 @@ function flashSaved() {
   }
   window.cpLoad = async function () {
     if (!sbOn()) { const b = $("cp-box"); if (b) b.innerHTML = `<div class="od-empty">មិនទាន់ភ្ជាប់ Supabase</div>`; return; }
-    try { coupons = await api("coupons?select=*&order=code", { headers: { Prefer: "" } }); } catch (e) { coupons = []; }
+    try { coupons = await api(`coupons?select=*&shop_id=eq.${SHOP_ID}&order=code`, { headers: { Prefer: "" } }); } catch (e) { coupons = []; }
     cpDraw();
     const box = $("cp-box");
     box.onclick = async (ev) => {
@@ -966,14 +979,14 @@ function flashSaved() {
           const code = $("cp-c").value.trim().toUpperCase(), v = parseAmount($("cp-v").value), er = $("cp-err");
           if (!/^[A-Z0-9_-]{3,20}$/.test(code) || !v) { er.textContent = "ត្រូវមានលេខកូដ (៣-២០ តួ A-Z/0-9) និងតម្លៃ"; return; }
           const kind = $("cp-k").value; if (kind === "percent" && v > 100) { er.textContent = "ភាគរយមិនអាចលើស ១០០"; return; }
-          await api("coupons", { method: "POST", body: JSON.stringify({ code, kind, value: v, min_total: parseAmount($("cp-m").value) || 0, max_uses: parseAmount($("cp-u").value) }) });
+          await api("coupons", { method: "POST", body: JSON.stringify({ shop_id: SHOP_ID, code, kind, value: v, min_total: parseAmount($("cp-m").value) || 0, max_uses: parseAmount($("cp-u").value) }) });
           return cpLoad();
         }
         const card = b.closest("[data-cp]"); if (!card) return; const code = card.dataset.cp, c = coupons.find((x) => x.code === code);
-        if (b.dataset.cpt) { await api(`coupons?code=eq.${encodeURIComponent(code)}`, { method: "PATCH", body: JSON.stringify({ active: !c.active }) }); return cpLoad(); }
+        if (b.dataset.cpt) { await api(`coupons?code=eq.${encodeURIComponent(code)}&shop_id=eq.${SHOP_ID}`, { method: "PATCH", body: JSON.stringify({ active: !c.active }) }); return cpLoad(); }
         if (b.dataset.cpd) {
           if (b.dataset.sure !== "1") { b.dataset.sure = "1"; b.textContent = "ចុចម្តងទៀត"; setTimeout(() => { if (b.isConnected) { b.dataset.sure = ""; b.textContent = "លុប"; } }, 3000); return; }
-          await api(`coupons?code=eq.${encodeURIComponent(code)}`, { method: "DELETE" }); cpLoad();
+          await api(`coupons?code=eq.${encodeURIComponent(code)}&shop_id=eq.${SHOP_ID}`, { method: "DELETE" }); cpLoad();
         }
       } catch (err) { alert("មិនបាន៖ " + err.message + " (ត្រូវ run SQL ថ្មីក្នុង Supabase)"); }
     };
@@ -997,7 +1010,7 @@ function flashSaved() {
     if (!ready) return;
     const ae = document.activeElement;
     if (ae && ae.matches && ae.matches("#od-list input")) return;
-    try { orders = await api("orders?select=*&order=created_at.desc&limit=300", { headers: { Prefer: "" } }); draw(); }
+    try { orders = await api(`orders?select=*&shop_id=eq.${SHOP_ID}&order=created_at.desc&limit=300`, { headers: { Prefer: "" } }); draw(); }
     catch (e) { $("od-list").innerHTML = `<div class="od-empty">ទាញទិន្នន័យមិនបាន (${e2(e.message)})</div>`; }
   };
   window.odInit = function () {
@@ -1143,6 +1156,7 @@ function openAdminPanel() {
     <div class="ad-panel" data-tab="access" style="display:none"><div id="ac-body"></div></div>
 
     <div class="ad-panel" data-tab="shop" style="display:none">
+      <div class="ac-item"><b>តំណហាងរបស់អ្នក</b><small id="ad-shoplink" style="word-break:break-all;user-select:all">${esc(new URL(SHOP_ID === 1 ? "index.html" : "index.html?shop=" + SHOP_ID, location.href).href)}</small></div>
       <label class="ad-field">លេខទូរស័ព្ទ<input class="ad-input" data-s="phone" inputmode="tel" value="${esc(settings.phone)}" /></label>
       <label class="ad-field">Username Telegram (គ្មាន @)<input class="ad-input" data-s="telegram" value="${esc(settings.telegram)}" /></label>
       <label class="ad-field">តំណ Messenger / Facebook<input class="ad-input" data-s="messenger" value="${esc(settings.messenger)}" /></label>
@@ -1431,7 +1445,7 @@ function openAdminPanel() {
   }));
 
   document.getElementById("ad-logout").addEventListener("click", () => {
-    try { localStorage.removeItem("adminOn"); localStorage.removeItem("sbSess"); } catch (e) {}
+    acClearLocal();
     location.reload();
   });
   // ផ្ទាំងផ្សព្វផ្សាយ
@@ -1470,10 +1484,9 @@ function openAdminPanel() {
 (async () => {
   if (adminOn && sbOn() && !sbSess) adminOn = false;     // ត្រូវចូលតាម Supabase
   if (adminOn && sbOn()) {                                // ពិនិត្យសិទ្ធិម្តងទៀតរាល់ពេលបើកទំព័រ
-    const em = (localStorage.getItem("adminEmail") || "").trim();
-    if (!em || !(await acApproved(em))) {
-      adminOn = false; sbSess = null;
-      try { localStorage.removeItem("adminOn"); localStorage.removeItem("sbSess"); } catch (e) {}
+    const em = (localStorage.getItem("adminEmail") || "").trim(), sid = em ? await acApproved(em) : 0;
+    if (!sid || sid !== SHOP_ID) {                        // មិនទាន់អនុម័ត ឬលេខហាងមិនត្រូវ → ចូលម្តងទៀត
+      adminOn = false; sbSess = null; acClearLocal();
     }
   }
   if (adminOn) { await syncFromRemote(); loadAdminData(); openAdminPanel(); } else openAdminLogin();

@@ -1855,9 +1855,16 @@ const SETTINGS = {        // ការកំណត់រចនា និងហ�
 // ===================================================================
 
 // ---------- Admin (ម្ចាស់ហាង) ----------
+const SHOP_ID = (() => { const n = parseInt(new URLSearchParams(location.search).get("shop"), 10); return n > 0 ? n : 1; })();   // ?shop=2 → ហាងលេខ 2
+if (SHOP_ID !== 1) {                                   // ហាងផ្សេង ចាប់ផ្តើមទទេ (មិនយកទំនិញ/ព័ត៌មានរបស់ហាងលេខ 1)
+  PRODUCTS.length = 0;
+  Object.keys(SETTINGS).forEach((k) => { if (typeof SETTINGS[k] === "string" && k !== "accent") SETTINGS[k] = ""; });
+  SETTINGS.name = "ហាងរបស់ខ្ញុំ"; SETTINGS.showPromo = false; SETTINGS.showFlash = false; SETTINGS.showMarquee = false; SETTINGS.banners = [];
+}
+const SC_KEY = "sharedCache" + (SHOP_ID === 1 ? "" : "_" + SHOP_ID);
 const ORIG_PRODUCTS = PRODUCTS.map((p) => ({ ...p }));
 let adminOn = false;
-try { adminOn = localStorage.getItem("adminOn") === "1"; } catch (e) {}
+try { adminOn = SHOP_ID === 1 && localStorage.getItem("adminOn") === "1"; } catch (e) {}
 let adminData = { edits: {}, hidden: [...HIDDEN], sale: { ...MANUAL_SALE }, stock: { ...STOCK }, settings: {}, added: [], deleted: [] };
 let shared = false;                                   // ទិន្នន័យចែករំលែកពី Supabase
 const useData = () => adminOn || shared;
@@ -1881,7 +1888,7 @@ const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJ
 const sbReady = () => /^https:\/\/[a-z0-9]+\.supabase\.co$/.test(SB_URL) && !SB_KEY.startsWith("YOUR");
 async function saveOrderRemote(o) {
   if (!sbReady()) return;
-  try { await fetch(`${SB_URL}/rest/v1/orders`, { method: "POST", keepalive: true, headers: { apikey: SB_KEY, Authorization: "Bearer " + SB_KEY, "Content-Type": "application/json", Prefer: "return=minimal" }, body: JSON.stringify(o) }); } catch (e) {}
+  try { await fetch(`${SB_URL}/rest/v1/orders`, { method: "POST", keepalive: true, headers: { apikey: SB_KEY, Authorization: "Bearer " + SB_KEY, "Content-Type": "application/json", Prefer: "return=minimal" }, body: JSON.stringify({ ...o, shop_id: SHOP_ID }) }); } catch (e) {}
 }
 function applyShared(d) {
   if (!d) return;
@@ -1893,7 +1900,7 @@ function applyShared(d) {
   adminData.added.forEach((a) => PRODUCTS.push({ name: a.name, place: a.place, price: a.price, desc: a.desc || "" }));
   shared = true; rebuildSettings();
 }
-try { applyShared(JSON.parse(localStorage.getItem("sharedCache") || "null")); } catch (e) {}
+try { applyShared(JSON.parse(localStorage.getItem(SC_KEY) || "null")); } catch (e) {}
 const esc = (v) => String(v).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
 const hiddenSet = () => new Set(useData() ? [...adminData.hidden, ...(adminData.deleted || [])] : HIDDEN);
 const manualSale = () => (useData() ? adminData.sale : MANUAL_SALE);
@@ -2172,7 +2179,7 @@ async function placeOrder(P, code) {
   try {
     let tok = SB_KEY; if (CU.sess) { try { tok = await cToken(); } catch (e) { tok = SB_KEY; } }
     if (CU.sess) body.customer_name = CU.sess.name;
-    const r = await fetch(`${SB_URL}/rest/v1/rpc/place_order`, { method: "POST", headers: { apikey: SB_KEY, Authorization: "Bearer " + tok, "Content-Type": "application/json" }, body: JSON.stringify({ p: body }) });
+    const r = await fetch(`${SB_URL}/rest/v1/rpc/place_order`, { method: "POST", headers: { apikey: SB_KEY, Authorization: "Bearer " + tok, "Content-Type": "application/json" }, body: JSON.stringify({ p: { ...body, shop_id: SHOP_ID } }) });
     if (r.ok) return { ok: true };
     const j = await r.json().catch(() => ({})), m = String(j.message || "");
     if (/STOCK:/.test(m)) return { ok: false, msg: "អស់ស្តុក៖ " + m.split("STOCK:")[1].trim() + " សូមកែចំនួនក្នុងកន្ត្រក" };
@@ -2256,7 +2263,7 @@ async function applyCoupon(code, silent) {
   if (!code) { msg.textContent = ""; return; }
   if (!sbReady()) { msg.textContent = "មិនអាចប្រើលេខកូដបាន"; return; }
   try {
-    const r = await fetch(`${SB_URL}/rest/v1/rpc/check_coupon`, { method: "POST", headers: { apikey: SB_KEY, Authorization: "Bearer " + SB_KEY, "Content-Type": "application/json" }, body: JSON.stringify({ p_code: code, p_total: T.sub }) });
+    const r = await fetch(`${SB_URL}/rest/v1/rpc/check_coupon`, { method: "POST", headers: { apikey: SB_KEY, Authorization: "Bearer " + SB_KEY, "Content-Type": "application/json" }, body: JSON.stringify({ p_code: code, p_total: T.sub, p_shop: SHOP_ID }) });
     const j = await r.json(), o = Array.isArray(j) ? j[0] : j;
     if (r.ok && o && o.ok) { cartCoupon = { code: code.trim().toUpperCase(), discount: o.discount }; msg.style.color = "#3F7D5C"; msg.textContent = "✓ " + o.message; }
     else { cartCoupon = null; msg.style.color = "#B8213F"; msg.textContent = (o && o.message) || "លេខកូដមិនត្រឹមត្រូវ"; }
@@ -2345,7 +2352,7 @@ async function loadMine() {
   const box = $c("my-list");
   try {
     const t = await cToken();
-    const r = await fetch(`${SB_URL}/rest/v1/orders?select=*&order=created_at.desc&limit=30`, { headers: { apikey: SB_KEY, Authorization: "Bearer " + t }, cache: "no-store" });
+    const r = await fetch(`${SB_URL}/rest/v1/orders?select=*&user_id=eq.${CU.sess.uid}&order=created_at.desc&limit=30`, { headers: { apikey: SB_KEY, Authorization: "Bearer " + t }, cache: "no-store" });
     if (!r.ok) throw new Error(r.status);
     const rows = await r.json();
     box.innerHTML = rows.length ? rows.map((o) => {
@@ -3028,12 +3035,12 @@ document.addEventListener("keydown", (e) => {
 (async () => {
   if (!/^https:\/\/[a-z0-9]+\.supabase\.co$/.test(SB_URL) || SB_KEY.startsWith("YOUR")) return;
   try {
-    const r = await fetch(`${SB_URL}/rest/v1/shop?id=eq.1&select=data`, { headers: { apikey: SB_KEY, Authorization: "Bearer " + SB_KEY }, cache: "no-store" });
+    const r = await fetch(`${SB_URL}/rest/v1/shop?id=eq.${SHOP_ID}&select=data`, { headers: { apikey: SB_KEY, Authorization: "Bearer " + SB_KEY }, cache: "no-store" });
     const j = await r.json(), d = j && j[0] && j[0].data;
     if (!d) return;
     const s = JSON.stringify(d);
-    if (localStorage.getItem("sharedCache") === s) return;      // គ្មានអ្វីថ្មី
-    try { localStorage.setItem("sharedCache", s); } catch (e) {}
+    if (localStorage.getItem(SC_KEY) === s) return;      // គ្មានអ្វីថ្មី
+    try { localStorage.setItem(SC_KEY, s); } catch (e) {}
     applyShared(d); SALE = buildSale(); renderCatNav(); render(); renderPromo(); applySettings();
   } catch (e) {}
 })();
