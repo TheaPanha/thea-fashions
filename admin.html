@@ -339,6 +339,76 @@
   .ad-gadd { flex: 0 0 auto; width: 58px; height: 76px; border-radius: 10px; border: 1.5px dashed var(--clay); color: var(--clay); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; cursor: pointer; background: #fff; }
   .ad-gadd span { font-size: 22px; line-height: 1; }
   .ad-gadd small { font-size: 10px; font-weight: 600; }
+
+  /* ===== Admin v5 · calm workspace (ស្រទាប់ចុងក្រោយ) ===== */
+  :root { --bg: #F7F3EE; --line: #EBE2D6; --sale: #C8223F; }
+  body { background: var(--bg); }
+
+  /* login */
+  .ad-login { background: radial-gradient(900px 500px at 80% -10%, rgba(var(--clay-rgb), .35), transparent 60%), #241820; }
+  .ad-card { border-radius: 24px; box-shadow: 0 24px 60px rgba(0,0,0,.35); }
+  .ad-card h1 { font-size: 26px; }
+
+  /* top bar */
+  #admin-app > .ad-top { background: rgba(255,255,255,.92); color: var(--ink); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-bottom: 1px solid var(--line); box-shadow: none; }
+  #admin-app > .ad-top h1 { color: var(--ink); font-size: 17px; flex: 0 1 auto; }
+  #admin-app > .ad-top .ad-logo { width: 32px; height: 32px; border-radius: 10px; }
+  #admin-app > .ad-top .ad-saved { margin-left: auto; background: rgba(63,125,92,.12); color: #2F6B4B; font-weight: 600; }
+  .ad-site { color: var(--ink); border: 1px solid var(--line); background: #fff; padding: 7px 14px; font-weight: 600; }
+  .ad-out { background: transparent; color: var(--sale); border: 1px solid rgba(200,34,63,.25); border-radius: 999px; padding: 7px 14px; font-weight: 600; }
+
+  /* bottom tabs: រូបតំណាង SVG */
+  .ad-tabs { padding: 6px 8px calc(6px + env(safe-area-inset-bottom)); background: rgba(255,255,255,.96); border-top: 1px solid var(--line); box-shadow: none; gap: 4px; }
+  .ad-tab { gap: 3px; padding: 8px 2px 7px; border-radius: 14px; font-size: 11px; font-weight: 600; color: #8C7B6F; }
+  .ad-tab svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+  .ad-tab.active { background: rgba(var(--clay-rgb), .12); color: var(--clay-dark); }
+  .ad-tab .bd { position: absolute; top: 2px; right: calc(50% - 20px); min-width: 17px; height: 17px; padding: 0 4px; border-radius: 999px; background: var(--sale); color: #fff; font-size: 10.5px; line-height: 17px; text-align: center; }
+
+  /* layout + surfaces */
+  .ad-wrap { max-width: 820px; padding: 18px 14px 120px; }
+  .ad-row, .od-card, .od-box, .od-stat, .st-card { background: #fff; border: 1px solid var(--line) !important; border-radius: 18px !important; box-shadow: none !important; }
+  .od-card { border-left-width: 1px; position: relative; overflow: hidden; padding: 16px 16px 14px 20px; }
+  .od-card::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 5px; background: #C98A1B; }
+  .od-card.contacted::before { background: #2E6DB4; } .od-card.shipping::before { background: #7A4EC2; } .od-card.done::before { background: #3F7D5C; } .od-card.cancel::before { background: #B8213F; }
+  .od-stats { gap: 10px; }
+  .od-stat { padding: 14px 12px; }
+  .od-stat b { font-size: 19px; letter-spacing: -.01em; }
+  .od-stat span { color: var(--muted); }
+  .od-chips { gap: 8px; }
+  .od-sm { border-radius: 999px; border-color: var(--line); background: #fff; min-height: 36px; padding: 7px 14px; }
+  .od-sm.on { background: var(--ink); border-color: var(--ink); color: #fff; }
+  .od-price { color: var(--ink); font-weight: 700; }
+
+  /* products */
+  .ad-stats { font-size: 13px; color: var(--muted); margin: 0 2px 12px; }
+  .ad-addbtn { background: var(--ink); border-color: var(--ink); color: #fff; border-radius: 14px; padding: 13px 16px; font-weight: 600; width: 100%; }
+  .ad-addbtn:hover { background: var(--clay-dark); border-color: var(--clay-dark); }
+  .ad-addform { background: #fff; border: 1px solid var(--line); border-radius: 18px; padding: 14px; }
+  .ad-photo-pick { border: 1.5px dashed #D8C8B6; border-radius: 14px; background: #FBF8F4; }
+  .ad-filters button { background: #fff; border: 1px solid var(--line); border-radius: 999px; }
+  .ad-filters button.on { background: var(--ink); border-color: var(--ink); color: #fff; }
+  .ad-row .ad-num { font-size: 12.5px; letter-spacing: 0; color: var(--muted); }
+  .ad-q { border-radius: 999px; }
+  .ad-del, .ad-delimg { border-radius: 10px; }
+
+  /* forms */
+  .ad-input { background: #fff; border: 1px solid #E3D8CA; border-radius: 12px; min-height: 44px; }
+  .ad-input:focus { border-color: var(--clay); box-shadow: 0 0 0 4px rgba(var(--clay-rgb), .12); }
+  .ad-field { font-size: 12.5px; font-weight: 500; color: #7A675B; }
+  .ad-label { color: var(--ink); font-size: 14px; font-weight: 700; letter-spacing: 0; margin-top: 14px; }
+  .ad-btn { border-radius: 12px; background: #fff; border: 1px solid #E3D8CA; color: var(--ink); font-weight: 600; }
+  .ad-btn:hover { background: var(--ink); border-color: var(--ink); color: #fff; }
+  .ad-btn.danger { color: var(--sale); border-color: rgba(200,34,63,.3); }
+  .ad-btn.danger:hover { background: var(--sale); border-color: var(--sale); color: #fff; }
+  .ad-sw { border-radius: 999px; }
+  .ad-foot button, .sheet-confirm { background: var(--ink); border-radius: 14px; box-shadow: none; }
+  .ad-empty, .od-empty { color: var(--muted); background: #fff; border: 1px dashed #DCCDBA; border-radius: 16px; padding: 28px 16px; text-align: center; }
+  :focus-visible { outline: 2px solid var(--clay); outline-offset: 2px; }
+
+  @media (min-width: 900px) {
+    .ad-tabs { left: 50%; right: auto; bottom: 16px; transform: translateX(-50%); width: min(560px, calc(100% - 32px)); border: 1px solid var(--line); border-radius: 22px; box-shadow: 0 10px 30px rgba(44,24,16,.12); }
+  }
+
 </style>
 </head>
 <body>
@@ -354,9 +424,9 @@
   </div>
 
   <div id="admin-app" style="display:none">
-    <div class="ad-top"><span class="ad-logo">T</span><h1>Thea Fashion</h1><span class="ad-saved" id="ad-saved">✓</span><a class="ad-site" href="index.html" aria-label="មើលគេហទំព័រ">🌐</a><button class="ad-out" id="ad-logout" type="button">ចេញ</button></div>
+    <div class="ad-top"><span class="ad-logo">T</span><h1>Thea Fashion</h1><span class="ad-saved" id="ad-saved">រក្សារួច</span><a class="ad-site" href="index.html" aria-label="មើលគេហទំព័រ">គេហទំព័រ</a><button class="ad-out" id="ad-logout" type="button">ចេញ</button></div>
     <div class="ad-wrap"><div id="ad-body"></div></div>
-    <div id="rcv" style="display:none"><button id="rcv-x" type="button">✕ បិទ</button><div id="rcv-msg"></div><img id="rcv-img" alt="" /><a id="rcv-open" target="_blank" rel="noopener">បើកក្នុងផ្ទាំងថ្មី ↗</a></div>
+    <div id="rcv" style="display:none"><button id="rcv-x" type="button">បិទ</button><div id="rcv-msg"></div><img id="rcv-img" alt="" /><a id="rcv-open" target="_blank" rel="noopener">បើកក្នុងផ្ទាំងថ្មី</a></div>
   </div>
 
 <script>
@@ -441,7 +511,7 @@ const SETTINGS = {        // ការកំណត់រចនា និងហ�
   tagline: "ខោអាវស្អាតៗ ទាន់សម័យ គ្រប់ទំហំ សម្រាប់ជាប់ចិត្តអ្នកគ្រប់ថ្ងៃ",
   marquee: "THEA FASHION|NEW COLLECTION|ខោអាវទាន់សម័យ",
   flashTitle: "បញ្ចុះតម្លៃពិសេសថ្ងៃនេះ",
-  thanks: "សូមអរគុណដែលគាំទ្រហាងរបស់យើង 💗",
+  thanks: "សូមអរគុណដែលគាំទ្រហាងរបស់យើង ",
   phone: "0968782682",
   telegram: "theapanha04042004",
   messenger: "https://www.facebook.com/share/1MQPrStX8p/?mibextid=wwXIfr",
@@ -455,7 +525,6 @@ const SETTINGS = {        // ការកំណត់រចនា និងហ�
   logoImg: "",
   showTimer: 1,
   requireLogin: 0,
-  statsUrl: "",             // URL របស់ Worker ស្ថិតិ (ទទេ = មិនប្រើ)
   showPromo: true,          // បង្ហាញផ្ទាំងផ្សព្វផ្សាយធំ
   banners: [                // ផ្ទាំងផ្សព្វផ្សាយធំ 3 · target៖ all / sale / top / bottom / dress / set / acc ឬ តំណ https://...
     { title: "បញ្ចុះតម្លៃពិសេស", sub: "ទំនិញថ្មី រៀងរាល់ 4 ម៉ោង", btn: "មើលទំនិញបញ្ចុះតម្លៃ", target: "sale", c1: "#E8445F", c2: "#8E1634" },
@@ -600,7 +669,7 @@ adminPass.addEventListener("keydown", (e) => { if (e.key === "Enter") tryAdminLo
 
 function adGallery(n) {
   const g = Array.isArray(adminImages["g" + n]) ? adminImages["g" + n] : [];
-  return `<div class="ad-gal"><div class="ad-gal-h">រូបបន្ថែម${g.length ? ` · ${g.length} សន្លឹក` : ""}</div><div class="ad-gal-row">${g.map((u, k) => `<div class="ad-gt"><img src="${u}" alt="" decoding="async" onerror="this.style.visibility='hidden'"><button type="button" class="ad-gx" data-gn="${n}" data-gk="${k}" aria-label="លុបរូប">✕</button></div>`).join("")}<label class="ad-gadd" title="ថែមរូប"><span>＋</span><small>ថែមរូប</small><input type="file" accept="image/*" multiple data-gimg="${n}" hidden></label></div></div>`;
+  return `<div class="ad-gal"><div class="ad-gal-h">រូបបន្ថែម${g.length ? ` · ${g.length} សន្លឹក` : ""}</div><div class="ad-gal-row">${g.map((u, k) => `<div class="ad-gt"><img src="${u}" alt="" decoding="async" onerror="this.style.visibility='hidden'"><button type="button" class="ad-gx" data-gn="${n}" data-gk="${k}" aria-label="លុបរូប">លុប</button></div>`).join("")}<label class="ad-gadd" title="ថែមរូប"><span>＋</span><small>ថែមរូប</small><input type="file" accept="image/*" multiple data-gimg="${n}" hidden></label></div></div>`;
 }
 const AD_SIZES = ["XS", "S", "M", "L", "XL", "XXL"];
 function adSizeRange(place) {
@@ -690,9 +759,9 @@ function adminRows(q) {
     return `<div class="ad-row${h ? " is-hidden" : ""}" data-n="${n}">
       <div class="ad-side">
         <div class="ad-thumbwrap"><img class="ad-thumb" src="${photoOf(n)}" alt="" decoding="async" onerror="this.style.display='none'" /></div>
-        <label class="ad-photo-btn">📷 ប្តូររូប<input type="file" accept="image/*" data-img="${n}" hidden></label>
-        ${adminImages[n] ? `<button type="button" class="ad-delimg" data-delimg="${n}">🗑 លុបរូប</button>` : ""}
-        <button type="button" class="ad-del" data-del="${n}">🗑 លុបប្រអប់</button>
+        <label class="ad-photo-btn">ប្តូររូប<input type="file" accept="image/*" data-img="${n}" hidden></label>
+        ${adminImages[n] ? `<button type="button" class="ad-delimg" data-delimg="${n}">លុបរូប</button>` : ""}
+        <button type="button" class="ad-del" data-del="${n}">លុបប្រអប់</button>
       </div>
       <div class="ad-main">
         <div class="ad-top"><span class="ad-num">${String(n).padStart(2, "0")}</span>
@@ -712,7 +781,7 @@ function adminRows(q) {
           <button type="button" class="ad-q" data-p="10">-10%</button>
           <button type="button" class="ad-q" data-p="20">-20%</button>
           <button type="button" class="ad-q" data-p="30">-30%</button>
-          <button type="button" class="ad-q clr" data-p="0">✕</button>
+          <button type="button" class="ad-q clr" data-p="0">លុប</button>
           <button type="button" class="ad-q stk" data-p="soldout">អស់ស្តុក</button>
         </div>
       </div></div>`;
@@ -729,66 +798,6 @@ function flashSaved() {
   savedTimer = setTimeout(() => el.classList.remove("show"), 1200);
 }
 
-async function getStats() {
-  const url = settings.statsUrl;
-  if (url) {
-    const key = (() => { try { return localStorage.getItem("statsKey") || ""; } catch (e) { return ""; } })();
-    const r = await fetch(`${url}${url.includes("?") ? "&" : "?"}key=${encodeURIComponent(key)}`);
-    if (!r.ok) throw new Error(r.status === 401 ? "key" : "http " + r.status);
-    return { data: await r.json(), remote: true };
-  }
-  let d = { view: {}, order: {} };
-  try { d = JSON.parse(localStorage.getItem("stats") || "null") || d; } catch (e) {}
-  return { data: d, remote: false };
-}
-
-async function renderStats() {
-  const box = document.getElementById("st-body");
-  if (!box) return;
-  box.innerHTML = `<div class="ad-empty">កំពុងផ្ទុក...</div>`;
-  const keyUI = settings.statsUrl
-    ? `<label class="ad-field">Key សម្រាប់មើលស្ថិតិ<input class="ad-input" id="st-key" type="password" value="${esc((() => { try { return localStorage.getItem("statsKey") || ""; } catch (e) { return ""; } })())}" placeholder="ADMIN_KEY របស់ Worker" /></label>` : "";
-  let res;
-  try { res = await getStats(); }
-  catch (e) {
-    box.innerHTML = keyUI + `<div class="ad-empty">${e.message === "key" ? "Key មិនត្រឹមត្រូវ" : "ផ្ទុកស្ថិតិមិនបាន"}</div><button class="ad-btn" id="st-refresh" type="button">ព្យាយាមម្តងទៀត</button>`;
-    wireStats(box); return;
-  }
-  const { view = {}, order = {} } = res.data;
-  const sum = (o) => Object.values(o).reduce((a, b) => a + Number(b || 0), 0);
-  const tv = sum(view), to = sum(order);
-  const ids = new Set([...Object.keys(view), ...Object.keys(order)]);
-  const rows = [...ids].map((n) => ({ n: Number(n), v: Number(view[n] || 0), o: Number(order[n] || 0) }))
-    .filter((r) => PRODUCTS[r.n - 1])
-    .sort((a, b) => b.o - a.o || b.v - a.v).slice(0, 10);
-  const max = Math.max(1, ...rows.map((r) => Math.max(r.o, r.v)));
-  box.innerHTML = keyUI + `
-    <div class="st-cards">
-      <div class="st-card"><b>${tv}</b><span>មើលរូប</span></div>
-      <div class="st-card"><b>${to}</b><span>ចុចកម្មង់</span></div>
-      <div class="st-card"><b>${tv ? Math.round((to / tv) * 100) : 0}%</b><span>កម្មង់ / មើល</span></div>
-    </div>
-    <div class="ad-label">ទំនិញនិយម (កំពូល 10)</div>
-    ${rows.length ? rows.map((r, k) => `
-      <div class="st-row">
-        <span class="st-rank">${k + 1}</span>
-        <img class="st-thumb" src="${photoOf(r.n)}" alt="" onerror="this.style.visibility='hidden'" />
-        <div class="st-info">
-          <div class="st-name">${String(r.n).padStart(2, "0")} · ${esc(PRODUCTS[r.n - 1].name)}</div>
-          <div class="st-bar"><i style="width:${(r.o / max) * 100}%"></i></div>
-          <div class="st-meta">កម្មង់ ${r.o} · មើល ${r.v}</div>
-        </div>
-      </div>`).join("") : `<div class="ad-empty">មិនទាន់មានទិន្នន័យ</div>`}
-    <div class="ad-hint">${res.remote ? "ទិន្នន័យពីអតិថិជនទាំងអស់ (តាម Worker)" : "រាប់តែលើឧបករណ៍នេះប៉ុណ្ណោះ។ ដើម្បីឃើញពីអតិថិជនទាំងអស់ ត្រូវដាក់ URL Worker ក្នុងផ្ទាំង ហាង។"}</div>
-    <div class="ad-actions"><button class="ad-btn" id="st-refresh" type="button">ផ្ទុកថ្មី</button>${res.remote ? "" : `<button class="ad-btn danger" id="st-clear" type="button">លុបស្ថិតិ</button>`}</div>`;
-  wireStats(box);
-}
-function wireStats(box) {
-  const r = box.querySelector("#st-refresh"), c = box.querySelector("#st-clear"), k = box.querySelector("#st-key");
-  if (k) k.addEventListener("change", () => { try { localStorage.setItem("statsKey", k.value); } catch (e) {} renderStats(); });
-  if (r) r.addEventListener("click", renderStats);
-  if (c) c.addEventListener("click", () => { if (confirm("លុបស្ថិតិលើឧបករណ៍នេះ?")) { try { localStorage.removeItem("stats"); } catch (e) {} renderStats(); } });
-}
 
 
 // ================= ការកម្មង់ (បញ្ចូលពី dashboard) =================
@@ -815,14 +824,14 @@ function wireStats(box) {
   function payState(o) {
     if (o.paid_amount == null) return ["⏳ មិនទាន់ផ្ទៀងផ្ទាត់ទឹកប្រាក់", "var(--muted)"];
     const df = o.paid_amount - (o.price || 0);
-    if (df >= 0) return [df > 0 ? `✅ បង់គ្រប់ (លើស ${money(df)})` : "✅ បង់គ្រប់", "#3F7D5C"];
-    return [`⚠️ បង់មិនទាន់គ្រប់ · ខ្វះ ${money(-df)}`, "#B8213F"];
+    if (df >= 0) return [df > 0 ? `បង់គ្រប់ (លើស ${money(df)})` : "បង់គ្រប់", "#3F7D5C"];
+    return [`បង់មិនទាន់គ្រប់ · ខ្វះ ${money(-df)}`, "#B8213F"];
   }
   function payBox(o) {
     if (o.pay_method !== "qr") return "";
     const [t, c] = payState(o), short = o.paid_amount != null && o.paid_amount < (o.price || 0);
     return `<div class="od-box"><div class="od-row"><input data-payer value="${e2(o.payer_name)}" placeholder="ឈ្មោះអ្នកបង់ (លើបង្កាន់ដៃ)"><input data-paid type="text" inputmode="decimal" value="${o.paid_amount == null ? "" : o.paid_amount}" placeholder="ទឹកប្រាក់ ៛"><button class="od-sm" data-savepay="1" type="button">រក្សា</button></div>
-      <div class="od-stat2" style="color:${c}">${t}</div>${short ? `<button class="od-sm" data-sms="1" type="button" style="margin-top:8px;border-color:#B8213F;color:#B8213F">📩 ប្រាប់ភ្ញៀវថាបង់មិនទាន់គ្រប់</button>` : ""}</div>`;
+      <div class="od-stat2" style="color:${c}">${t}</div>${short ? `<button class="od-sm" data-sms="1" type="button" style="margin-top:8px;border-color:#B8213F;color:#B8213F">ប្រាប់ភ្ញៀវថាបង់មិនទាន់គ្រប់</button>` : ""}</div>`;
   }
   function draw() {
     const today = dayKey(new Date()), live = orders.filter((o) => o.status !== "cancel"), td = live.filter((o) => dayKey(o.created_at) === today);
@@ -834,25 +843,25 @@ function wireStats(box) {
     const rows = orders.filter((o) => flt === "all" || o.status === flt);
     $("od-list").innerHTML = rows.length ? rows.map((o) => `<div class="od-card ${e2(o.status)}" data-id="${o.id}">
       <div class="od-top"><div class="od-name">${e2(o.product)}${o.size ? " · " + e2(o.size) : ""}</div><div class="od-time">${when(o.created_at)}</div></div>
-      <div class="od-meta"><span class="od-price">${money(o.price)}</span> · #${e2(o.product_no)}${o.order_code ? " · 🔖 <b>" + e2(o.order_code) + "</b>" : ""}${o.pay_method ? " · " + (o.pay_method === "qr" ? "💳 បង់ឥឡូវ" : "🚚 បង់ពេលទទួល") : ""}<br>
-        ${Array.isArray(o.items) && o.items.length ? o.items.map((it) => "• " + e2(it.name) + (it.size ? " · " + e2(it.size) : "") + " ×" + it.qty + " — " + money(it.price * it.qty)).join("<br>") + "<br>" : ""}${o.coupon ? "🎟️ " + e2(o.coupon) + " −" + money(o.discount) + "<br>" : ""}${o.customer_name ? "👤 " + e2(o.customer_name) + " (គណនី)<br>" : ""}📞 <a href="tel:${e2(String(o.phone).replace(/[^\d+]/g, ""))}">${e2(o.phone)}</a><br>${o.location ? "📍 " + e2(o.location) + "<br>" : ""}${/^https?:\/\//.test(o.map_link || "") ? `🗺 <a href="${e2(o.map_link)}" target="_blank" rel="noopener">បើក Google Map</a>` : ""}</div>
+      <div class="od-meta"><span class="od-price">${money(o.price)}</span> · #${e2(o.product_no)}${o.order_code ? " · <b>" + e2(o.order_code) + "</b>" : ""}${o.pay_method ? " · " + (o.pay_method === "qr" ? "បង់ឥឡូវ" : "បង់ពេលទទួល") : ""}<br>
+        ${Array.isArray(o.items) && o.items.length ? o.items.map((it) => "• " + e2(it.name) + (it.size ? " · " + e2(it.size) : "") + " ×" + it.qty + " — " + money(it.price * it.qty)).join("<br>") + "<br>" : ""}${o.coupon ? "" + e2(o.coupon) + " −" + money(o.discount) + "<br>" : ""}${o.customer_name ? "" + e2(o.customer_name) + " (គណនី)<br>" : ""}<a href="tel:${e2(String(o.phone).replace(/[^\d+]/g, ""))}">${e2(o.phone)}</a><br>${o.location ? "" + e2(o.location) + "<br>" : ""}${/^https?:\/\//.test(o.map_link || "") ? `<a href="${e2(o.map_link)}" target="_blank" rel="noopener">បើក Google Map</a>` : ""}</div>
       ${payBox(o)}
       <div class="od-box"><div class="od-row"><input data-courier value="${e2(o.courier)}" placeholder="ក្រុមហ៊ុនដឹក"><input data-trackno value="${e2(o.courier_no)}" placeholder="លេខតាមដាន"></div>
         <div class="od-row" style="margin-top:6px"><input data-note value="${e2(o.tracking_note)}" placeholder="ដឹកដល់ណាហើយ?"><button class="od-sm" data-savetrack="1" type="button">រក្សា</button></div></div>
-      <div class="od-acts">${o.receipt_url ? `<button class="od-sm" data-rc="${e2(o.receipt_url)}" type="button" style="border-color:#3F7D5C;color:#3F7D5C">🧾 មើលបង្កាន់ដៃ</button>` : ""}${Object.entries(ST).filter(([k]) => k !== o.status).map(([k, v]) => `<button class="od-sm" data-s="${k}" type="button">${v}</button>`).join("")}<button class="od-sm" data-del="1" type="button" style="color:#B8213F">🗑</button></div>
+      <div class="od-acts">${o.receipt_url ? `<button class="od-sm" data-rc="${e2(o.receipt_url)}" type="button" style="border-color:#3F7D5C;color:#3F7D5C">មើលបង្កាន់ដៃ</button>` : ""}${Object.entries(ST).filter(([k]) => k !== o.status).map(([k, v]) => `<button class="od-sm" data-s="${k}" type="button">${v}</button>`).join("")}<button class="od-sm" data-del="1" type="button" style="color:#B8213F">លុប</button></div>
     </div>`).join("") : `<div class="od-empty">មិនទាន់មានការបញ្ជាទិញ</div>`;
   }
   // ----- លេខកូដបញ្ចុះតម្លៃ -----
   let coupons = [];
   function cpDraw() {
     const box = $("cp-box"); if (!box) return;
-    box.innerHTML = `<div class="ad-label" style="margin-top:6px">🎟️ លេខកូដបញ្ចុះតម្លៃ</div>
+    box.innerHTML = `<div class="ad-label" style="margin-top:6px">លេខកូដបញ្ចុះតម្លៃ</div>
       <div class="od-box"><div class="od-row"><input id="cp-c" placeholder="លេខកូដ ឧ. NEW10" autocapitalize="characters"><select id="cp-k" class="ad-input" style="margin:0;max-width:84px"><option value="percent">%</option><option value="amount">៛</option></select><input id="cp-v" inputmode="numeric" placeholder="តម្លៃ" style="max-width:90px"></div>
         <div class="od-row" style="margin-top:6px"><input id="cp-m" inputmode="numeric" placeholder="ទិញយ៉ាងតិច ៛ (ទទេ=គ្មាន)"><input id="cp-u" inputmode="numeric" placeholder="ប្រើបានចំនួន (ទទេ=គ្មានកំណត់)"></div>
         <button class="od-sm" id="cp-add" type="button" style="margin-top:8px;background:var(--ink);color:#fff">＋ បង្កើតលេខកូដ</button><div class="od-stat2" id="cp-err" style="color:#B8213F"></div></div>
       ${coupons.length ? coupons.map((c) => `<div class="od-card ${c.active ? "done" : "cancel"}" data-cp="${e2(c.code)}"><div class="od-top"><div class="od-name">${e2(c.code)}</div><div class="od-time">ប្រើ ${c.uses}${c.max_uses != null ? "/" + c.max_uses : ""}</div></div>
         <div class="od-meta">${c.kind === "percent" ? "−" + c.value + "%" : "−" + money(c.value)}${c.min_total ? " · ទិញយ៉ាងតិច " + money(c.min_total) : ""}</div>
-        <div class="od-acts"><button class="od-sm" data-cpt="1" type="button">${c.active ? "⏸ បិទ" : "▶ បើក"}</button><button class="od-sm" data-cpd="1" type="button" style="color:#B8213F">🗑</button></div></div>`).join("") : `<div class="od-empty">មិនទាន់មានលេខកូដ</div>`}`;
+        <div class="od-acts"><button class="od-sm" data-cpt="1" type="button">${c.active ? "បិទ" : "បើក"}</button><button class="od-sm" data-cpd="1" type="button" style="color:#B8213F">លុប</button></div></div>`).join("") : `<div class="od-empty">មិនទាន់មានលេខកូដ</div>`}`;
   }
   window.cpLoad = async function () {
     if (!sbOn()) { const b = $("cp-box"); if (b) b.innerHTML = `<div class="od-empty">មិនទាន់ភ្ជាប់ Supabase</div>`; return; }
@@ -872,7 +881,7 @@ function wireStats(box) {
         const card = b.closest("[data-cp]"); if (!card) return; const code = card.dataset.cp, c = coupons.find((x) => x.code === code);
         if (b.dataset.cpt) { await api(`coupons?code=eq.${encodeURIComponent(code)}`, { method: "PATCH", body: JSON.stringify({ active: !c.active }) }); return cpLoad(); }
         if (b.dataset.cpd) {
-          if (b.dataset.sure !== "1") { b.dataset.sure = "1"; b.textContent = "ចុចម្តងទៀត"; setTimeout(() => { if (b.isConnected) { b.dataset.sure = ""; b.textContent = "🗑"; } }, 3000); return; }
+          if (b.dataset.sure !== "1") { b.dataset.sure = "1"; b.textContent = "ចុចម្តងទៀត"; setTimeout(() => { if (b.isConnected) { b.dataset.sure = ""; b.textContent = "លុប"; } }, 3000); return; }
           await api(`coupons?code=eq.${encodeURIComponent(code)}`, { method: "DELETE" }); cpLoad();
         }
       } catch (err) { alert("មិនបាន៖ " + err.message + " (ត្រូវ run SQL ថ្មីក្នុង Supabase)"); }
@@ -928,7 +937,7 @@ function wireStats(box) {
         if (b.dataset.savetrack) {
           const body = { courier: g("[data-courier]") || null, courier_no: g("[data-trackno]") || null, tracking_note: g("[data-note]") || null };
           await api(`orders?id=eq.${id}`, { method: "PATCH", body: JSON.stringify(body) }); Object.assign(o, body);
-          b.textContent = "✓"; setTimeout(() => { b.textContent = "រក្សា"; }, 1200); return;
+          b.textContent = "រួច"; setTimeout(() => { b.textContent = "រក្សា"; }, 1200); return;
         }
         if (b.dataset.savepay) {
           const payer = g("[data-payer]"), paid = parseAmount(g("[data-paid]"));
@@ -943,7 +952,7 @@ function wireStats(box) {
         }
         if (b.dataset.s) { await api(`orders?id=eq.${id}`, { method: "PATCH", body: JSON.stringify({ status: b.dataset.s }) }); o.status = b.dataset.s; draw(); return; }
         if (b.dataset.del) {
-          if (b.dataset.sure !== "1") { b.dataset.sure = "1"; b.textContent = "ចុចម្តងទៀត"; setTimeout(() => { if (b.isConnected) { b.dataset.sure = ""; b.textContent = "🗑"; } }, 3000); return; }
+          if (b.dataset.sure !== "1") { b.dataset.sure = "1"; b.textContent = "ចុចម្តងទៀត"; setTimeout(() => { if (b.isConnected) { b.dataset.sure = ""; b.textContent = "លុប"; } }, 3000); return; }
           await api(`orders?id=eq.${id}`, { method: "DELETE" }); orders = orders.filter((x) => String(x.id) !== id); draw();
         }
       } catch (err) { alert("មិនបាន៖ " + err.message); }
@@ -959,12 +968,11 @@ function openAdminPanel() {
   body.innerHTML = `
     <div class="ad-stats" id="ad-stats" style="display:none"></div>
     <div class="ad-tabs" id="ad-tabs">
-      <button class="ad-tab active" data-tab="orders" type="button"><span class="ic">📦</span>ការកម្មង់<b class="bd" id="od-badge" hidden></b></button>
-      <button class="ad-tab" data-tab="products" type="button"><span class="ic">🛍️</span>ទំនិញ</button>
-      <button class="ad-tab" data-tab="design" type="button"><span class="ic">🎨</span>រចនា</button>
-      <button class="ad-tab" data-tab="shop" type="button"><span class="ic">🏪</span>ហាង</button>
-      <button class="ad-tab" data-tab="promo" type="button"><span class="ic">📣</span>ផ្សព្វផ្សាយ</button>
-      <button class="ad-tab" data-tab="stats" type="button"><span class="ic">📊</span>ស្ថិតិ</button>
+      <button class="ad-tab active" data-tab="orders" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7.5 12 3l9 4.5v9L12 21l-9-4.5v-9Z"/><path d="M3 7.5 12 12l9-4.5M12 12v9"/></svg>ការកម្មង់<b class="bd" id="od-badge" hidden></b></button>
+      <button class="ad-tab" data-tab="products" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8h14l-1 12H6L5 8Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>ទំនិញ</button>
+      <button class="ad-tab" data-tab="design" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18c1.2 0 2-.8 2-1.8 0-.6-.3-1-.6-1.4-.3-.4-.4-.8-.4-1.3 0-1 .8-1.8 1.8-1.8H17a4 4 0 0 0 4-4C21 6.5 17 3 12 3Z"/><circle cx="7.5" cy="11" r="1"/><circle cx="10" cy="7" r="1"/><circle cx="15" cy="7.5" r="1"/></svg>រចនា</button>
+      <button class="ad-tab" data-tab="shop" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5 5.5 4h13L20 9.5"/><path d="M4 9.5a2.7 2.7 0 0 0 5.3 0 2.7 2.7 0 0 0 5.4 0 2.7 2.7 0 0 0 5.3 0"/><path d="M5 12.5V20h14v-7.5M10 20v-4.5h4V20"/></svg>ហាង</button>
+      <button class="ad-tab" data-tab="promo" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10v4h3l8 4V6L7 10H4Z"/><path d="M18.5 9.5a4 4 0 0 1 0 5"/></svg>ផ្សព្វផ្សាយ</button>
     </div>
     <div class="ad-panel" data-tab="orders"><div id="od-root"></div></div>
 
@@ -973,7 +981,7 @@ function openAdminPanel() {
       <div class="ad-addform" id="ad-addform" style="display:none">
         <label class="ad-photo-pick" id="ad-photo-pick">
           <input type="file" accept="image/*" id="ad-new-file" hidden />
-          <span id="ad-photo-label">📷 ជ្រើសរើសរូបទំនិញ</span>
+          <span id="ad-photo-label">ជ្រើសរើសរូបទំនិញ</span>
         </label>
         <input class="ad-input" id="ad-new-name" placeholder="ឈ្មោះទំនិញ" />
         <input class="ad-input" id="ad-new-place" placeholder="ទំហំ ឧ. ទំហំ S - XL ឬ Free Size" />
@@ -1003,7 +1011,7 @@ function openAdminPanel() {
       <label class="ad-field">ឈ្មោះហាង<input class="ad-input" data-s="name" value="${esc(settings.name)}" /></label>
       <div class="ad-field">រូបសញ្ញាហាង (Logo)
         <div class="ad-imgrow"><span class="ad-logo-prev" id="ad-logo-prev"></span>
-          <label class="ad-btn" style="cursor:pointer"><input type="file" id="ad-logo-file" accept="image/*" hidden />📷 ដាក់រូប Logo</label>
+          <label class="ad-btn" style="cursor:pointer"><input type="file" id="ad-logo-file" accept="image/*" hidden />ដាក់រូប Logo</label>
           <button type="button" class="ad-btn" id="ad-logo-clear">លុបរូប</button></div></div>
       <label class="ad-field">អក្សរ Logo ១ តួ (ប្រើពេលគ្មានរូប)<input class="ad-input" data-s="logoText" maxlength="2" value="${esc(settings.logoText)}" placeholder="${esc((String(settings.name).trim()[0] || "T").toUpperCase())}" /></label>
       <label class="ad-field">ខ្សែប្រកាសខាងលើបំផុត (ទទេ = លាក់)<input class="ad-input" data-s="announce" value="${esc(settings.announce)}" /></label>
@@ -1034,15 +1042,12 @@ function openAdminPanel() {
             <label>ពណ៌ទី 1<input type="color" data-bf="c1" value="${esc(b.c1 || "#333333")}" /></label>
             <label>ពណ៌ទី 2<input type="color" data-bf="c2" value="${esc(b.c2 || "#666666")}" /></label>
           </div>
-          <label class="ad-photo-btn bn-photo">📷 ដាក់រូបផ្ទាំងទី ${i + 1}<input type="file" accept="image/*" data-bimg="${i + 1}" hidden></label>
+          <label class="ad-photo-btn bn-photo">ដាក់រូបផ្ទាំងទី ${i + 1}<input type="file" accept="image/*" data-bimg="${i + 1}" hidden></label>
           <div class="ad-hint">រូបដែលដាក់នៅទីនេះឃើញតែលើទូរស័ព្ទនេះ។ ដើម្បីឱ្យអតិថិជនឃើញ ត្រូវ upload ឯកសារឈ្មោះ Banner${i + 1}.jpg (ទំហំណែនាំ 1400×600) ទៅជាមួយ index.html</div>
         </div>`).join("")}
     </div>
 
     <div class="ad-panel" data-tab="promo" style="display:none"><div id="cp-box"></div></div>
-    <div class="ad-panel" data-tab="stats" style="display:none">
-      <div id="st-body"><div class="ad-empty">កំពុងផ្ទុក...</div></div>
-    </div>
 
     <div class="ad-panel" data-tab="shop" style="display:none">
       <label class="ad-field">លេខទូរស័ព្ទ<input class="ad-input" data-s="phone" inputmode="tel" value="${esc(settings.phone)}" /></label>
@@ -1065,7 +1070,6 @@ function openAdminPanel() {
           <option value="0"${Number(settings.requireLogin) === 1 ? "" : " selected"}>ទេ (ភ្ញៀវទិញបានដោយមិនចាំបាច់ចូល)</option>
           <option value="1"${Number(settings.requireLogin) === 1 ? " selected" : ""}>បាទ/ចាស (ត្រូវចូលគណនីមុន)</option>
         </select></label>
-      <label class="ad-field">URL Worker ស្ថិតិ (ទទេ = រាប់លើឧបករណ៍នេះប៉ុណ្ណោះ)<input class="ad-input" data-s="statsUrl" value="${esc(settings.statsUrl)}" placeholder="https://stats.xxx.workers.dev" /></label>
     </div>`;
   const list = document.getElementById("ad-list");
   const stats = () => {
@@ -1157,7 +1161,7 @@ function openAdminPanel() {
     if (gx) {                                   // លុបរូបបន្ថែម (ចុចពីរដង)
       if (gx.dataset.sure !== "1") {
         gx.dataset.sure = "1"; gx.style.background = "#B8213F"; gx.textContent = "លុប?";
-        setTimeout(() => { if (gx.isConnected) { gx.dataset.sure = ""; gx.style.background = ""; gx.textContent = "✕"; } }, 3000);
+        setTimeout(() => { if (gx.isConnected) { gx.dataset.sure = ""; gx.style.background = ""; gx.textContent = "លុប"; } }, 3000);
         return;
       }
       const key = "g" + Number(gx.dataset.gn), arr = (adminImages[key] || []).slice();
@@ -1176,7 +1180,7 @@ function openAdminPanel() {
       if (di.dataset.sure !== "1") {
         di.dataset.sure = "1"; di.textContent = "ចុចម្តងទៀត";
         di.style.background = "#B8213F"; di.style.color = "#fff";
-        setTimeout(() => { if (di.isConnected) { di.dataset.sure = ""; di.textContent = "🗑 លុបរូប"; di.style.background = ""; di.style.color = ""; } }, 3000);
+        setTimeout(() => { if (di.isConnected) { di.dataset.sure = ""; di.textContent = "លុបរូប"; di.style.background = ""; di.style.color = ""; } }, 3000);
         return;
       }
       delete adminImages[n];
@@ -1192,7 +1196,7 @@ function openAdminPanel() {
       if (del.dataset.sure !== "1") {            // ចុចពីរដង
         del.dataset.sure = "1"; del.textContent = "ចុចម្តងទៀត";
         del.style.background = "#B8213F"; del.style.color = "#fff";
-        setTimeout(() => { if (del.isConnected) { del.dataset.sure = ""; del.textContent = "🗑 លុបប្រអប់"; del.style.background = ""; del.style.color = ""; } }, 3000);
+        setTimeout(() => { if (del.isConnected) { del.dataset.sure = ""; del.textContent = "លុបប្រអប់"; del.style.background = ""; del.style.color = ""; } }, 3000);
         return;
       }
       delete adminImages[n]; delete adminImages["g" + n]; delete adminData.stock[n]; delete adminData.sale[n]; window.__sd.add(String(n));
@@ -1230,7 +1234,6 @@ function openAdminPanel() {
   body.querySelectorAll(".ad-tab").forEach((t) => t.addEventListener("click", () => {
     body.querySelectorAll(".ad-tab").forEach((x) => x.classList.toggle("active", x === t));
     body.querySelectorAll(".ad-panel").forEach((pn) => (pn.style.display = pn.dataset.tab === t.dataset.tab ? "" : "none"));
-    if (t.dataset.tab === "stats") renderStats();
     if (t.dataset.tab === "orders") odLoad();
     if (t.dataset.tab === "promo") window.cpLoad && cpLoad();
     if (t.dataset.tab === "products" && sbOn() && window.__sd.size === 0) {
@@ -1252,7 +1255,7 @@ function openAdminPanel() {
     document.getElementById("ad-new-file").value = "";
     const pick = document.getElementById("ad-photo-pick");
     pick.style.backgroundImage = ""; pick.classList.remove("has");
-    document.getElementById("ad-photo-label").textContent = "📷 ជ្រើសរើសរូបទំនិញ";
+    document.getElementById("ad-photo-label").textContent = "ជ្រើសរើសរូបទំនិញ";
   };
   document.getElementById("ad-add-open").addEventListener("click", () => {
     addForm.style.display = addForm.style.display === "none" ? "" : "none";
@@ -1265,7 +1268,7 @@ function openAdminPanel() {
       newPhoto = data;
       const pick = document.getElementById("ad-photo-pick");
       pick.style.backgroundImage = `url("${data}")`; pick.classList.add("has");
-      document.getElementById("ad-photo-label").textContent = "📷 ប្តូររូប";
+      document.getElementById("ad-photo-label").textContent = "ប្តូររូប";
     }).catch((err) => alert("បើករូបមិនបាន (" + (err && err.message) + ")។ សូមសាកល្បងរូប JPG/PNG"));
   });
   document.getElementById("ad-add-save").addEventListener("click", async () => {
