@@ -675,7 +675,7 @@ function openAdminLogin() {
 }
 
 // ===== សិទ្ធិ Admin: ស្នើសុំ / អនុម័ត =====
-const acIsOwner = () => !sbOn() || (localStorage.getItem("adminEmail") || OWNER_EMAIL).trim().toLowerCase() === OWNER_EMAIL.toLowerCase();
+const acIsOwner = () => !sbOn() || (localStorage.getItem("adminEmail") || "").trim().toLowerCase() === OWNER_EMAIL.toLowerCase();
 async function acApproved(email) {
   if (email.trim().toLowerCase() === OWNER_EMAIL.toLowerCase()) return true;
   try {
@@ -1469,6 +1469,13 @@ function openAdminPanel() {
 // ---- ចាប់ផ្តើម ----
 (async () => {
   if (adminOn && sbOn() && !sbSess) adminOn = false;     // ត្រូវចូលតាម Supabase
+  if (adminOn && sbOn()) {                                // ពិនិត្យសិទ្ធិម្តងទៀតរាល់ពេលបើកទំព័រ
+    const em = (localStorage.getItem("adminEmail") || "").trim();
+    if (!em || !(await acApproved(em))) {
+      adminOn = false; sbSess = null;
+      try { localStorage.removeItem("adminOn"); localStorage.removeItem("sbSess"); } catch (e) {}
+    }
+  }
   if (adminOn) { await syncFromRemote(); loadAdminData(); openAdminPanel(); } else openAdminLogin();
 })();
 // ការពារ zoom លើទូរស័ព្ទ
