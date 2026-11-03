@@ -420,6 +420,15 @@
 
   .od-stat b { white-space: nowrap; font-size: clamp(15px, 4.6vw, 19px); }
   .od-stat span { display: block; margin-top: 2px; }
+
+  .ad-tabs { overflow-x: auto; scrollbar-width: none; }
+  .ad-tabs::-webkit-scrollbar { display: none; }
+  .ad-tab { flex: 1 0 auto; min-width: 58px; }
+  .rv-stars-s { color: #E0A526; letter-spacing: 1px; font-size: 14px; }
+  .rv-ph { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+  .rv-ph img { width: 64px; height: 64px; object-fit: cover; border-radius: 10px; border: 1px solid var(--line); }
+  .rv-cm { margin: 6px 0 0; font-size: 13.5px; line-height: 1.7; white-space: pre-line; }
+  .rv-rp { width: 100%; min-height: 64px; margin-top: 10px; }
 </style>
 </head>
 <body>
@@ -726,6 +735,47 @@ async function acApi(path, opt = {}) {
     b.disabled = false; b.textContent = "ផ្ញើសំណើ";
   });
 })();
+
+const NT_HTML = `<div class="ac-item" id="nt-box"><b>ជូនដំណឹងការកម្មង់ទៅ Telegram</b><small id="nt-bot"></small><small>១) បើក Bot ខាងលើ ហើយចុច Start · ២) រក Chat ID របស់អ្នកតាម @userinfobot · ៣) បញ្ចូលលេខនោះខាងក្រោម</small><input class="ad-input" id="nt-chat" inputmode="numeric" placeholder="Chat ID (លេខ)" style="margin-top:8px" /><div class="ac-acts"><button class="ad-btn" id="nt-save" type="button">រក្សាទុក</button><button class="ad-btn" id="nt-test" type="button">ផ្ញើសារសាកល្បង</button></div><small id="nt-msg" style="margin-top:6px"></small></div>`;
+async function bindNotify() {
+  const $ = (id) => document.getElementById(id), msg = $("nt-msg");
+  if (!$("nt-box")) return;
+  if (!sbOn()) { $("nt-box").style.display = "none"; return; }
+  try { const r = await acApi(`shop_notify?select=chat_id&shop_id=eq.${SHOP_ID}`); $("nt-chat").value = (r[0] && r[0].chat_id) || ""; } catch (e) {}
+  try { const bu = await acApi("rpc/notify_bot", { method: "POST", body: "{}" }); if (bu && !/^ដាក់-/.test(bu)) $("nt-bot").innerHTML = `Bot៖ <a href="https://t.me/${esc(bu)}" target="_blank" rel="noopener">@${esc(bu)}</a>`; } catch (e) {}
+  $("nt-save").onclick = async () => {
+    const v = $("nt-chat").value.trim(); msg.style.color = "";
+    if (v && !/^-?\d+$/.test(v)) { msg.textContent = "Chat ID ត្រូវជាលេខ"; return; }
+    try { await acApi("shop_notify?on_conflict=shop_id", { method: "POST", headers: { Prefer: "resolution=merge-duplicates,return=minimal" }, body: JSON.stringify({ shop_id: SHOP_ID, chat_id: v }) }); msg.textContent = "បានរក្សាទុក"; }
+    catch (e) { msg.style.color = "#B8213F"; msg.textContent = "រក្សាមិនបាន (តើបាន run admin-telegram.sql ហើយឬនៅ?)"; }
+  };
+  $("nt-test").onclick = async () => {
+    msg.style.color = ""; msg.textContent = "កំពុងផ្ញើ...";
+    try {
+      const st = await acApi("rpc/send_test_notify", { method: "POST", body: "{}" });
+      msg.textContent = st === "ok" ? "បានផ្ញើហើយ បើមិនទទួលបានសារ សូមពិនិត្យថាបានចុច Start ក្នុង Bot និង Chat ID ត្រឹមត្រូវ" : st === "no_chat" ? "សូមបញ្ចូល និងរក្សាទុក Chat ID ជាមុនសិន" : "ម្ចាស់ហាងមិនទាន់កំណត់ Bot ទេ";
+    } catch (e) { msg.style.color = "#B8213F"; msg.textContent = "ផ្ញើមិនបាន (តើបាន run admin-telegram.sql ហើយឬនៅ?)"; }
+  };
+}
+async function renderReviews() {
+  const box = document.getElementById("rv-body"); if (!box) return;
+  if (!sbOn()) { box.innerHTML = '<div class="ad-empty">មុខងារនេះត្រូវការ Supabase</div>'; return; }
+  box.innerHTML = '<div class="ad-empty">កំពុងផ្ទុក...</div>';
+  const nm = (n) => (PRODUCTS[n - 1] && PRODUCTS[n - 1].name) || ("ទំនិញលេខ " + n);
+  try {
+    const rows = await acApi(`reviews?select=*&shop_id=eq.${SHOP_ID}&order=created_at.desc&limit=100`);
+    if (!rows.length) { box.innerHTML = '<div class="ad-empty">មិនទាន់មានវាយតម្លៃ។ អតិថិជនវាយតម្លៃបាន បន្ទាប់ពីការកម្មង់ត្រូវបានដាក់ស្ថានភាព "ដឹកដល់ហើយ"។</div>'; return; }
+    const pend = rows.filter((r) => !r.reply).length;
+    box.innerHTML = `<div class="ad-label" style="margin-top:0">វាយតម្លៃ (${rows.length}) · មិនទាន់ឆ្លើយ ${pend}</div>` + rows.map((r) => `<div class="ac-item" data-id="${r.id}"><b>${esc(nm(r.product_n))} <span class="rv-stars-s">${"★".repeat(r.rating)}${"☆".repeat(5 - r.rating)}</span></b><small>${esc(r.name || "")} · ${esc(String(r.created_at || "").slice(0, 10))}</small>${r.comment ? `<p class="rv-cm">${esc(r.comment)}</p>` : ""}${(r.photos && r.photos.length) ? `<div class="rv-ph">${r.photos.map((u) => `<a href="${esc(u)}" target="_blank" rel="noopener"><img src="${esc(u)}" alt="" /></a>`).join("")}</div>` : ""}<textarea class="ad-input rv-rp" maxlength="500" placeholder="ឆ្លើយតបអតិថិជន...">${esc(r.reply || "")}</textarea><div class="ac-acts"><button class="ad-btn" data-rp="${r.id}" type="button">${r.reply ? "កែចម្លើយ" : "ឆ្លើយតប"}</button><button class="ad-btn danger" data-rd="${r.id}" type="button">លុប</button></div></div>`).join("");
+    box.onclick = async (e) => {
+      const b = e.target.closest("button"); if (!b) return;
+      try {
+        if (b.dataset.rp) { const txt = b.closest(".ac-item").querySelector(".rv-rp").value; await acApi("rpc/reply_review", { method: "POST", body: JSON.stringify({ p_id: Number(b.dataset.rp), p_reply: txt }) }); renderReviews(); }
+        else if (b.dataset.rd) { if (!confirm("លុបវាយតម្លៃនេះ?")) return; await acApi(`reviews?id=eq.${b.dataset.rd}`, { method: "DELETE" }); renderReviews(); }
+      } catch (err) { alert("មិនបាន៖ " + err.message); }
+    };
+  } catch (e) { box.innerHTML = '<div class="ad-empty">ផ្ទុកមិនបាន (តើបាន run admin-reviews.sql និង admin-reviews2.sql ហើយឬនៅ?)</div>'; }
+}
 async function renderAccess() {
   const box = document.getElementById("ac-body"); if (!box) return;
   box.innerHTML = '<div class="ad-empty">កំពុងផ្ទុក...</div>';
@@ -1078,6 +1128,7 @@ function openAdminPanel() {
       ${SHOP_ID === 1 ? `<button class="ad-tab" data-tab="design" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18c1.2 0 2-.8 2-1.8 0-.6-.3-1-.6-1.4-.3-.4-.4-.8-.4-1.3 0-1 .8-1.8 1.8-1.8H17a4 4 0 0 0 4-4C21 6.5 17 3 12 3Z"/><circle cx="7.5" cy="11" r="1"/><circle cx="10" cy="7" r="1"/><circle cx="15" cy="7.5" r="1"/></svg>រចនា</button>` : ""}
       ${SHOP_ID === 1 ? `<button class="ad-tab" data-tab="shop" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5 5.5 4h13L20 9.5"/><path d="M4 9.5a2.7 2.7 0 0 0 5.3 0 2.7 2.7 0 0 0 5.4 0 2.7 2.7 0 0 0 5.3 0"/><path d="M5 12.5V20h14v-7.5M10 20v-4.5h4V20"/></svg>ហាង</button>` : ""}
       ${sbOn() && acIsOwner() ? `<button class="ad-tab" data-tab="access" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="8" cy="15" r="4"/><path d="m11 12 9-9M16 7l3 3M14 9l2 2"/></svg> សិទ្ធិ</button>` : ""}
+      <button class="ad-tab" data-tab="reviews" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9L12 3Z"/></svg> វាយតម្លៃ</button>
       <button class="ad-tab" data-tab="promo" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10v4h3l8 4V6L7 10H4Z"/><path d="M18.5 9.5a4 4 0 0 1 0 5"/></svg>ផ្សព្វផ្សាយ</button>
     </div>
     <div class="ad-panel" data-tab="orders"><div id="od-root"></div></div>
@@ -1153,6 +1204,7 @@ function openAdminPanel() {
         </div>`).join("")}
     </div>
 
+    <div class="ad-panel" data-tab="reviews" style="display:none"><div id="rv-body"></div></div>
     <div class="ad-panel" data-tab="promo" style="display:none"><div id="cp-box"></div></div>
     <div class="ad-panel" data-tab="access" style="display:none"><div id="ac-body"></div></div>
 
@@ -1165,8 +1217,10 @@ function openAdminPanel() {
       <label class="ad-field">លេខទូរស័ព្ទ<input class="ad-input" data-s="phone" inputmode="tel" value="${esc(settings.phone)}" /></label>
       <label class="ad-field">Username Telegram (គ្មាន @)<input class="ad-input" data-s="telegram" value="${esc(settings.telegram)}" /></label>
       <label class="ad-field">តំណ Messenger / Facebook<input class="ad-input" data-s="messenger" value="${esc(settings.messenger)}" /></label>
+      ${NT_HTML}
     </div>` : ""}
     <div class="ad-panel" data-tab="shop" style="display:none">
+      ${SHOP_ID === 1 ? NT_HTML : ""}
       <label class="ad-field">ពិពណ៌នាហាង (បង្ហាញក្នុងទំព័រហាង)<textarea class="ad-input" data-s="about" rows="3" style="min-height:84px">${esc(settings.about || "")}</textarea></label>
       <label class="ad-field">លេខទូរស័ព្ទ<input class="ad-input" data-s="phone" inputmode="tel" value="${esc(settings.phone)}" /></label>
       <label class="ad-field">Username Telegram (គ្មាន @)<input class="ad-input" data-s="telegram" value="${esc(settings.telegram)}" /></label>
@@ -1354,6 +1408,7 @@ function openAdminPanel() {
     body.querySelectorAll(".ad-panel").forEach((pn) => (pn.style.display = pn.dataset.tab === t.dataset.tab ? "" : "none"));
     if (t.dataset.tab === "orders") odLoad();
     if (t.dataset.tab === "access") renderAccess();
+    if (t.dataset.tab === "reviews") renderReviews();
     if (t.dataset.tab === "promo") window.cpLoad && cpLoad();
     if (t.dataset.tab === "products" && sbOn() && window.__sd.size === 0) {
       sbPull().then((rd) => {
@@ -1450,6 +1505,7 @@ function openAdminPanel() {
   { const pl = document.getElementById("pf-logo"), px = document.getElementById("pf-logo-x");
     if (pl) pl.addEventListener("click", () => document.getElementById("ad-logo-file").click());
     if (px) px.addEventListener("click", () => document.getElementById("ad-logo-clear").click()); }
+  bindNotify();
   updPrev();
   body.querySelectorAll(".ad-sw").forEach((b) => b.addEventListener("click", () => {
     adminData.settings.accent = b.dataset.c;
