@@ -1545,6 +1545,8 @@
   select.of-input { height: 46px; padding: 0 12px; appearance: auto; background: #fff; }
 
   .color-chip { display: inline-flex; align-items: center; justify-content: center; gap: 0; }
+  .cdots { display: flex; gap: 5px; margin: 2px 0 4px; flex-wrap: wrap; }
+  .cdots .cdot { width: 11px; height: 11px; margin-right: 0; }
   .cdot { display: inline-block; width: 13px; height: 13px; border-radius: 50%; margin-right: 7px; border: 1px solid rgba(0,0,0,.2); flex: none; }
   /* ===== ui-pro: ការសម្អាតចុងក្រោយ ===== */
   :root { --ring: 0 0 0 3px rgba(var(--clay-rgb), 0.18); --ink-2: #4A3F38; }
@@ -1879,74 +1881,74 @@
 // ដាក់ username Telegram របស់ហាងនៅទីនេះ (មិនបាច់ដាក់ @)
 
 const PRODUCTS = [
-  { name: "អាវយឺតកប្បាស", place: "ទំហំ S - XL", price: 35000 },
-  { name: "អាវប៉ូឡូ", place: "ទំហំ S - XL", price: 45000 },
-  { name: "អាវដៃវែង", place: "ទំហំ S - XL", price: 55000 },
-  { name: "អាវសឺមី", place: "ទំហំ S - XL", price: 60000 },
-  { name: "អាវក្រៅ", place: "ទំហំ S - XL", price: 120000 },
-  { name: "អាវកាឌីហ្គែន", place: "ទំហំ S - XL", price: 85000 },
-  { name: "អាវហូដី", place: "ទំហំ S - XL", price: 90000 },
-  { name: "អាវបាំងត្រជាក់", place: "ទំហំ M - XXL", price: 150000 },
-  { name: "ខោខូវប៊យ", place: "ទំហំ 28 - 36", price: 95000 },
-  { name: "ខោជើងវែង", place: "ទំហំ 28 - 36", price: 70000 },
-  { name: "ខោខ្លី", place: "ទំហំ 28 - 36", price: 40000 },
-  { name: "ខោលេគីន", place: "Free Size", price: 38000 },
-  { name: "ខោជើងធំ", place: "ទំហំ S - XL", price: 75000 },
-  { name: "ខោស្លាក់", place: "ទំហំ S - XL", price: 80000 },
-  { name: "សំពត់ខ្លី", place: "ទំហំ S - L", price: 55000 },
-  { name: "សំពត់វែង", place: "ទំហំ S - L", price: 75000 },
-  { name: "សំពត់ប៉ាក់ក្បាច់", place: "ទំហំ S - L", price: 90000 },
-  { name: "រ៉ូបខ្លី", place: "ទំហំ S - L", price: 110000 },
-  { name: "រ៉ូបវែង", place: "ទំហំ S - L", price: 140000 },
-  { name: "រ៉ូបពិធី", place: "ទំហំ S - L", price: 180000 },
-  { name: "អាវក្រុប", place: "ទំហំ S - L", price: 32000 },
-  { name: "អាវដៃខ្លីស្ត្រី", place: "ទំហំ S - L", price: 38000 },
-  { name: "អាវសូត្រ", place: "ទំហំ S - L", price: 130000 },
-  { name: "ឈុតពីរដុំ", place: "ទំហំ S - XL", price: 160000 },
-  { name: "ឈុតកីឡា", place: "ទំហំ M - XXL", price: 120000 },
-  { name: "អាវកីឡា", place: "ទំហំ M - XXL", price: 48000 },
-  { name: "ឈុតគេង", place: "Free Size", price: 65000 },
-  { name: "អាវធំស្ត្រី", place: "ទំហំ S - XL", price: 125000 },
-  { name: "អាវក្រណាត់ត្បាញ", place: "ទំហំ S - XL", price: 85000 },
-  { name: "មួក", place: "Free Size", price: 20000 },
-  { name: "ខ្សែក្រវ៉ាត់", place: "Free Size", price: 28000 },
-  { name: "កន្សែងកសូត្រ", place: "Free Size", price: 45000 },
-  { name: "អាវយឺតបោះពុម្ព", place: "ទំហំ S - XL", price: 38000 },
-  { name: "អាវយឺតដៃវែង", place: "ទំហំ S - XL", price: 42000 },
-  { name: "អាវទ្រនាប់", place: "ទំហំ S - L", price: 30000 },
-  { name: "អាវក្រណាត់ទន់", place: "ទំហំ S - XL", price: 68000 },
-  { name: "អាវសឺមីឆ្នូត", place: "ទំហំ S - XL", price: 62000 },
+  { name: "អាវយឺតកប្បាស", place: "ទំហំ S - XL · ពណ៌: ស, ខ្មៅ, ប្រផេះ, ក្រែម, ខៀវ", price: 35000 },
+  { name: "អាវប៉ូឡូ", place: "ទំហំ S - XL · ពណ៌: ស, ខ្មៅ, ខៀវ, បៃតង", price: 45000 },
+  { name: "អាវដៃវែង", place: "ទំហំ S - XL · ពណ៌: ស, ខ្មៅ, ប្រផេះ, ក្រែម", price: 55000 },
+  { name: "អាវសឺមី", place: "ទំហំ S - XL · ពណ៌: ស, ខៀវ, ខ្មៅ, ក្រែម", price: 60000 },
+  { name: "អាវក្រៅ", place: "ទំហំ S - XL · ពណ៌: ខ្មៅ, ប្រផេះ, ត្នោត, ខៀវ", price: 120000 },
+  { name: "អាវកាឌីហ្គែន", place: "ទំហំ S - XL · ពណ៌: ក្រែម, ប្រផេះ, ផ្កាឈូក, ត្នោត", price: 85000 },
+  { name: "អាវហូដី", place: "ទំហំ S - XL · ពណ៌: ខ្មៅ, ប្រផេះ, ស, ខៀវ, ក្រហម", price: 90000 },
+  { name: "អាវបាំងត្រជាក់", place: "ទំហំ M - XXL · ពណ៌: ខ្មៅ, ខៀវ, ប្រផេះ, បៃតង", price: 150000 },
+  { name: "ខោខូវប៊យ", place: "ទំហំ 28 - 36 · ពណ៌: ខៀវ, ខ្មៅ, ប្រផេះ", price: 95000 },
+  { name: "ខោជើងវែង", place: "ទំហំ 28 - 36 · ពណ៌: ខ្មៅ, ប្រផេះ, ត្នោត, ក្រែម", price: 70000 },
+  { name: "ខោខ្លី", place: "ទំហំ 28 - 36 · ពណ៌: ខ្មៅ, ខៀវ, ក្រែម, បៃតង", price: 40000 },
+  { name: "ខោលេគីន", place: "Free Size · ពណ៌: ខ្មៅ, ប្រផេះ, ត្នោត", price: 38000 },
+  { name: "ខោជើងធំ", place: "ទំហំ S - XL · ពណ៌: ខ្មៅ, ក្រែម, ត្នោត, ប្រផេះ", price: 75000 },
+  { name: "ខោស្លាក់", place: "ទំហំ S - XL · ពណ៌: ខ្មៅ, ស, ក្រែម, ត្នោត", price: 80000 },
+  { name: "សំពត់ខ្លី", place: "ទំហំ S - L · ពណ៌: ខ្មៅ, ស, ផ្កាឈូក, ខៀវ", price: 55000 },
+  { name: "សំពត់វែង", place: "ទំហំ S - L · ពណ៌: ខ្មៅ, ក្រែម, ផ្កាឈូក, បៃតង", price: 75000 },
+  { name: "សំពត់ប៉ាក់ក្បាច់", place: "ទំហំ S - L · ពណ៌: ស, ក្រហម, ខៀវ, ស្វាយ", price: 90000 },
+  { name: "រ៉ូបខ្លី", place: "ទំហំ S - L · ពណ៌: ខ្មៅ, ក្រហម, ផ្កាឈូក, ស", price: 110000 },
+  { name: "រ៉ូបវែង", place: "ទំហំ S - L · ពណ៌: ខ្មៅ, ខៀវ, ស្វាយ, បៃតង", price: 140000 },
+  { name: "រ៉ូបពិធី", place: "ទំហំ S - L · ពណ៌: ក្រហម, ស្វាយ, ខ្មៅ, ផ្កាឈូក", price: 180000 },
+  { name: "អាវក្រុប", place: "ទំហំ S - L · ពណ៌: ស, ខ្មៅ, ផ្កាឈូក, ក្រែម", price: 32000 },
+  { name: "អាវដៃខ្លីស្ត្រី", place: "ទំហំ S - L · ពណ៌: ស, ផ្កាឈូក, លឿង, ខៀវ", price: 38000 },
+  { name: "អាវសូត្រ", place: "ទំហំ S - L · ពណ៌: ក្រែម, ផ្កាឈូក, ស្វាយ, ខៀវ", price: 130000 },
+  { name: "ឈុតពីរដុំ", place: "ទំហំ S - XL · ពណ៌: ខ្មៅ, ក្រែម, ផ្កាឈូក, ខៀវ", price: 160000 },
+  { name: "ឈុតកីឡា", place: "ទំហំ M - XXL · ពណ៌: ខ្មៅ, ប្រផេះ, ខៀវ", price: 120000 },
+  { name: "អាវកីឡា", place: "ទំហំ M - XXL · ពណ៌: ខ្មៅ, ស, ខៀវ, ក្រហម", price: 48000 },
+  { name: "ឈុតគេង", place: "Free Size · ពណ៌: ផ្កាឈូក, ខៀវ, ប្រផេះ, ក្រែម", price: 65000 },
+  { name: "អាវធំស្ត្រី", place: "ទំហំ S - XL · ពណ៌: ក្រែម, ខ្មៅ, ត្នោត, ប្រផេះ", price: 125000 },
+  { name: "អាវក្រណាត់ត្បាញ", place: "ទំហំ S - XL · ពណ៌: ក្រែម, ត្នោត, ប្រផេះ, ស", price: 85000 },
+  { name: "មួក", place: "Free Size · ពណ៌: ខ្មៅ, ស, ក្រែម, ខៀវ", price: 20000 },
+  { name: "ខ្សែក្រវ៉ាត់", place: "Free Size · ពណ៌: ខ្មៅ, ត្នោត", price: 28000 },
+  { name: "កន្សែងកសូត្រ", place: "Free Size · ពណ៌: ក្រហម, ខៀវ, ស្វាយ, ក្រែម, លឿង", price: 45000 },
+  { name: "អាវយឺតបោះពុម្ព", place: "ទំហំ S - XL · ពណ៌: ស, ខ្មៅ, លឿង, ខៀវ", price: 38000 },
+  { name: "អាវយឺតដៃវែង", place: "ទំហំ S - XL · ពណ៌: ស, ខ្មៅ, ប្រផេះ, ក្រហម", price: 42000 },
+  { name: "អាវទ្រនាប់", place: "ទំហំ S - L · ពណ៌: ស, ខ្មៅ, ក្រែម", price: 30000 },
+  { name: "អាវក្រណាត់ទន់", place: "ទំហំ S - XL · ពណ៌: ក្រែម, ប្រផេះ, ផ្កាឈូក, ខៀវ", price: 68000 },
+  { name: "អាវសឺមីឆ្នូត", place: "ទំហំ S - XL · ពណ៌: ខៀវ, ក្រហម, ខ្មៅ", price: 62000 },
   { name: "អាវសឺមីពណ៌ស", place: "ទំហំ S - XL", price: 58000 },
-  { name: "អាវក្រៅស្បែក", place: "ទំហំ M - XXL", price: 210000 },
-  { name: "អាវក្រៅភ្លៀង", place: "ទំហំ M - XXL", price: 95000 },
-  { name: "អាវក្រៅកប្បាសក្រាស់", place: "ទំហំ M - XXL", price: 130000 },
-  { name: "អាវខ្សែ", place: "ទំហំ S - L", price: 36000 },
-  { name: "អាវក្រុបដៃវែង", place: "ទំហំ S - L", price: 40000 },
-  { name: "អាវក្រណាត់សូត្រស្ត្រី", place: "ទំហំ S - L", price: 72000 },
-  { name: "ខោខូវប៊យជើងវែងស្ត្រី", place: "ទំហំ 26 - 32", price: 98000 },
-  { name: "ខោខូវប៊យខ្លី", place: "ទំហំ 26 - 34", price: 52000 },
-  { name: "ខោក្រណាត់រឹង", place: "ទំហំ 28 - 36", price: 78000 },
-  { name: "ខោធ្វើការ", place: "ទំហំ 28 - 38", price: 82000 },
-  { name: "ខោកីឡា", place: "ទំហំ M - XXL", price: 45000 },
-  { name: "ខោគេង", place: "Free Size", price: 28000 },
-  { name: "សំពត់ក្រណាត់ទន់", place: "ទំហំ S - L", price: 62000 },
+  { name: "អាវក្រៅស្បែក", place: "ទំហំ M - XXL · ពណ៌: ខ្មៅ, ត្នោត", price: 210000 },
+  { name: "អាវក្រៅភ្លៀង", place: "ទំហំ M - XXL · ពណ៌: ខ្មៅ, ខៀវ, លឿង, បៃតង", price: 95000 },
+  { name: "អាវក្រៅកប្បាសក្រាស់", place: "ទំហំ M - XXL · ពណ៌: ខ្មៅ, ប្រផេះ, ត្នោត, ក្រែម", price: 130000 },
+  { name: "អាវខ្សែ", place: "ទំហំ S - L · ពណ៌: ស, ខ្មៅ, ក្រហម, ផ្កាឈូក", price: 36000 },
+  { name: "អាវក្រុបដៃវែង", place: "ទំហំ S - L · ពណ៌: ខ្មៅ, ស, ក្រែម, ស្វាយ", price: 40000 },
+  { name: "អាវក្រណាត់សូត្រស្ត្រី", place: "ទំហំ S - L · ពណ៌: ក្រែម, ផ្កាឈូក, ស្វាយ, ខៀវ, ស", price: 72000 },
+  { name: "ខោខូវប៊យជើងវែងស្ត្រី", place: "ទំហំ 26 - 32 · ពណ៌: ខៀវ, ខ្មៅ, ប្រផេះ", price: 98000 },
+  { name: "ខោខូវប៊យខ្លី", place: "ទំហំ 26 - 34 · ពណ៌: ខៀវ, ខ្មៅ, ស", price: 52000 },
+  { name: "ខោក្រណាត់រឹង", place: "ទំហំ 28 - 36 · ពណ៌: ខ្មៅ, ប្រផេះ, ត្នោត, ក្រែម", price: 78000 },
+  { name: "ខោធ្វើការ", place: "ទំហំ 28 - 38 · ពណ៌: ខ្មៅ, ប្រផេះ, ត្នោត, បៃតង", price: 82000 },
+  { name: "ខោកីឡា", place: "ទំហំ M - XXL · ពណ៌: ខ្មៅ, ប្រផេះ, ខៀវ", price: 45000 },
+  { name: "ខោគេង", place: "Free Size · ពណ៌: ផ្កាឈូក, ខៀវ, ប្រផេះ", price: 28000 },
+  { name: "សំពត់ក្រណាត់ទន់", place: "ទំហំ S - L · ពណ៌: ក្រែម, ខ្មៅ, ផ្កាឈូក, បៃតង", price: 62000 },
   { name: "សំពត់ខ្លីពណ៌ខ្មៅ", place: "ទំហំ S - L", price: 48000 },
-  { name: "សំពត់ភ្លីត", place: "ទំហំ S - L", price: 68000 },
-  { name: "រ៉ូបកំណត់ចង្កេះ", place: "ទំហំ S - L", price: 125000 },
-  { name: "រ៉ូបសូត្រ", place: "ទំហំ S - L", price: 190000 },
-  { name: "រ៉ូបក្មេងស្រី", place: "ទំហំ 3 - 12 ឆ្នាំ", price: 75000 },
-  { name: "ឈុតក្មេងប្រុស", place: "ទំហំ 3 - 12 ឆ្នាំ", price: 68000 },
-  { name: "ឈុតគូស្នេហ៍", place: "ទំហំ S - XL", price: 150000 },
-  { name: "ស្រោមជើង", place: "Free Size", price: 6000 },
-  { name: "កាបូបស្ពាយ", place: "Free Size", price: 55000 },
-  { name: "ស្រោមដៃ", place: "Free Size", price: 22000 },
+  { name: "សំពត់ភ្លីត", place: "ទំហំ S - L · ពណ៌: ខ្មៅ, ក្រែម, ប្រផេះ, ត្នោត", price: 68000 },
+  { name: "រ៉ូបកំណត់ចង្កេះ", place: "ទំហំ S - L · ពណ៌: ខ្មៅ, ក្រហម, ខៀវ, បៃតង", price: 125000 },
+  { name: "រ៉ូបសូត្រ", place: "ទំហំ S - L · ពណ៌: ក្រហម, ស្វាយ, ខៀវ, ខ្មៅ", price: 190000 },
+  { name: "រ៉ូបក្មេងស្រី", place: "ទំហំ 3 - 12 ឆ្នាំ · ពណ៌: ផ្កាឈូក, ស្វាយ, ស, លឿង", price: 75000 },
+  { name: "ឈុតក្មេងប្រុស", place: "ទំហំ 3 - 12 ឆ្នាំ · ពណ៌: ខៀវ, ប្រផេះ, ខ្មៅ, បៃតង", price: 68000 },
+  { name: "ឈុតគូស្នេហ៍", place: "ទំហំ S - XL · ពណ៌: ស, ខ្មៅ, ក្រហម", price: 150000 },
+  { name: "ស្រោមជើង", place: "Free Size · ពណ៌: ស, ខ្មៅ, ប្រផេះ", price: 6000 },
+  { name: "កាបូបស្ពាយ", place: "Free Size · ពណ៌: ខ្មៅ, ត្នោត, ក្រែម, ក្រហម", price: 55000 },
+  { name: "ស្រោមដៃ", place: "Free Size · ពណ៌: ខ្មៅ, ប្រផេះ, ក្រហម", price: 22000 },
   { name: "ខ្សែក", place: "Free Size", price: 18000 },
-  { name: "អាវយឺតគូ", place: "ទំហំ S - XL", price: 70000 },
-  { name: "ខោខូវប៊យជើងធំ", place: "ទំហំ 28 - 36", price: 92000 },
-  { name: "រ៉ូបវែងស្ត្រី", place: "ទំហំ S - L", price: 135000 },
-  { name: "អាវក្រៅស្ត្រី", place: "ទំហំ S - XL", price: 115000 },
-  { name: "ខោជើងវែងស្ត្រី", place: "ទំហំ S - XL", price: 72000 },
-  { name: "ឈុតសម្លៀកបំពាក់ក្មេង", place: "ទំហំ 3 - 12 ឆ្នាំ", price: 85000 },
+  { name: "អាវយឺតគូ", place: "ទំហំ S - XL · ពណ៌: ស, ខ្មៅ, ប្រផេះ", price: 70000 },
+  { name: "ខោខូវប៊យជើងធំ", place: "ទំហំ 28 - 36 · ពណ៌: ខៀវ, ខ្មៅ, ប្រផេះ", price: 92000 },
+  { name: "រ៉ូបវែងស្ត្រី", place: "ទំហំ S - L · ពណ៌: ខ្មៅ, ស្វាយ, ខៀវ, ក្រែម", price: 135000 },
+  { name: "អាវក្រៅស្ត្រី", place: "ទំហំ S - XL · ពណ៌: ក្រែម, ខ្មៅ, ត្នោត, ផ្កាឈូក", price: 115000 },
+  { name: "ខោជើងវែងស្ត្រី", place: "ទំហំ S - XL · ពណ៌: ខ្មៅ, ក្រែម, ប្រផេះ, ត្នោត", price: 72000 },
+  { name: "ឈុតសម្លៀកបំពាក់ក្មេង", place: "ទំហំ 3 - 12 ឆ្នាំ · ពណ៌: ខៀវ, ផ្កាឈូក, លឿង, បៃតង", price: 85000 },
 ];
 
 // ===== កែនៅទីនេះ (ទំនិញ ការលាក់ ស្តុក ការបញ្ចុះដោយដៃ និងការកំណត់) =====
@@ -2162,6 +2164,11 @@ const COLOR_DOT = { "ខ្មៅ": "#1A1A1A", "ស": "#FFFFFF", "ក្រហ�
 function colorsOf(place) {
   const m = String(place || "").match(/ពណ៌\s*[:：]\s*(.+)$/);
   return m ? m[1].split(/\s*[,،、\/]\s*/).map((x) => x.trim()).filter(Boolean) : [];
+}
+const stripColors = (place) => String(place || "").replace(/\s*·?\s*ពណ៌\s*[:：]\s*(.+)$/, "").trim();
+function colorDots(place) {
+  const cs = colorsOf(place);
+  return cs.length ? `<span class="cdots">${cs.map((c) => `<i class="cdot" title="${esc(c)}" style="background:${COLOR_DOT[c] || "#CFC6BA"}"></i>`).join("")}</span>` : "";
 }
 const variantOf = (size, color) => [size, color].filter(Boolean).join(" · ");
 function colorChip(c) {
@@ -2916,7 +2923,7 @@ function fillGrid(grid, list, instant) {
       <div class="body">
         <span class="brand-line">${esc((SHOPS[item.shop || 1] || {}).name || settings.name)}</span>
         <h3>${item.name}</h3>
-        <span class="place">${item.place}</span>
+        <span class="place">${esc(stripColors(item.place))}</span>${colorDots(item.place)}
         ${rateChip(item)}
         <div class="pricebox${saleOf(item) ? " on-sale" : ""}">
           <span class="price"><b>${finalPrice(item).toLocaleString("en-US")}</b><small>៛</small></span>
@@ -3055,10 +3062,11 @@ function openDetail(i) {
   dt$("dt-guide-rows").innerHTML = SIZE_GUIDE.filter((g) => sizes.includes(g[0])).map((g) => `<tr><td>${g[0]}</td><td>${g[1]}</td></tr>`).join("");
   // ពិពណ៌នា
   const custom = (p.desc || "").trim();
-  dt$("dt-desc").innerHTML = esc(custom || `${p.name} ទំហំ ${p.place}។ ${info.tip}`).replace(/\n/g, "<br>");
+  dt$("dt-desc").innerHTML = esc(custom || `${p.name} ទំហំ ${stripColors(p.place)}។ ${info.tip}`).replace(/\n/g, "<br>");
   // ព័ត៌មានលម្អិត
   const mat = dtMaterial(p.name), who = dtAudience(p.name);
-  const rows = [["ប្រភេទ", CAT_LABEL[cat]], ["ទំហំ", p.place]];
+  const rows = [["ប្រភេទ", CAT_LABEL[cat]], ["ទំហំ", stripColors(p.place)]];
+  if (dtCols.length) rows.push(["ពណ៌", dtCols.join(", ")]);
   if (mat) rows.push(["ក្រណាត់", mat]);
   if (who) rows.push(["សម្រាប់", who]);
   rows.push(["ថែរក្សា", info.care]);
