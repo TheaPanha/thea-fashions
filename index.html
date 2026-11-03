@@ -2414,7 +2414,7 @@ function openTracking(claim) {
 }
 $t("tb-track").addEventListener("click", (e) => { e.preventDefault(); openTracking(false); });
 async function placeOrder(P, code) {
-  P = { ...P, items: P.items.map((it) => { const p = PRODUCTS[it.n - 1] || {}; return { ...it, shop_id: p.shop || 1, n: p.ln || it.n }; }) };   // ការកម្មង់ទៅតាមម្ចាស់ទំនិញ
+  P = { ...P, items: P.items.map((it) => { const p = PRODUCTS[it.n - 1] || {}; let ph = ""; try { const u = photoOf(it.n); if (u && !/^data:/i.test(u)) ph = new URL(u, location.href).href; } catch (e) {} return { ...it, shop_id: p.shop || 1, n: p.ln || it.n, photo: ph }; }) };   // ការកម្មង់ទៅតាមម្ចាស់ទំនិញ
   const f = P.items[0];
   const body = { order_code: code, product_no: f.n, product: P.items.length > 1 ? `${f.name} +${P.items.length - 1}` : f.name, size: P.items.length === 1 ? (f.size || null) : null, phone: P.contact.phone, location: P.contact.isLink ? null : P.contact.loc, map_link: P.contact.link, pay_method: "cod", receipt_url: null, items: P.items, coupon: P.coupon };
   try {
