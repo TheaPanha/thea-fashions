@@ -1040,7 +1040,7 @@ function flashSaved() {
     return opt.method && opt.method !== "GET" ? null : r.json();
   }
   function payState(o) {
-    if (o.paid_amount == null) return ["⏳ មិនទាន់ផ្ទៀងផ្ទាត់ទឹកប្រាក់", "var(--muted)"];
+    if (o.paid_amount == null) return ["មិនទាន់ផ្ទៀងផ្ទាត់ទឹកប្រាក់", "var(--muted)"];
     const df = o.paid_amount - (o.price || 0);
     if (df >= 0) return [df > 0 ? `បង់គ្រប់ (លើស ${money(df)})` : "បង់គ្រប់", "#3F7D5C"];
     return [`បង់មិនទាន់គ្រប់ · ខ្វះ ${money(-df)}`, "#B8213F"];

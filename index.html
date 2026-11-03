@@ -533,7 +533,7 @@
   .mo-s { font-size: 12px; color: var(--muted); margin: 2px 0 6px; }
   #tb-acc.on { color: #3F7D5C; }
   .pf-av { width: 76px; height: 76px; border-radius: 50%; background: var(--border) center/cover no-repeat; display: grid; place-items: center; font-size: 30px; color: var(--muted); cursor: pointer; margin: 0 auto 6px; position: relative; overflow: hidden; }
-  .pf-av::after { content: "📷"; position: absolute; right: 0; bottom: 0; font-size: 13px; background: #fff; border-radius: 50%; width: 24px; height: 24px; line-height: 24px; text-align: center; box-shadow: 0 1px 4px rgba(0,0,0,.25); }
+  .pf-av::after { content: "+"; position: absolute; right: 0; bottom: 0; font-size: 13px; background: #fff; border-radius: 50%; width: 24px; height: 24px; line-height: 24px; text-align: center; box-shadow: 0 1px 4px rgba(0,0,0,.25); }
   .pf-box { border: 1px solid var(--border); border-radius: 14px; padding: 12px; margin-bottom: 12px; background: #fff; }
   .pf-box .of-input { margin-bottom: 8px; padding: 10px 12px; font-size: 15px; }
   .of-input[type=date] { -webkit-appearance: none; appearance: none; display: block; min-width: 0; max-width: 100%; text-align: left; }
@@ -1737,7 +1737,7 @@
   <div class="sheet-backdrop" id="donesheet">
     <div class="sheet" role="dialog" aria-modal="true" style="text-align:center">
       <div class="sheet-handle"></div>
-      <div style="font-size:44px;margin-top:6px">✅</div>
+      <div style="margin-top:6px"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#3F7D5C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M7.5 12.5l3 3 6-6.5"/></svg></div>
       <h3 style="margin:6px 0 6px">បានទទួលការកម្មង់ហើយ</h3>
       <p class="of-hint" style="margin-bottom:14px">សូមអរគុណ! យើងនឹងទំនាក់ទំនងអ្នកតាមលេខទូរស័ព្ទ ដើម្បីបញ្ជាក់ និងដឹកជញ្ជូនទំនិញ។</p>
       <button class="sheet-cancel" id="done-ok" type="button">បិទ</button>
@@ -1780,7 +1780,7 @@
         <div class="of-hint" id="pf-msg" style="text-align:center;margin:8px 0 0"></div>
       </div>
       <button class="sheet-cancel" id="my-out" type="button">ចេញពីគណនី</button>
-      <button class="sheet-cancel" id="my-del" type="button" style="color:#B8213F">🗑 លុបគណនីរបស់ខ្ញុំ</button>
+      <button class="sheet-cancel" id="my-del" type="button" style="color:#B8213F">លុបគណនីរបស់ខ្ញុំ</button>
       <button class="sheet-cancel" id="my-close" type="button">បិទ</button>
     </div>
   </div>
@@ -1788,7 +1788,7 @@
   <div class="sheet-backdrop" id="ordsheet">
     <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="ord-title">
       <div class="sheet-handle"></div>
-      <h3 id="ord-title" style="margin:6px 0 2px">🧾 ការកម្មង់របស់ខ្ញុំ</h3>
+      <h3 id="ord-title" style="margin:6px 0 2px">ការកម្មង់របស់ខ្ញុំ</h3>
       <p class="of-hint" id="ord-sub">ស្ថានភាព និងលេខតាមដានការដឹកជញ្ជូន</p>
       <div id="my-list"></div>
       <button class="sheet-cancel" id="ord-close" type="button">បិទ</button>
@@ -1798,7 +1798,7 @@
   <div class="sheet-backdrop" id="cartsheet">
     <div class="sheet" role="dialog" aria-modal="true">
       <div class="sheet-handle"></div>
-      <h3 style="margin:6px 0 4px">🛒 កន្ត្រកទំនិញ</h3>
+      <h3 style="margin:6px 0 4px">កន្ត្រកទំនិញ</h3>
       <div id="cart-list"></div>
       <div class="cp-row"><input class="of-input" id="cp-code" type="text" placeholder="លេខកូដបញ្ចុះតម្លៃ" autocapitalize="characters" autocomplete="off" /><button type="button" class="of-btn" id="cp-go" style="flex:none;padding:0 14px">ប្រើ</button></div>
       <div class="of-hint" id="cp-msg" style="margin-top:6px"></div>
@@ -1868,7 +1868,7 @@
       <input class="of-input" id="of-loc" type="text" placeholder="ផ្ទះលេខ ផ្លូវ ឬចំណុចសម្គាល់" autocomplete="street-address" style="margin-top:8px" />
       
       <div class="of-hint" id="of-hint"></div>
-      <div class="of-hint" style="text-align:center;margin:0 0 8px">🚚 បង់ប្រាក់ជូនអ្នកដឹកពេលទទួលអីវ៉ាន់</div>
+      <div class="of-hint" style="text-align:center;margin:0 0 8px">បង់ប្រាក់ជូនអ្នកដឹកពេលទទួលអីវ៉ាន់</div>
       <button class="sheet-confirm" id="sheet-confirm" type="button" disabled>សូមជ្រើសរើសទំហំសិន</button>
       <button class="sheet-cancel" id="sheet-cancel" type="button">បោះបង់</button>
     </div>
@@ -1961,7 +1961,7 @@ const SETTINGS = {        // ការកំណត់រចនា និងហ�
   tagline: "ខោអាវស្អាតៗ ទាន់សម័យ គ្រប់ទំហំ សម្រាប់ជាប់ចិត្តអ្នកគ្រប់ថ្ងៃ",
   marquee: "THEA FASHION|NEW COLLECTION|ខោអាវទាន់សម័យ",
   flashTitle: "បញ្ចុះតម្លៃពិសេសថ្ងៃនេះ",
-  thanks: "សូមអរគុណដែលគាំទ្រហាងរបស់យើង 💗",
+  thanks: "សូមអរគុណដែលគាំទ្រហាងរបស់យើង",
   phone: "0968782682",
   telegram: "theapanha04042004",
   messenger: "https://www.facebook.com/share/1MQPrStX8p/?mibextid=wwXIfr",
@@ -2476,7 +2476,7 @@ function renderCartUI() {
   if (!$c("cartsheet").classList.contains("open")) return;
   $c("cart-list").innerHTML = T.L.length ? T.L.map((l, k) => `<div class="ci"><img src="${photoOf(l.n)}" alt="" onerror="this.style.visibility='hidden'">
     <div><b>${esc(l.name)}</b><div class="cs">${l.size ? esc(l.size) + " · " : ""}${formatRiel(l.price)}</div>
-    <div class="qty"><button type="button" data-q="-1" data-k="${k}">−</button><b>${l.qty}</b><button type="button" data-q="1" data-k="${k}">＋</button><button type="button" data-q="x" data-k="${k}" style="margin-left:6px;color:#B8213F">🗑</button></div></div></div>`).join("")
+    <div class="qty"><button type="button" data-q="-1" data-k="${k}">−</button><b>${l.qty}</b><button type="button" data-q="1" data-k="${k}">＋</button><button type="button" data-q="x" data-k="${k}" style="margin-left:6px;color:#B8213F" aria-label="លុប">×</button></div></div></div>`).join("")
     : `<div class="of-hint" style="padding:16px 0">កន្ត្រកទទេ</div>`;
   $c("cart-sum").innerHTML = `<div><span>តម្លៃសរុប</span><span>${formatRiel(T.sub)}</span></div>${T.disc ? `<div style="color:#3F7D5C"><span>បញ្ចុះ (${esc(cartCoupon.code)})</span><span>−${formatRiel(T.disc)}</span></div>` : ""}<div class="tot"><span>ត្រូវបង់</span><span>${formatRiel(T.total)}</span></div>`;
   $c("cart-go").disabled = !T.L.length;
@@ -2615,9 +2615,9 @@ async function loadMine() {
     const rows = await r.json();
     box.innerHTML = rows.length ? rows.map((o) => {
       const k = STEPS.findIndex((s) => s[0] === o.status), d = new Date(o.created_at).toLocaleDateString("en-GB", { timeZone: "Asia/Phnom_Penh", day: "2-digit", month: "short" });
-      const prog = o.status === "cancel" ? `<div style="color:#B8213F;font-weight:700">❌ បានបោះបង់</div>` : `<div class="mo-prog">${STEPS.map((s, n) => `<span class="${n <= k ? "on" : ""}"><i></i>${s[1]}</span>`).join("")}</div>`;
+      const prog = o.status === "cancel" ? `<div style="color:#B8213F;font-weight:700">បានបោះបង់</div>` : `<div class="mo-prog">${STEPS.map((s, n) => `<span class="${n <= k ? "on" : ""}"><i></i>${s[1]}</span>`).join("")}</div>`;
       return `<div class="mo"><b>${esc(o.product)}${o.size ? " · " + esc(o.size) : ""}</b><div class="mo-s">${formatRiel(o.price || 0)} · ${d}${o.order_code ? " · " + esc(o.order_code) : ""}</div>${prog}
-        ${o.tracking_note ? `📍 ${esc(o.tracking_note)}<br>` : ""}${o.courier_no ? `🚚 ${esc(o.courier || "")} <b>${esc(o.courier_no)}</b> <button type="button" class="of-btn" data-copy="${esc(o.courier_no)}" style="flex:none;padding:3px 9px">ចម្លង</button>` : ""}</div>`;
+        ${o.tracking_note ? `${esc(o.tracking_note)}<br>` : ""}${o.courier_no ? `${esc(o.courier || "")} <b>${esc(o.courier_no)}</b> <button type="button" class="of-btn" data-copy="${esc(o.courier_no)}" style="flex:none;padding:3px 9px">ចម្លង</button>` : ""}</div>`;
     }).join("") : `<div class="of-hint">មិនទាន់មានការកម្មង់</div>`;
   } catch (e) { box.innerHTML = `<div class="of-hint">ទាញទិន្នន័យមិនបាន សូមចូលម្តងទៀត</div>`; }
 }
@@ -2648,7 +2648,7 @@ $c("my-del").onclick = async (e) => {
   const b = e.currentTarget;
   if (b.dataset.sure !== "1") {
     b.dataset.sure = "1"; b.textContent = "ចុចម្តងទៀតដើម្បីលុបជាអចិន្ត្រៃយ៍";
-    setTimeout(() => { if (b.dataset.sure === "1") { b.dataset.sure = ""; b.textContent = "🗑 លុបគណនីរបស់ខ្ញុំ"; } }, 4000); return;
+    setTimeout(() => { if (b.dataset.sure === "1") { b.dataset.sure = ""; b.textContent = "លុបគណនីរបស់ខ្ញុំ"; } }, 4000); return;
   }
   b.disabled = true;
   try {
@@ -2683,7 +2683,7 @@ pfComm.onchange = () => pfSync({ prov: pfProv.value, dist: pfDist.value, comm: p
 function pfFill() {
   const p = PF || {}, nm = p.name || (CU.sess && CU.sess.name) || "";
   pfEl("pf-name").value = nm; pfEl("pf-phone").value = p.phone || ""; pfEl("pf-bday").value = p.birthday || ""; const pa = parseAddr(p.address); pfSync(pa); pfEl("pf-addr").value = pa.loc;
-  const av = pfEl("pf-av"); av.style.backgroundImage = p.avatar_url ? `url("${p.avatar_url}")` : ""; av.textContent = p.avatar_url ? "" : (nm.trim()[0] || "👤");
+  const av = pfEl("pf-av"); av.style.backgroundImage = p.avatar_url ? `url("${p.avatar_url}")` : ""; av.textContent = p.avatar_url ? "" : (nm.trim()[0] || "•");
 }
 async function loadProfile() {
   if (!CU.sess || !sbReady()) return;
