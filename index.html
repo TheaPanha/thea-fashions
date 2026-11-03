@@ -2166,14 +2166,16 @@ function colorsOf(place) {
   return m ? m[1].split(/\s*[,،、\/]\s*/).map((x) => x.trim()).filter(Boolean) : [];
 }
 const stripColors = (place) => String(place || "").replace(/\s*·?\s*ពណ៌\s*[:：]\s*(.+)$/, "").trim();
+const cName = (t) => String(t).replace(/~?#[0-9a-fA-F]{6}$/, "") || String(t);
+const cHex = (t) => { const m = String(t).match(/(#[0-9a-fA-F]{6})$/); return m ? m[1] : COLOR_DOT[t] || ""; };
 function colorDots(place) {
   const cs = colorsOf(place);
-  return cs.length ? `<span class="cdots">${cs.map((c) => `<i class="cdot" title="${esc(c)}" style="background:${COLOR_DOT[c] || "#CFC6BA"}"></i>`).join("")}</span>` : "";
+  return cs.length ? `<span class="cdots">${cs.map((c) => `<i class="cdot" title="${esc(cName(c))}" style="background:${cHex(c) || "#CFC6BA"}"></i>`).join("")}</span>` : "";
 }
-const variantOf = (size, color) => [size, color].filter(Boolean).join(" · ");
+const variantOf = (size, color) => [size, color ? cName(color) : ""].filter(Boolean).join(" · ");
 function colorChip(c) {
   const b = document.createElement("button"); b.type = "button"; b.className = "size-chip color-chip"; b.dataset.c = c;
-  const d = COLOR_DOT[c]; b.innerHTML = (d ? `<i class="cdot" style="background:${d}"></i>` : "") + esc(c);
+  const d = cHex(c); b.innerHTML = (d ? `<i class="cdot" style="background:${d}"></i>` : "") + esc(cName(c));
   return b;
 }
 function sizesOf(place) {
@@ -2309,7 +2311,7 @@ function updateConfirm() {
   else if (commsOf().length && !ofCommSel.value) t = isPP() ? "សូមជ្រើសរើសសង្កាត់" : "សូមជ្រើសរើសឃុំ / សង្កាត់";
   else if (villsOf().length && !ofVillSel.value) t = "សូមជ្រើសរើសភូមិ";
   else if (!locOk) t = "សូមបំពេញផ្ទះលេខ ឬចំណុចសម្គាល់";
-  else { ok = true; t = (chosenSize || chosenColor) ? `បញ្ជាក់ការកម្មង់ · ${[chosenSize ? "ទំហំ " + chosenSize : "", chosenColor].filter(Boolean).join(" · ")}` : "បញ្ជាក់ការកម្មង់"; }
+  else { ok = true; t = (chosenSize || chosenColor) ? `បញ្ជាក់ការកម្មង់ · ${[chosenSize ? "ទំហំ " + chosenSize : "", chosenColor ? cName(chosenColor) : ""].filter(Boolean).join(" · ")}` : "បញ្ជាក់ការកម្មង់"; }
   sheetConfirm.disabled = !ok; sheetConfirm.textContent = t;
 }
 ofPhone.addEventListener("input", updateConfirm);
