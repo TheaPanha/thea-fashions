@@ -1541,6 +1541,8 @@
   .rv-add { width: 64px; height: 64px; border-radius: 10px; border: 1.5px dashed #D8C8B6; background: #FBF8F4; color: var(--muted); font-size: 22px; cursor: pointer; }
   .rv-reply { margin-top: 8px; padding: 10px 12px; border-radius: 12px; background: #F6F0E8; font-size: 13px; line-height: 1.65; color: #4C3F37; white-space: pre-line; }
   .rv-reply b { display: block; font-size: 12px; color: var(--clay-dark); margin-bottom: 2px; }
+
+  select.of-input { height: 46px; padding: 0 12px; appearance: auto; background: #fff; }
 </style>
 </head>
 <body>
@@ -1833,7 +1835,11 @@
       <div class="sheet-label">លេខទូរស័ព្ទ</div>
       <input class="of-input" id="of-phone" type="tel" inputmode="tel" placeholder="ឧ. 012 345 678" autocomplete="tel" />
       <div class="sheet-label">ទីតាំងដឹកជញ្ជូន</div>
-      <input class="of-input" id="of-loc" type="text" placeholder="វាយឈ្មោះទីតាំង ឬបិទភ្ជាប់តំណ Google Map" autocomplete="street-address" />
+      <select class="of-input" id="of-prov" aria-label="ខេត្ត / រាជធានី"></select>
+      <select class="of-input" id="of-dist" aria-label="ស្រុក / ខណ្ឌ" style="display:none;margin-top:8px"></select>
+      <select class="of-input" id="of-commsel" aria-label="ឃុំ / សង្កាត់" style="display:none;margin-top:8px"></select>
+      <input class="of-input" id="of-comm" type="text" aria-label="ឃុំ / សង្កាត់" placeholder="ឃុំ / សង្កាត់" autocomplete="off" style="display:none;margin-top:8px" />
+      <input class="of-input" id="of-loc" type="text" placeholder="ផ្ទះលេខ ផ្លូវ ឬចំណុចសម្គាល់ (ឬបិទភ្ជាប់តំណ Google Map)" autocomplete="street-address" style="margin-top:8px" />
       <div class="of-row">
         <button type="button" class="of-btn" id="of-gps">📍 ប្រើទីតាំងខ្ញុំ</button>
         <button type="button" class="of-btn" id="of-map">🔍 ស្វែងរកលើ Google Map</button>
@@ -2175,12 +2181,84 @@ const ofPhone = document.getElementById("of-phone"), ofLoc = document.getElement
 const isUrl = (v) => /^https?:\/\//i.test(v.trim());
 const mapLinkOf = (v) => isUrl(v) ? v.trim() : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(v.trim())}`;
 let needSize = false;
+// ទីតាំងដឹកជញ្ជូន៖ ជ្រើសខេត្ត (និងខណ្ឌសម្រាប់ភ្នំពេញ) ពីបញ្ជី រួចវាយតែផ្ទះលេខ/ផ្លូវ
+const PROVINCES = ["ភ្នំពេញ", "កណ្តាល", "កំពង់ចាម", "ត្បូងឃ្មុំ", "កំពង់ឆ្នាំង", "កំពង់ស្ពឺ", "កំពង់ធំ", "កំពត", "កែប", "កោះកុង", "ក្រចេះ", "មណ្ឌលគិរី", "ឧត្តរមានជ័យ", "ប៉ៃលិន", "ព្រះវិហារ", "ព្រះសីហនុ", "ពោធិ៍សាត់", "ព្រៃវែង", "បាត់ដំបង", "បន្ទាយមានជ័យ", "រតនគិរី", "សៀមរាប", "ស្ទឹងត្រែង", "ស្វាយរៀង", "តាកែវ"];
+const DISTRICTS = {
+  "កណ្តាល": ["ក្រុងតាខ្មៅ", "កណ្តាលស្ទឹង", "កៀនស្វាយ", "ខ្សាច់កណ្តាល", "កោះធំ", "លើកដែក", "ល្វាឯម", "មុខកំពូល", "អង្គស្នួល", "ពញាឬ", "ស្អាង"],
+  "កំពង់ចាម": ["ក្រុងកំពង់ចាម", "បាធាយ", "កងមាស", "កំពង់សៀម", "ចំការលើ", "ជើងព្រៃ", "ព្រៃឈរ", "ស្រីសន្ធរ", "ស្ទឹងត្រង់", "កោះសូទិន"],
+  "ត្បូងឃ្មុំ": ["ក្រុងសួង", "ត្បូងឃ្មុំ", "អូររាំងឪ", "មេមត់", "ពញាក្រែក", "ក្រូចឆ្មារ", "ដំបែរ"],
+  "កំពង់ឆ្នាំង": ["ក្រុងកំពង់ឆ្នាំង", "បរិបូណ៌", "ជលគិរី", "កំពង់លែង", "កំពង់ត្រឡាច", "រលាប្អៀរ", "សាមគ្គីមានជ័យ", "ទឹកផុស"],
+  "កំពង់ស្ពឺ": ["ក្រុងច្បារមន", "ឱរ៉ាល់", "ឧដុង្គ", "បរសេដ្ឋ", "គងពិសី", "ភ្នំស្រួច", "សំរោងទង", "ថ្ពង"],
+  "កំពង់ធំ": ["ក្រុងស្ទឹងសែន", "បារាយណ៍", "កំពង់ស្វាយ", "ស្ទោង", "ប្រាសាទបល្ល័ង្ក", "ប្រាសាទសំបូរ", "សណ្តាន់", "សន្ទុក"],
+  "កំពត": ["ក្រុងកំពត", "អង្គរជ័យ", "បន្ទាយមាស", "ឈូក", "ជុំគិរី", "ដងទង់", "កំពង់ត្រាច", "ទឹកឈូ"],
+  "កែប": ["ក្រុងកែប", "ដំណាក់ចង្អើរ"],
+  "កោះកុង": ["ក្រុងខេមរភូមិន្ទ", "បូទុមសាគរ", "គិរីសាគរ", "កោះកុង", "មណ្ឌលសីមា", "ស្រែអំបិល", "ថ្មបាំង"],
+  "ក្រចេះ": ["ក្រុងក្រចេះ", "ឆ្លូង", "ព្រែកប្រសព្វ", "សំបូរ", "ស្នួល", "ចិត្របុរី"],
+  "មណ្ឌលគិរី": ["ក្រុងសែនមនោរម្យ", "កែវសីមា", "កោះញែក", "អូររាំង", "ពេជ្រាដា"],
+  "ឧត្តរមានជ័យ": ["ក្រុងសំរោង", "អន្លង់វែង", "បន្ទាយអំពិល", "ចុងកាល់", "សំរោង"],
+  "ប៉ៃលិន": ["ក្រុងប៉ៃលិន", "សាលាក្រៅ"],
+  "ព្រះវិហារ": ["ក្រុងព្រះវិហារ", "ឆែប", "ជ័យសែន", "ជ្រោយឃ្លោក", "កុលែន", "រវៀង", "សង្គមថ្មី", "ត្បែងមានជ័យ"],
+  "ព្រះសីហនុ": ["ក្រុងព្រះសីហនុ", "ព្រៃនប់", "ស្ទឹងហាវ", "កំពង់សីលា", "កោះរ៉ុង"],
+  "ពោធិ៍សាត់": ["ក្រុងពោធិ៍សាត់", "បាកាន", "កណ្តៀង", "ក្រគរ", "ភ្នំក្រវាញ", "វាលវែង"],
+  "ព្រៃវែង": ["ក្រុងព្រៃវែង", "បាភ្នំ", "កំចាយមារ", "កំពង់ត្របែក", "កញ្ជ្រៀច", "មេសាង", "ពាមជរ", "ពាមរក៍", "ពារាំង", "ពោធិ៍រៀង", "ព្រះស្តេច", "ស្វាយអន្ទរ", "ស៊ីធរកណ្តាល"],
+  "បាត់ដំបង": ["ក្រុងបាត់ដំបង", "បាណន់", "ឯកភ្នំ", "មោង ឫស្សី", "រតនមណ្ឌល", "សង្កែ", "សំឡូត", "សំពៅលូន", "ភ្នំព្រឹក", "កំរៀង", "គាស់ក្រឡ", "រុក្ខគិរី"],
+  "បន្ទាយមានជ័យ": ["ក្រុងសិរីសោភ័ណ", "ក្រុងប៉ោយប៉ែត", "មង្គលបូរី", "ភ្នំស្រុក", "ព្រះនេត្រព្រះ", "អូរជ្រៅ", "ថ្មពួក", "ស្វាយចេក"],
+  "រតនគិរី": ["ក្រុងបានលុង", "អណ្តូងមាស", "បរកែវ", "កូនមុំ", "លំផាត់", "អូរជុំ", "អូរយ៉ាដាវ", "តាវែង", "វើនសៃ"],
+  "សៀមរាប": ["ក្រុងសៀមរាប", "អង្គរជុំ", "អង្គរធំ", "បន្ទាយស្រី", "ជីក្រែង", "ក្រឡាញ់", "ពួក", "ប្រាសាទបាគង", "សូទ្រនិគម", "ស្វាយលើ", "វ៉ារិន"],
+  "ស្ទឹងត្រែង": ["ក្រុងស្ទឹងត្រែង", "សេសាន", "សៀមបូក", "សៀមប៉ាង", "ថាឡាបរិវ៉ាត់", "ស្រែបាំង"],
+  "ស្វាយរៀង": ["ក្រុងស្វាយរៀង", "ក្រុងបាវិត", "ចន្ទ្រា", "កំពង់រោទ៍", "រំដួល", "រមាសហែក", "ស្វាយជ្រំ", "ស្វាយទាប"],
+  "តាកែវ": ["ក្រុងដូនកែវ", "អង្គរបូរី", "បាទី", "បូរីជលសា", "កោះអណ្តែត", "គិរីវង់", "ព្រៃកប្បាស", "ត្រាំកក់", "ទ្រាំង"]
+};
+DISTRICTS["ភ្នំពេញ"] = ["ចំការមន", "ដូនពេញ", "៧មករា", "ទួលគោក", "ដង្កោ", "មានជ័យ", "ឫស្សីកែវ", "សែនសុខ", "ពោធិ៍សែនជ័យ", "ជ្រោយចង្វារ", "ព្រែកព្នៅ", "ច្បារអំពៅ", "បឹងកេងកង", "កំបូល"];
+const distsOf = (p) => DISTRICTS[p] || [];
+const ofProv = document.getElementById("of-prov"), ofDist = document.getElementById("of-dist"), ofComm = document.getElementById("of-comm"), ofCommSel = document.getElementById("of-commsel");
+// បញ្ជីឃុំ/សង្កាត់ ផ្ទុកពី communes.json  ទម្រង់៖ { "ខេត្ត": { "ស្រុក": ["ឃុំ", ...] } }  បើគ្មានទិន្នន័យ នឹងប្រើប្រអប់វាយដោយដៃជំនួស
+let COMMUNES = {};
+fetch("communes.json").then((r) => (r.ok ? r.json() : {})).then((d) => { COMMUNES = d || {}; syncComm(); }).catch(() => {});
+const commsOf = () => ((COMMUNES[ofProv.value] || {})[ofDist.value]) || [];
+const commVal = () => (commsOf().length ? ofCommSel.value : ofComm.value.trim());
+function syncComm(keep) {
+  const list = commsOf(), shown = !!ofDist.value;
+  ofCommSel.style.display = shown && list.length ? "" : "none";
+  ofComm.style.display = shown && !list.length ? "" : "none";
+  if (list.length) {
+    const label = isPP() ? "ជ្រើសរើសសង្កាត់" : "ជ្រើសរើសឃុំ / សង្កាត់";
+    ofCommSel.innerHTML = `<option value="">${label}</option>` + list.map((x) => `<option>${x}</option>`).join("");
+    ofCommSel.value = list.includes(keep) ? keep : "";
+  } else { ofComm.placeholder = isPP() ? "សង្កាត់" : "ឃុំ"; if (keep !== undefined) ofComm.value = keep; }
+}
+ofProv.innerHTML = `<option value="">ជ្រើសរើសខេត្ត / រាជធានី</option>` + PROVINCES.map((x) => `<option>${x}</option>`).join("");
+
+const isPP = () => ofProv.value === "ភ្នំពេញ";
+const distLabel = () => (isPP() ? "ជ្រើសរើសខណ្ឌ" : "ជ្រើសរើសស្រុក / ក្រុង");
+function syncDist() {
+  const list = distsOf(ofProv.value), has = list.length > 0;
+  ofDist.innerHTML = `<option value="">${distLabel()}</option>` + list.map((x) => `<option>${x}</option>`).join("");
+  ofDist.style.display = has ? "" : "none";
+  if (!has) { ofDist.value = ""; ofComm.value = ""; }
+}
+const areaText = () => [ofProv.value, ofDist.value, commVal()].filter(Boolean).join(", ");
+function fillContact() {
+  try {
+    const c = JSON.parse(localStorage.getItem("orderContact") || "{}");
+    ofPhone.value = c.phone || (PF && PF.phone) || "";
+    ofProv.value = PROVINCES.includes(c.prov) ? c.prov : ""; syncDist(); ofDist.value = distsOf(ofProv.value).includes(c.dist) ? c.dist : ""; syncComm(ofDist.value ? (c.comm || "") : ""); if (!ofDist.value) ofComm.value = "";
+    ofLoc.value = c.loc || (PF && PF.address) || "";
+  } catch (e) {}
+}
+ofProv.addEventListener("change", () => { ofComm.value = ""; syncDist(); syncComm(""); ofHint.textContent = ""; updateConfirm(); });
+ofCommSel.addEventListener("change", () => { ofHint.textContent = ""; updateConfirm(); });
+ofComm.addEventListener("input", () => { ofHint.textContent = ""; updateConfirm(); });
+ofDist.addEventListener("change", () => { ofComm.value = ""; syncComm(""); ofHint.textContent = ""; updateConfirm(); });
 function updateConfirm() {
-  const phoneOk = ofPhone.value.replace(/\D/g, "").length >= 8, locOk = ofLoc.value.trim().length >= 2;
+  const phoneOk = ofPhone.value.replace(/\D/g, "").length >= 8, locOk = !!ofProv.value && (!distsOf(ofProv.value).length || !!ofDist.value) && (!commsOf().length || !!ofCommSel.value) && ofLoc.value.trim().length >= 2;
   let t = "", ok = false;
   if (needSize && !chosenSize) t = "សូមជ្រើសរើសទំហំសិន";
   else if (!phoneOk) t = "សូមបំពេញលេខទូរស័ព្ទ";
-  else if (!locOk) t = "សូមបំពេញទីតាំង";
+  else if (!ofProv.value) t = "សូមជ្រើសរើសខេត្ត / រាជធានី";
+  else if (distsOf(ofProv.value).length && !ofDist.value) t = isPP() ? "សូមជ្រើសរើសខណ្ឌ" : "សូមជ្រើសរើសស្រុក / ក្រុង";
+  else if (commsOf().length && !ofCommSel.value) t = isPP() ? "សូមជ្រើសរើសសង្កាត់" : "សូមជ្រើសរើសឃុំ / សង្កាត់";
+  else if (!locOk) t = "សូមបំពេញផ្ទះលេខ ឬចំណុចសម្គាល់";
   else { ok = true; t = chosenSize ? `បញ្ជាក់ការកម្មង់ · ទំហំ ${chosenSize}` : "បញ្ជាក់ការកម្មង់"; }
   sheetConfirm.disabled = !ok; sheetConfirm.textContent = t;
 }
@@ -2196,14 +2274,14 @@ document.getElementById("of-gps").addEventListener("click", () => {
   }, () => { ofHint.textContent = "មិនអាចទទួលទីតាំងបាន សូមអនុញ្ញាតទីតាំង ឬវាយដោយដៃ"; }, { enableHighAccuracy: true, timeout: 12000 });
 });
 document.getElementById("of-map").addEventListener("click", () => {
-  const q = isUrl(ofLoc.value) ? "" : ofLoc.value.trim();
+  const q = isUrl(ofLoc.value) ? "" : [areaText(), ofLoc.value.trim()].filter(Boolean).join(" ");
   window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(q || "ទីតាំងរបស់ខ្ញុំ")}`, "_blank", "noopener");
   ofHint.textContent = "ជ្រើសទីតាំងលើ Google Map → ចុច Share → Copy link រួចមកបិទភ្ជាប់ក្នុងប្រអប់ខាងលើ";
 });
 function openSizeSheet(item, i, sizes, btn) {
   sheetCtx = { item, i, btn };
   chosenSize = ""; needSize = sizes.length > 0;
-  try { const c = JSON.parse(localStorage.getItem("orderContact") || "{}"); ofPhone.value = c.phone || (PF && PF.phone) || ""; ofLoc.value = c.loc || (PF && PF.address) || ""; } catch (e) {}
+  fillContact();
   ofHint.textContent = ""; ofHint.style.color = "";
   document.getElementById("size-block").style.display = needSize ? "" : "none";
   document.getElementById("sheet-name").textContent = item.name;
@@ -2247,13 +2325,14 @@ function shrink(file, max = 1200) {
 let submitting = false;
 sheetConfirm.addEventListener("click", async () => {
   if (!sheetCtx || sheetConfirm.disabled || submitting) return;
-  const loc = ofLoc.value.trim(), phone = ofPhone.value.trim();
-  try { localStorage.setItem("orderContact", JSON.stringify({ phone, loc })); } catch (e) {}
+  const raw = ofLoc.value.trim(), phone = ofPhone.value.trim(), area = areaText(), rawUrl = isUrl(raw);
+  const loc = [area, rawUrl ? "" : raw].filter(Boolean).join(" · ");           // ទីតាំងជាអក្សរ៖ ខេត្ត, ស្រុក, ឃុំ · ផ្ទះលេខ/ផ្លូវ
+  try { localStorage.setItem("orderContact", JSON.stringify({ phone, prov: ofProv.value, dist: ofDist.value, comm: commVal(), loc: raw })); } catch (e) {}
   const items = sheetCtx.cart
     ? cartLines().map((l) => ({ n: l.n, name: l.name, size: l.size || "", qty: l.qty, price: l.price }))
     : [{ n: sheetCtx.i + 1, name: sheetCtx.item.name, size: chosenSize || "", qty: 1, price: finalPrice(sheetCtx.item) }];
   const sub = items.reduce((s, x) => s + x.price * x.qty, 0), disc = sheetCtx.cart && cartCoupon ? Math.min(cartCoupon.discount, sub) : 0;
-  const P = { items, sub, disc, coupon: sheetCtx.cart && cartCoupon ? cartCoupon.code : null, btn: sheetCtx.btn, cart: !!sheetCtx.cart, contact: { phone, loc, isLink: isUrl(loc), link: mapLinkOf(loc), name: CU.sess ? CU.sess.name : "" } };
+  const P = { items, sub, disc, coupon: sheetCtx.cart && cartCoupon ? cartCoupon.code : null, btn: sheetCtx.btn, cart: !!sheetCtx.cart, contact: { phone, loc, isLink: false, link: rawUrl ? raw : mapLinkOf(loc), name: CU.sess ? CU.sess.name : "" } };
   const code = sbReady() ? newCode() : null;
   if (sbReady()) {
     submitting = true; sheetConfirm.disabled = true; sheetConfirm.textContent = "កំពុងបញ្ជូនការកម្មង់...";
@@ -2388,7 +2467,7 @@ $c("cp-go").onclick = () => applyCoupon($c("cp-code").value);
 function openCheckout() {
   const T = cartTotals(); if (!T.L.length) return;
   sheetCtx = { cart: true, btn: null }; chosenSize = ""; needSize = false;
-  try { const c = JSON.parse(localStorage.getItem("orderContact") || "{}"); ofPhone.value = c.phone || (PF && PF.phone) || ""; ofLoc.value = c.loc || (PF && PF.address) || ""; } catch (e) {}
+  fillContact();
   ofHint.textContent = ""; ofHint.style.color = "";
   $c("size-block").style.display = "none";
   $c("sheet-name").textContent = `កន្ត្រកទំនិញ (${T.qty} មុខ)`;
