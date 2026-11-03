@@ -1543,6 +1543,32 @@
   .rv-reply b { display: block; font-size: 12px; color: var(--clay-dark); margin-bottom: 2px; }
 
   select.of-input { height: 46px; padding: 0 12px; appearance: auto; background: #fff; }
+
+  .color-chip { display: inline-flex; align-items: center; justify-content: center; gap: 0; }
+  .cdot { display: inline-block; width: 13px; height: 13px; border-radius: 50%; margin-right: 7px; border: 1px solid rgba(0,0,0,.2); flex: none; }
+  /* ===== ui-pro: ការសម្អាតចុងក្រោយ ===== */
+  :root { --ring: 0 0 0 3px rgba(var(--clay-rgb), 0.18); --ink-2: #4A3F38; }
+  html { -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; scroll-behavior: smooth; }
+  ::selection { background: rgba(var(--clay-rgb), 0.22); }
+  .price, .price b, .timer span, .sale-pill, .ad-num, .st-card b, .od-stat b, .od-price, .qty, .cart-sum { font-variant-numeric: tabular-nums; }
+  .of-input, .ad-input, select.of-input { transition: border-color .15s ease, box-shadow .15s ease, background-color .15s ease; }
+  .of-input:hover:not(:focus), .ad-input:hover:not(:focus) { border-color: #D3C6B8; }
+  .of-input:focus, .ad-input:focus, select.of-input:focus { outline: none; border-color: var(--clay); box-shadow: var(--ring); }
+  .of-input::placeholder, .ad-input::placeholder { color: #A39990; }
+  :focus-visible { outline: 2px solid var(--clay); outline-offset: 2px; }
+  button, a { -webkit-tap-highlight-color: transparent; }
+  button:not(:disabled):active { transform: scale(0.985); }
+  button:disabled { cursor: not-allowed; }
+  .sheet-confirm:disabled { opacity: 1; background: #E6DED5 !important; color: #8E847B; box-shadow: none; }
+  * { scrollbar-width: thin; scrollbar-color: #D8CCBF transparent; }
+  img { image-rendering: auto; }
+
+  .card { transition: box-shadow .2s ease, border-color .2s ease; }
+  .card:hover { border-color: #DDD2C6; box-shadow: 0 10px 28px -10px rgba(30,25,21,.16); }
+  .sheet { box-shadow: 0 -24px 60px -12px rgba(30,25,21,.28); }
+  .size-chip.active { border-color: var(--ink); box-shadow: 0 0 0 1px var(--ink) inset; }
+  .sheet-label { color: var(--ink-2); font-weight: 600; }
+  .of-hint { line-height: 1.6; }
 </style>
 </head>
 <body>
@@ -1620,16 +1646,6 @@
       </select>
     </div>
     <div class="grid" id="grid"></div>
-    <footer>
-      <div class="f-brand" id="ft-brand">Thea Fashion</div>
-      <div class="thanks" id="ft-thanks">សូមអរគុណដែលគាំទ្រហាងរបស់យើង 💗</div>
-      <div class="contact">
-        <a class="call" id="ft-call" href="tel:0968782682"><i class="fa-solid fa-phone"></i> <span id="ft-phone-text">096 878 2682</span></a>
-        <a class="tg" id="ft-tg" href="https://t.me/theapanha04042004" target="_blank" rel="noopener"><i class="fa-brands fa-telegram"></i> Telegram</a>
-        <a class="msg" id="ft-msg" href="https://www.facebook.com/share/1MQPrStX8p/?mibextid=wwXIfr" target="_blank" rel="noopener"><i class="fa-brands fa-facebook-messenger"></i> Messenger</a>
-      </div>
-      <div class="copy">© <span id="ft-year"></span> <span id="ft-name">Thea Fashion</span></div>
-    </footer>
   </div>
 
   <div class="lightbox" id="lightbox">
@@ -1662,6 +1678,11 @@
           <div class="dt-price" id="dt-price"></div>
           <div class="dt-stock" id="dt-stock"></div>
           <div class="dt-seller" id="dt-seller"></div>
+
+          <div class="dt-sec" id="dt-color-sec" style="display:none">
+            <div class="dt-h">ជ្រើសរើសពណ៌</div>
+            <div class="sizes" id="dt-colors"></div>
+          </div>
 
           <div class="dt-sec" id="dt-size-sec">
             <div class="dt-h">ជ្រើសរើសទំហំ</div>
@@ -1790,8 +1811,11 @@
     <div class="sheet" role="dialog" aria-modal="true">
       <div class="sheet-handle"></div>
       <h3 id="add-name" style="margin:6px 0 10px"></h3>
-      <div class="of-hint">ជ្រើសរើសទំហំ</div>
+      <div class="of-hint" id="add-size-hint">ជ្រើសរើសទំហំ</div>
       <div class="sizes" id="add-sizes"></div>
+      <div id="add-color-wrap" style="display:none"><div class="of-hint" style="margin-top:10px">ជ្រើសរើសពណ៌</div>
+      <div class="sizes" id="add-colors"></div></div>
+      <button class="sheet-confirm" id="add-confirm" type="button" style="display:none;margin-top:12px" disabled>ដាក់ក្នុងកន្ត្រក</button>
       <button class="sheet-cancel" id="add-close" type="button">បិទ</button>
     </div>
   </div>
@@ -1829,6 +1853,8 @@
       </div>
       <div id="size-block"><div class="sheet-label">ជ្រើសរើសទំហំ</div>
       <div class="sizes" id="sizes"></div></div>
+      <div id="color-block" style="display:none"><div class="sheet-label">ជ្រើសរើសពណ៌</div>
+      <div class="sizes" id="colors"></div></div>
       <div class="sheet-label">លេខទូរស័ព្ទ</div>
       <input class="of-input" id="of-phone" type="tel" inputmode="tel" placeholder="ឧ. 012 345 678" autocomplete="tel" />
       <div class="sheet-label">ទីតាំងដឹកជញ្ជូន</div>
@@ -1938,7 +1964,7 @@ const SETTINGS = {        // ការកំណត់រចនា និងហ�
   telegram: "theapanha04042004",
   messenger: "https://www.facebook.com/share/1MQPrStX8p/?mibextid=wwXIfr",
   accent: "#C2566E",
-  announce: "ទំនិញបញ្ចុះតម្លៃថ្មី · ទិញបានភ្លាមៗ ងាយស្រួល",
+  announce: "",
   showMarquee: false,
   showFlash: true,
   saleCount: 16,
@@ -2131,6 +2157,18 @@ const saveText = (item) => saleOf(item).toLocaleString("en-US") + " ៛";
 
 // ---------- Size + order ----------
 const SIZE_ORDER = ["XS", "S", "M", "L", "XL", "XXL"];
+// ពណ៌ទំនិញ៖ រក្សាទុកក្នុងអត្ថបទ place ជា "... · ពណ៌: ខ្មៅ, ស, ក្រហម"
+const COLOR_DOT = { "ខ្មៅ": "#1A1A1A", "ស": "#FFFFFF", "ក្រហម": "#D0021B", "ខៀវ": "#2F5BD0", "បៃតង": "#3F7D5C", "លឿង": "#F2C94C", "ផ្កាឈូក": "#F29CB5", "ស្វាយ": "#7A4FB5", "ប្រផេះ": "#9A9A9A", "ត្នោត": "#8B5A3C", "ទឹកក្រូច": "#F2994A", "ក្រែម": "#F3E7D3" };
+function colorsOf(place) {
+  const m = String(place || "").match(/ពណ៌\s*[:：]\s*(.+)$/);
+  return m ? m[1].split(/\s*[,،、\/]\s*/).map((x) => x.trim()).filter(Boolean) : [];
+}
+const variantOf = (size, color) => [size, color].filter(Boolean).join(" · ");
+function colorChip(c) {
+  const b = document.createElement("button"); b.type = "button"; b.className = "size-chip color-chip"; b.dataset.c = c;
+  const d = COLOR_DOT[c]; b.innerHTML = (d ? `<i class="cdot" style="background:${d}"></i>` : "") + esc(c);
+  return b;
+}
 function sizesOf(place) {
   if (/free/i.test(place)) return [];
   if (place.includes("ឆ្នាំ")) return ["3-4 ឆ្នាំ", "5-6 ឆ្នាំ", "7-8 ឆ្នាំ", "9-10 ឆ្នាំ", "11-12 ឆ្នាំ"];
@@ -2168,7 +2206,8 @@ const sheet = document.getElementById("sheet");
 const sizesBox = document.getElementById("sizes");
 const sheetConfirm = document.getElementById("sheet-confirm");
 let sheetCtx = null;
-let chosenSize = "";
+let chosenSize = "", chosenColor = "", needColor = false;
+const colorsBox = document.getElementById("colors");
 
 const ofPhone = document.getElementById("of-phone"), ofLoc = document.getElementById("of-loc"), ofHint = document.getElementById("of-hint");
 const isUrl = (v) => /^https?:\/\//i.test(v.trim());
@@ -2256,13 +2295,14 @@ function updateConfirm() {
   const phoneOk = ofPhone.value.replace(/\D/g, "").length >= 8, locOk = !!ofProv.value && (!distsOf(ofProv.value).length || !!ofDist.value) && (!commsOf().length || !!ofCommSel.value) && (!villsOf().length || !!ofVillSel.value) && ofLoc.value.trim().length >= 2;
   let t = "", ok = false;
   if (needSize && !chosenSize) t = "សូមជ្រើសរើសទំហំសិន";
+  else if (needColor && !chosenColor) t = "សូមជ្រើសរើសពណ៌សិន";
   else if (!phoneOk) t = "សូមបំពេញលេខទូរស័ព្ទ";
   else if (!ofProv.value) t = "សូមជ្រើសរើសខេត្ត / រាជធានី";
   else if (distsOf(ofProv.value).length && !ofDist.value) t = isPP() ? "សូមជ្រើសរើសខណ្ឌ" : "សូមជ្រើសរើសស្រុក / ក្រុង";
   else if (commsOf().length && !ofCommSel.value) t = isPP() ? "សូមជ្រើសរើសសង្កាត់" : "សូមជ្រើសរើសឃុំ / សង្កាត់";
   else if (villsOf().length && !ofVillSel.value) t = "សូមជ្រើសរើសភូមិ";
   else if (!locOk) t = "សូមបំពេញផ្ទះលេខ ឬចំណុចសម្គាល់";
-  else { ok = true; t = chosenSize ? `បញ្ជាក់ការកម្មង់ · ទំហំ ${chosenSize}` : "បញ្ជាក់ការកម្មង់"; }
+  else { ok = true; t = (chosenSize || chosenColor) ? `បញ្ជាក់ការកម្មង់ · ${[chosenSize ? "ទំហំ " + chosenSize : "", chosenColor].filter(Boolean).join(" · ")}` : "បញ្ជាក់ការកម្មង់"; }
   sheetConfirm.disabled = !ok; sheetConfirm.textContent = t;
 }
 ofPhone.addEventListener("input", updateConfirm);
@@ -2270,6 +2310,18 @@ ofLoc.addEventListener("input", () => { ofHint.textContent = ""; ofHint.style.co
 function openSizeSheet(item, i, sizes, btn) {
   sheetCtx = { item, i, btn };
   chosenSize = ""; needSize = sizes.length > 0;
+  const colors = colorsOf(item.place); chosenColor = ""; needColor = colors.length > 0;
+  document.getElementById("color-block").style.display = needColor ? "" : "none";
+  colorsBox.innerHTML = "";
+  colors.forEach((c) => {
+    const b = colorChip(c);
+    b.addEventListener("click", () => {
+      chosenColor = c;
+      colorsBox.querySelectorAll(".size-chip").forEach((x) => x.classList.toggle("active", x === b));
+      updateConfirm();
+    });
+    colorsBox.appendChild(b);
+  });
   fillContact();
   ofHint.textContent = ""; ofHint.style.color = "";
   document.getElementById("size-block").style.display = needSize ? "" : "none";
@@ -2319,7 +2371,7 @@ sheetConfirm.addEventListener("click", async () => {
   try { localStorage.setItem("orderContact", JSON.stringify({ phone, prov: ofProv.value, dist: ofDist.value, comm: commVal(), vill: villVal(), loc: raw })); } catch (e) {}
   const items = sheetCtx.cart
     ? cartLines().map((l) => ({ n: l.n, name: l.name, size: l.size || "", qty: l.qty, price: l.price }))
-    : [{ n: sheetCtx.i + 1, name: sheetCtx.item.name, size: chosenSize || "", qty: 1, price: finalPrice(sheetCtx.item) }];
+    : [{ n: sheetCtx.i + 1, name: sheetCtx.item.name, size: variantOf(chosenSize, chosenColor), qty: 1, price: finalPrice(sheetCtx.item) }];
   const sub = items.reduce((s, x) => s + x.price * x.qty, 0), disc = sheetCtx.cart && cartCoupon ? Math.min(cartCoupon.discount, sub) : 0;
   const P = { items, sub, disc, coupon: sheetCtx.cart && cartCoupon ? cartCoupon.code : null, btn: sheetCtx.btn, cart: !!sheetCtx.cart, contact: { phone, loc, isLink: false, link: rawUrl ? raw : mapLinkOf(loc), name: CU.sess ? CU.sess.name : "" } };
   const code = sbReady() ? newCode() : null;
@@ -2453,7 +2505,8 @@ async function applyCoupon(code, silent) {
 $c("cp-go").onclick = () => applyCoupon($c("cp-code").value);
 function openCheckout() {
   const T = cartTotals(); if (!T.L.length) return;
-  sheetCtx = { cart: true, btn: null }; chosenSize = ""; needSize = false;
+  sheetCtx = { cart: true, btn: null }; chosenSize = ""; needSize = false; chosenColor = ""; needColor = false;
+  $c("color-block").style.display = "none";
   fillContact();
   ofHint.textContent = ""; ofHint.style.color = "";
   $c("size-block").style.display = "none";
@@ -2468,13 +2521,29 @@ $c("cart-go").onclick = () => {
   openCheckout();
 };
 function openAddSheet(item, i, sizes) {
+  const colors = colorsOf(item.place); let sz = "", cl = "";
   $c("add-name").textContent = item.name;
-  const box = $c("add-sizes"); box.innerHTML = "";
-  sizes.forEach((sz) => {
-    const b = document.createElement("button"); b.type = "button"; b.className = "size-chip"; b.textContent = sz;
-    b.onclick = () => { $c("addsheet").classList.remove("open"); addToCart(i + 1, sz); };
-    box.appendChild(b);
+  const sbox = $c("add-sizes"), cbox = $c("add-colors"), conf = $c("add-confirm"), close = () => $c("addsheet").classList.remove("open");
+  const sync = () => { conf.disabled = (sizes.length && !sz) || (colors.length && !cl); };
+  $c("add-size-hint").style.display = sizes.length ? "" : "none";
+  sbox.innerHTML = "";
+  sizes.forEach((z) => {
+    const b = document.createElement("button"); b.type = "button"; b.className = "size-chip"; b.textContent = z;
+    b.onclick = () => {
+      if (!colors.length) { close(); addToCart(i + 1, z); return; }
+      sz = z; sbox.querySelectorAll(".size-chip").forEach((x) => x.classList.toggle("active", x === b)); sync();
+    };
+    sbox.appendChild(b);
   });
+  $c("add-color-wrap").style.display = colors.length ? "" : "none";
+  cbox.innerHTML = "";
+  colors.forEach((c) => {
+    const b = colorChip(c);
+    b.onclick = () => { cl = c; cbox.querySelectorAll(".size-chip").forEach((x) => x.classList.toggle("active", x === b)); sync(); };
+    cbox.appendChild(b);
+  });
+  conf.style.display = colors.length ? "" : "none"; sync();
+  conf.onclick = () => { if (conf.disabled) return; close(); addToCart(i + 1, variantOf(sz, cl)); };
   $c("addsheet").classList.add("open");
 }
 $c("add-close").onclick = () => $c("addsheet").classList.remove("open");
@@ -2891,7 +2960,7 @@ function fillGrid(grid, list, instant) {
       if (stockOf(i) === 0) return;
       track("order", i + 1);
       const sizes = sizesOf(item.place);
-      if (sizes.length) openAddSheet(item, i, sizes); else { addToCart(i + 1, ""); }
+      if (sizes.length || colorsOf(item.place).length) openAddSheet(item, i, sizes); else { addToCart(i + 1, ""); }
     });
 
     grid.appendChild(card);
@@ -2912,6 +2981,7 @@ const CAT_INFO = {
 const MATERIALS = [["កប្បាស", "កប្បាស (Cotton)"], ["ខូវប៊យ", "ក្រណាត់ខូវប៊យ (Denim)"], ["សូត្រ", "សូត្រ"], ["ស្បែក", "ស្បែក"], ["ក្រណាត់ទន់", "ក្រណាត់ទន់"], ["ក្រណាត់រឹង", "ក្រណាត់រឹង"], ["ក្រណាត់ត្បាញ", "ក្រណាត់ត្បាញ"]];
 const SIZE_GUIDE = [["XS", "40 – 46"], ["S", "46 – 52"], ["M", "52 – 60"], ["L", "60 – 68"], ["XL", "68 – 76"], ["XXL", "76 – 85"]];
 const dt$ = (id) => document.getElementById(id);
+let dtColor = "";
 let dtI = -1, dtSize = "", dtFavTouched = false, dtGal = [], dtSlide = 0;
 const galleryOf = (n) => [photoOf(n), ...((useData() && Array.isArray(adminImages["g" + n])) ? adminImages["g" + n] : [])];
 function syncDt() {
@@ -2938,7 +3008,7 @@ function openDetail(i) {
   const p = PRODUCTS[i]; if (!p) return;
   const item = itemAt(i), n = i + 1, cat = catOf(p), info = CAT_INFO[cat] || CAT_INFO.acc;
   const sizes = sizesOf(p.place), stock = stockOf(i), sale = saleOf(item);
-  dtI = i; dtSize = ""; dtFavTouched = false;
+  dtI = i; dtSize = ""; dtColor = ""; dtFavTouched = false;
   dtGal = galleryOf(n); dtSlide = 0;
   const trk = dt$("dt-track"); trk.scrollLeft = 0;
   trk.innerHTML = dtGal.map((u, k) => `<div class="dt-slide"><img src="${u}" alt="${esc(p.name)}"${k ? ' loading="lazy"' : ""} onerror="this.style.visibility='hidden'"></div>`).join("");
@@ -2956,6 +3026,18 @@ function openDetail(i) {
   if (stock === 0) { st.textContent = "អស់ស្តុក"; st.className = "dt-stock out"; }
   else if (stock !== null && stock <= 5) { st.textContent = `នៅសល់ ${stock} ប៉ុណ្ណោះ`; st.className = "dt-stock low"; }
   else { st.textContent = "មានលក់"; st.className = "dt-stock in"; }
+  // ពណ៌
+  const dtCols = colorsOf(p.place);
+  dt$("dt-color-sec").style.display = dtCols.length ? "" : "none";
+  const cbox = dt$("dt-colors"); cbox.innerHTML = "";
+  dtCols.forEach((c) => {
+    const b = colorChip(c);
+    b.addEventListener("click", () => {
+      dtColor = dtColor === c ? "" : c;
+      cbox.querySelectorAll(".size-chip").forEach((x) => x.classList.toggle("active", x.dataset.c === dtColor));
+    });
+    cbox.appendChild(b);
+  });
   // ទំហំ
   dt$("dt-size-sec").style.display = sizes.length ? "" : "none";
   const box = dt$("dt-sizes"); box.innerHTML = "";
@@ -3013,6 +3095,12 @@ function dtNeedSize() {
     b.scrollIntoView({ behavior: "smooth", block: "center" });
     return true;
   }
+  if (colorsOf(PRODUCTS[dtI].place).length && !dtColor) {
+    toast("សូមជ្រើសរើសពណ៌សិន");
+    const b = dt$("dt-colors"); b.classList.remove("nudge"); void b.offsetWidth; b.classList.add("nudge");
+    b.scrollIntoView({ behavior: "smooth", block: "center" });
+    return true;
+  }
   return false;
 }
 dt$("dt-close").onclick = closeDetail;
@@ -3036,15 +3124,16 @@ dt$("dt-fav").onclick = (e) => {
 dt$("dt-rel").addEventListener("click", (e) => { const b = e.target.closest("[data-r]"); if (b) openDetail(+b.dataset.r); });
 dt$("dt-cart").onclick = () => {
   if (stockOf(dtI) === 0 || dtNeedSize()) return;
-  track("order", dtI + 1); addToCart(dtI + 1, dtSize);
+  track("order", dtI + 1); addToCart(dtI + 1, variantOf(dtSize, dtColor));
 };
 dt$("dt-buy").onclick = () => {
   if (stockOf(dtI) === 0 || dtNeedSize()) return;
-  const i = dtI, item = itemAt(i), sizes = sizesOf(item.place), sz = dtSize;
+  const i = dtI, item = itemAt(i), sizes = sizesOf(item.place), sz = dtSize, cl = dtColor;
   track("order", i + 1);
   const go = () => {
     closeDetail(); openSizeSheet(item, i, sizes, null);
     if (sz) { const c = Array.from(sizesBox.children).find((b) => b.textContent === sz); if (c) c.click(); }
+    if (cl) { const c = Array.from(colorsBox.children).find((b) => b.dataset.c === cl); if (c) c.click(); }
   };
   if (needLogin()) { afterAuth = go; openAuth("login", "ត្រូវមានគណនីដើម្បីបន្តការទិញ"); return; }
   go();

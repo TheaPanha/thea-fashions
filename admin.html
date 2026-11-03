@@ -429,6 +429,31 @@
   .rv-ph img { width: 64px; height: 64px; object-fit: cover; border-radius: 10px; border: 1px solid var(--line); }
   .rv-cm { margin: 6px 0 0; font-size: 13.5px; line-height: 1.7; white-space: pre-line; }
   .rv-rp { width: 100%; min-height: 64px; margin-top: 10px; }
+
+  /* ===== ui-pro: ការសម្អាតចុងក្រោយ ===== */
+  :root { --ring: 0 0 0 3px rgba(var(--clay-rgb), 0.18); --ink-2: #4A3F38; }
+  html { -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; scroll-behavior: smooth; }
+  ::selection { background: rgba(var(--clay-rgb), 0.22); }
+  .price, .price b, .timer span, .sale-pill, .ad-num, .st-card b, .od-stat b, .od-price, .qty, .cart-sum { font-variant-numeric: tabular-nums; }
+  .of-input, .ad-input, select.of-input { transition: border-color .15s ease, box-shadow .15s ease, background-color .15s ease; }
+  .of-input:hover:not(:focus), .ad-input:hover:not(:focus) { border-color: #D3C6B8; }
+  .of-input:focus, .ad-input:focus, select.of-input:focus { outline: none; border-color: var(--clay); box-shadow: var(--ring); }
+  .of-input::placeholder, .ad-input::placeholder { color: #A39990; }
+  :focus-visible { outline: 2px solid var(--clay); outline-offset: 2px; }
+  button, a { -webkit-tap-highlight-color: transparent; }
+  button:not(:disabled):active { transform: scale(0.985); }
+  button:disabled { cursor: not-allowed; }
+  .sheet-confirm:disabled { opacity: 1; background: #E6DED5 !important; color: #8E847B; box-shadow: none; }
+  * { scrollbar-width: thin; scrollbar-color: #D8CCBF transparent; }
+  img { image-rendering: auto; }
+
+  .ad-row, .od-card, .od-box, .od-stat, .st-card { border-color: #E7DFD6; }
+  .ad-btn, .ad-addbtn, .ad-q, .od-sm { transition: background-color .15s ease, border-color .15s ease, color .15s ease; }
+  .ad-tab { transition: background-color .15s ease, color .15s ease; }
+  .ad-input, select.ad-input { min-height: 44px; }
+  textarea.ad-input { min-height: 88px; }
+  .ad-empty, .od-empty { line-height: 1.7; }
+  @media (min-width: 900px) { .ad-wrap { max-width: 880px; } }
 </style>
 </head>
 <body>
@@ -826,6 +851,13 @@ function adGallery(n) {
   return `<div class="ad-gal"><div class="ad-gal-h">រូបបន្ថែម${g.length ? ` · ${g.length} សន្លឹក` : ""}</div><div class="ad-gal-row">${g.map((u, k) => `<div class="ad-gt"><img src="${u}" alt="" decoding="async" onerror="this.style.visibility='hidden'"><button type="button" class="ad-gx" data-gn="${n}" data-gk="${k}" aria-label="លុបរូប">លុប</button></div>`).join("")}<label class="ad-gadd" title="ថែមរូប"><span>＋</span><small>ថែមរូប</small><input type="file" accept="image/*" multiple data-gimg="${n}" hidden></label></div></div>`;
 }
 const AD_SIZES = ["XS", "S", "M", "L", "XL", "XXL"];
+// ពណ៌ទំនិញ៖ រក្សាទុកក្នុង place ជា "ទំហំ S - XL · ពណ៌: ខ្មៅ, ស"
+function adColors(place) {
+  const m = String(place || "").match(/ពណ៌\s*[:：]\s*(.+)$/);
+  return m ? m[1].split(/\s*[,،、\/]\s*/).map((x) => x.trim()).filter(Boolean) : [];
+}
+const adStripColors = (place) => String(place || "").replace(/\s*·?\s*ពណ៌\s*[:：]\s*(.+)$/, "").trim();
+const adColorSuffix = (place) => { const c = adColors(place); return c.length ? " · ពណ៌: " + c.join(", ") : ""; };
 function adSizeRange(place) {
   const m = String(place || "").match(/\b(XXL|XL|XS|S|M|L)\s*-\s*(XXL|XL|XS|S|M|L)\b/);
   return m ? [m[1], m[2]] : ["", ""];
@@ -923,6 +955,7 @@ function adminRows(q) {
         <input class="ad-input" data-f="name" value="${esc(p.name)}" placeholder="ឈ្មោះ" />
         <input class="ad-input" data-f="place" value="${esc(p.place)}" placeholder="ទំហំ" />
         ${adSizeSel(p.place)}
+        <input class="ad-input" data-f="colors" value="${esc(adColors(p.place).join(", "))}" placeholder="ពណ៌ (ចែកដោយក្បៀស ឧ. ខ្មៅ, ស, ក្រហម)" aria-label="ពណ៌ទំនិញ" />
         ${adGallery(n)}
         <textarea class="ad-input ad-desc" data-f="desc" rows="3" placeholder="ពិពណ៌នាទំនិញ (ក្រណាត់ ទ្រង់ទ្រាយ ពណ៌...) · ទុកទទេ = ប្រើអត្ថបទស្វ័យប្រវត្តិ">${esc(p.desc || "")}</textarea>
         <div class="ad-three">
@@ -1293,12 +1326,17 @@ function openAdminPanel() {
       if (!a || !b) return;
       if (AD_SIZES.indexOf(b) < AD_SIZES.indexOf(a)) [a, b] = [b, a];
       row.querySelector('[data-f="sizeFrom"]').value = a; row.querySelector('[data-f="sizeTo"]').value = b;
-      p.place = `ទំហំ ${a} - ${b}`;
+      p.place = `ទំហំ ${a} - ${b}` + adColorSuffix(p.place);
+      row.querySelector('[data-f="place"]').value = p.place;
+    }
+    else if (f === "colors") {
+      const list = el.value.split(/\s*[,،、\/]\s*/).map((x) => x.trim()).filter(Boolean);
+      p.place = adStripColors(p.place) + (list.length ? " · ពណ៌: " + list.join(", ") : "");
       row.querySelector('[data-f="place"]').value = p.place;
     }
     else if (f === "name" || f === "place") {
       p[f] = el.value.trim();
-      if (f === "place") { const r = adSizeRange(p.place); row.querySelector('[data-f="sizeFrom"]').value = r[0]; row.querySelector('[data-f="sizeTo"]').value = r[1]; }
+      if (f === "place") { const ci = row.querySelector('[data-f="colors"]'); if (ci) ci.value = adColors(p.place).join(", "); const r = adSizeRange(p.place); row.querySelector('[data-f="sizeFrom"]').value = r[0]; row.querySelector('[data-f="sizeTo"]').value = r[1]; }
     }
     else if (f === "desc") p.desc = el.value.trim().slice(0, 600);
     else if (f === "price") { p.price = Math.max(0, Math.round(Number(el.value) || 0)); }
