@@ -1533,6 +1533,14 @@
   .rv-stars button { background: none; border: none; font-size: 34px; line-height: 1; color: #D9CFC2; cursor: pointer; padding: 2px; }
   .rv-stars button.on { color: #E0A526; }
   #rv-text { width: 100%; min-height: 96px; border: 1px solid var(--line); border-radius: 14px; padding: 12px; font: inherit; resize: vertical; margin: 6px 0 12px; background: #fff; }
+
+  .rv-ph { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+  .rv-ph a, .rv-ph div.th { position: relative; width: 64px; height: 64px; border-radius: 10px; overflow: hidden; border: 1px solid var(--line); display: block; background: #F3ECE3; }
+  .rv-ph img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .rv-ph .x { position: absolute; top: 2px; right: 2px; width: 20px; height: 20px; border-radius: 50%; border: none; background: rgba(0,0,0,.6); color: #fff; font-size: 13px; line-height: 20px; padding: 0; cursor: pointer; }
+  .rv-add { width: 64px; height: 64px; border-radius: 10px; border: 1.5px dashed #D8C8B6; background: #FBF8F4; color: var(--muted); font-size: 22px; cursor: pointer; }
+  .rv-reply { margin-top: 8px; padding: 10px 12px; border-radius: 12px; background: #F6F0E8; font-size: 13px; line-height: 1.65; color: #4C3F37; white-space: pre-line; }
+  .rv-reply b { display: block; font-size: 12px; color: var(--clay-dark); margin-bottom: 2px; }
 </style>
 </head>
 <body>
@@ -1794,6 +1802,8 @@
     <h3 id="rv-title" style="margin:6px 0 2px">វាយតម្លៃទំនិញ</h3>
     <div class="rv-stars" id="rv-stars"></div>
     <textarea id="rv-text" maxlength="500" placeholder="សរសេរមតិរបស់អ្នកអំពីទំនិញនេះ (មិនបង្ខំ)"></textarea>
+    <div class="rv-ph" id="rv-ph"></div>
+    <input type="file" id="rv-file" accept="image/*" multiple hidden />
     <p class="of-hint" id="rv-msg"></p>
     <button class="sheet-confirm" id="rv-send" type="button">ផ្ញើវាយតម្លៃ</button>
     <button class="sheet-cancel" id="rv-close" type="button">បិទ</button>
@@ -3329,15 +3339,24 @@ async function loadReviews(i) {
   try {
     const rows = await rpcPost("get_reviews", { p_shop: sid, p_n: ln });
     if (dtI !== i) return;
-    list.innerHTML = rows.length ? rows.map((x) => `<div class="rv-item"><div class="rv-top"><b>${esc(x.name || "អតិថិជន")}</b><span>${stars(x.rating)}</span></div>${x.comment ? `<p>${esc(x.comment)}</p>` : ""}<small>${esc(String(x.created_at || "").slice(0, 10))}</small></div>`).join("") : '<div class="rv-empty">មិនទាន់មានវាយតម្លៃ។ មានតែអ្នកដែលបានទិញ និងទទួលទំនិញរួចទេ ទើបអាចវាយតម្លៃបាន។</div>';
+    list.innerHTML = rows.length ? rows.map((x) => `<div class="rv-item"><div class="rv-top"><b>${esc(x.name || "អតិថិជន")}</b><span>${stars(x.rating)}</span></div>${x.comment ? `<p>${esc(x.comment)}</p>` : ""}${(x.photos && x.photos.length) ? `<div class="rv-ph">${x.photos.map((u) => `<a href="${esc(u)}" target="_blank" rel="noopener"><img src="${esc(u)}" alt="" loading="lazy" /></a>`).join("")}</div>` : ""}${x.reply ? `<div class="rv-reply"><b>ការឆ្លើយតបពីហាង</b>${esc(x.reply)}</div>` : ""}<small>${esc(String(x.created_at || "").slice(0, 10))}</small></div>`).join("") : '<div class="rv-empty">មិនទាន់មានវាយតម្លៃ។ មានតែអ្នកដែលបានទិញ និងទទួលទំនិញរួចទេ ទើបអាចវាយតម្លៃបាន។</div>';
   } catch (e) { list.innerHTML = '<div class="rv-empty">មិនទាន់មានវាយតម្លៃ</div>'; }
 }
 (function bindReviews() {
   const $ = (id) => document.getElementById(id);
-  let cur = null, pick = 0;
+  let cur = null, pick = 0, photos = [];
+  const drawPh = () => { $("rv-ph").innerHTML = photos.map((f, k) => `<div class="th"><img src="${f.url}" alt="" /><button class="x" type="button" data-k="${k}" aria-label="លុប">×</button></div>`).join("") + (photos.length < 3 ? `<button class="rv-add" id="rv-addbtn" type="button" aria-label="បន្ថែមរូប">+</button>` : ""); };
   const paint = () => $("rv-stars").querySelectorAll("button").forEach((b, k) => b.classList.toggle("on", k < pick));
   $("rv-stars").innerHTML = [1, 2, 3, 4, 5].map((n) => `<button type="button" data-n="${n}" aria-label="${n} ផ្កាយ">★</button>`).join("");
   $("rv-stars").addEventListener("click", (e) => { const b = e.target.closest("button"); if (!b) return; pick = Number(b.dataset.n); paint(); });
+  $("rv-ph").addEventListener("click", (e) => {
+    if (e.target.id === "rv-addbtn") { $("rv-file").click(); return; }
+    const x = e.target.closest(".x"); if (x) { const f = photos.splice(Number(x.dataset.k), 1)[0]; if (f) URL.revokeObjectURL(f.url); drawPh(); }
+  });
+  $("rv-file").addEventListener("change", (e) => {
+    [...e.target.files].slice(0, 3 - photos.length).forEach((f) => { if (/^image\//.test(f.type)) photos.push({ file: f, url: URL.createObjectURL(f) }); });
+    e.target.value = ""; drawPh();
+  });
   $("rv-close").onclick = () => $("rvsheet").classList.remove("open");
   $("rvsheet").addEventListener("click", (e) => { if (e.target.id === "rvsheet") e.target.classList.remove("open"); });
   $("dt-rev-write").addEventListener("click", async () => {
@@ -3349,16 +3368,25 @@ async function loadReviews(i) {
       if (st === "already") { toast("អ្នកបានវាយតម្លៃទំនិញនេះរួចហើយ"); return; }
       if (st !== "ok") { toast("មានតែអ្នកដែលបានទិញ និងទទួលទំនិញរួចទេ ទើបវាយតម្លៃបាន"); return; }
     } catch (e) { toast("ពិនិត្យមិនបាន សូមព្យាយាមម្តងទៀត"); return; }
-    pick = 5; paint(); $("rv-text").value = ""; $("rv-msg").textContent = ""; $("rv-title").textContent = "វាយតម្លៃ · " + cur.name;
+    pick = 5; paint(); photos.forEach((f) => URL.revokeObjectURL(f.url)); photos = []; drawPh(); $("rv-text").value = ""; $("rv-msg").textContent = ""; $("rv-title").textContent = "វាយតម្លៃ · " + cur.name;
     $("rvsheet").classList.add("open");
   });
   $("rv-send").addEventListener("click", async () => {
     if (!cur) return;
     const b = $("rv-send"); b.disabled = true;
     try {
-      await rpcPost("submit_review", { p_shop: cur.shop, p_n: cur.n, p_rating: pick, p_comment: $("rv-text").value.trim() }, await cToken());
+      const tok = await cToken(), urls = [];
+      for (let k = 0; k < photos.length; k++) {                      // ផ្ទុករូបទៅ Storage ជាមុនសិន
+        $("rv-msg").style.color = ""; $("rv-msg").textContent = `កំពុងផ្ទុករូប ${k + 1}/${photos.length}...`;
+        const blob = await shrink(photos[k].file, 900), path = `${CU.sess.uid}/${Date.now()}_${k}.jpg`;
+        const up = await fetch(`${SB_URL}/storage/v1/object/reviews/${path}`, { method: "POST", headers: { apikey: SB_KEY, Authorization: "Bearer " + tok, "Content-Type": "image/jpeg" }, body: blob });
+        if (!up.ok) throw new Error("upload");
+        urls.push(`${SB_URL}/storage/v1/object/public/reviews/${path}`);
+      }
+      $("rv-msg").textContent = "";
+      await rpcPost("submit_review", { p_shop: cur.shop, p_n: cur.n, p_rating: pick, p_comment: $("rv-text").value.trim(), p_photos: urls }, tok);
       $("rvsheet").classList.remove("open"); toast("អរគុណសម្រាប់ការវាយតម្លៃ"); loadReviewSummary();
-    } catch (e) { $("rv-msg").style.color = "#B8213F"; $("rv-msg").textContent = /not_bought/.test(e.message) ? "មានតែអ្នកដែលបានទិញ និងទទួលទំនិញរួចទេ ទើបវាយតម្លៃបាន" : /already/.test(e.message) ? "អ្នកបានវាយតម្លៃរួចហើយ" : "ផ្ញើមិនបាន សូមព្យាយាមម្តងទៀត"; }
+    } catch (e) { $("rv-msg").style.color = "#B8213F"; $("rv-msg").textContent = /not_bought/.test(e.message) ? "មានតែអ្នកដែលបានទិញ និងទទួលទំនិញរួចទេ ទើបវាយតម្លៃបាន" : /already/.test(e.message) ? "អ្នកបានវាយតម្លៃរួចហើយ" : /upload/.test(e.message) ? "ផ្ទុករូបមិនបាន សូមព្យាយាមម្តងទៀត ឬផ្ញើដោយគ្មានរូប" : "ផ្ញើមិនបាន សូមព្យាយាមម្តងទៀត"; }
     b.disabled = false;
   });
 })();
