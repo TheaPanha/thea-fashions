@@ -1511,6 +1511,28 @@
   .dt-seller .nm { flex: 1 1 120px; }
   .dt-seller .sl-acts { display: flex; gap: 8px; width: 100%; }
   .dt-seller .sl-acts button { flex: 1 1 0; white-space: nowrap; padding: 0 8px; }
+
+  /* ===== វាយតម្លៃ ===== */
+  .rate { display: inline-flex; align-items: center; gap: 3px; font-size: 12px; color: #8A6A1E; margin: 0 0 4px; }
+  .rate i { font-style: normal; color: #E0A526; }
+  .rate small { color: var(--muted); font-size: 11.5px; }
+  .dt-rate { display: none; align-items: center; gap: 6px; margin: 6px 0 2px; font-size: 14px; color: #8A6A1E; }
+  .dt-rate.on { display: flex; }
+  .dt-rate i { font-style: normal; color: #E0A526; font-size: 16px; }
+  .dt-rate small { color: var(--muted); }
+  .rv-item { padding: 12px 0; border-top: 1px solid var(--line); }
+  .rv-item:first-child { border-top: none; }
+  .rv-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 13px; }
+  .rv-top b { color: var(--ink); }
+  .rv-top span { color: #E0A526; letter-spacing: 1px; }
+  .rv-item p { margin: 6px 0 0; font-size: 13.5px; line-height: 1.7; color: #4C3F37; white-space: pre-line; }
+  .rv-item small { color: var(--muted); font-size: 11.5px; }
+  .rv-empty { color: var(--muted); font-size: 13px; padding: 4px 0 10px; }
+  .rv-write { width: 100%; height: 42px; border-radius: 999px; border: 1px solid var(--line); background: #fff; font: 600 14px inherit; color: var(--ink); cursor: pointer; margin-top: 10px; }
+  .rv-stars { display: flex; justify-content: center; gap: 6px; margin: 10px 0 6px; }
+  .rv-stars button { background: none; border: none; font-size: 34px; line-height: 1; color: #D9CFC2; cursor: pointer; padding: 2px; }
+  .rv-stars button.on { color: #E0A526; }
+  #rv-text { width: 100%; min-height: 96px; border: 1px solid var(--line); border-radius: 14px; padding: 12px; font: inherit; resize: vertical; margin: 6px 0 12px; background: #fff; }
 </style>
 </head>
 <body>
@@ -1626,6 +1648,7 @@
         <div class="dt-body">
           <div class="dt-cat" id="dt-cat"></div>
           <h2 id="dt-name"></h2>
+          <div class="dt-rate" id="dt-rate"></div>
           <div class="dt-price" id="dt-price"></div>
           <div class="dt-stock" id="dt-stock"></div>
           <div class="dt-seller" id="dt-seller"></div>
@@ -1657,6 +1680,12 @@
               <li><i class="fa-solid fa-truck-fast"></i><span>បន្ទាប់ពីកម្មង់ អាចតាមដានស្ថានភាពក្នុង «ការកម្មង់របស់ខ្ញុំ»</span></li>
               <li><i class="fa-regular fa-comments"></i><span>មានសំណួរអំពីទំហំ ឬពណ៌ សូមសួរហាងបានគ្រប់ពេល</span></li>
             </ul>
+          </div>
+
+          <div class="dt-sec" id="dt-rev-sec">
+            <div class="dt-h">វាយតម្លៃពីអតិថិជន</div>
+            <div id="dt-rev-list"></div>
+            <button class="rv-write" id="dt-rev-write" type="button">+ សរសេរវាយតម្លៃ</button>
           </div>
 
           <div class="dt-sec" id="dt-rel-sec">
@@ -1759,7 +1788,18 @@
       <button class="sheet-cancel" id="add-close" type="button">បិទ</button>
     </div>
   </div>
-  <div class="sheet-backdrop" id="asksheet">
+  <div class="sheet-backdrop" id="rvsheet">
+  <div class="sheet" role="dialog" aria-label="វាយតម្លៃ">
+    <div class="sheet-handle"></div>
+    <h3 id="rv-title" style="margin:6px 0 2px">វាយតម្លៃទំនិញ</h3>
+    <div class="rv-stars" id="rv-stars"></div>
+    <textarea id="rv-text" maxlength="500" placeholder="សរសេរមតិរបស់អ្នកអំពីទំនិញនេះ (មិនបង្ខំ)"></textarea>
+    <p class="of-hint" id="rv-msg"></p>
+    <button class="sheet-confirm" id="rv-send" type="button">ផ្ញើវាយតម្លៃ</button>
+    <button class="sheet-cancel" id="rv-close" type="button">បិទ</button>
+  </div>
+</div>
+<div class="sheet-backdrop" id="asksheet">
   <div class="sheet asksheet" role="dialog" aria-label="សួរម្ចាស់ហាង">
     <div class="sheet-handle"></div>
     <h3 id="ask-title" style="margin:6px 0 2px">សួរម្ចាស់ហាង</h3>
@@ -1935,7 +1975,7 @@ async function saveOrderRemote(o) {
   if (!sbReady()) return;
   try { await fetch(`${SB_URL}/rest/v1/orders`, { method: "POST", keepalive: true, headers: { apikey: SB_KEY, Authorization: "Bearer " + SB_KEY, "Content-Type": "application/json", Prefer: "return=minimal" }, body: JSON.stringify(o) }); } catch (e) {}
 }
-let SHOPS = {}, shopFilter = 0;
+let SHOPS = {}, shopFilter = 0, RSUM = {}, FOLLOWS = {};   // RSUM: ពិន្ទុវាយតម្លៃ · FOLLOWS: ចំនួនអ្នកតាមដាន
 function applyShared(d, others) {                    // d = ទិន្នន័យហាងលេខ 1 · others = [{id, data}] ហាងរបស់ admin ផ្សេង (បង្ហាញរួមគ្នា)
   if (!d) return;
   PRODUCTS.length = ORIG_PRODUCTS.length;
@@ -2718,9 +2758,10 @@ function fillGrid(grid, list, instant) {
       ${saleOf(item) ? `<span class="disc">-${Math.max(1, Math.round((saleOf(item) / item.price) * 100))}%</span>` : ""}
       ${stock === 0 ? `<span class="soldout">អស់ស្តុក</span>` : stock !== null && stock <= 5 ? `<span class="lowstock">នៅសល់ ${stock}</span>` : ""}
       <div class="body">
-        <span class="brand-line">${esc(settings.name)}</span>
+        <span class="brand-line">${esc((SHOPS[item.shop || 1] || {}).name || settings.name)}</span>
         <h3>${item.name}</h3>
         <span class="place">${item.place}</span>
+        ${rateChip(item)}
         <div class="pricebox${saleOf(item) ? " on-sale" : ""}">
           <span class="price"><b>${finalPrice(item).toLocaleString("en-US")}</b><small>៛</small></span>
           ${saleOf(item) ? `<span class="old">${item.price.toLocaleString("en-US")} ៛</span>` : ""}
@@ -2863,6 +2904,7 @@ function openDetail(i) {
   fb.classList.toggle("on", on); fb.firstElementChild.className = (on ? "fa-solid" : "fa-regular") + " fa-heart";
   dt$("dt-cart").disabled = stock === 0; dt$("dt-buy").disabled = stock === 0;
   renderSeller(i);
+  loadReviews(i);
   updateDtBuy();
   dt$("dt-scroll").scrollTop = 0;
   dt$("detailsheet").classList.add("open");
@@ -3140,7 +3182,7 @@ function renderShopHead() {
   if (!el) return;
   if (!shopFilter || !SHOPS[shopFilter]) { el.classList.remove("on"); el.innerHTML = ""; return; }
   const s = SHOPS[shopFilter], fol = isFol(s.id);
-  el.innerHTML = `<div class="sh-top"><div class="av" ${avStyle(s)}>${avText(s)}</div><div><b>${esc(s.name)}</b><small>${shopCount(s.id)} ទំនិញ${fol ? " · កំពុងតាមដាន" : ""}</small></div></div>${s.about ? `<p class="sh-about">${esc(s.about)}</p>` : ""}<div class="sh-acts"><button class="sh-btn ${fol ? "fol" : "pri"}" data-a="fol" type="button">${fol ? "កំពុងតាមដាន" : "+ តាមដាន"}</button><button class="sh-btn" data-a="ask" type="button">សួរម្ចាស់ហាង</button></div><button class="sh-back" data-a="back" type="button">← ត្រឡប់ទៅទំនិញទាំងអស់</button>`;
+  el.innerHTML = `<div class="sh-top"><div class="av" ${avStyle(s)}>${avText(s)}</div><div><b>${esc(s.name)}</b><small>${shopRateText(s.id)}${shopCount(s.id)} ទំនិញ · ${FOLLOWS[s.id] || 0} អ្នកតាមដាន${fol ? " · កំពុងតាមដាន" : ""}</small></div></div>${s.about ? `<p class="sh-about">${esc(s.about)}</p>` : ""}<div class="sh-acts"><button class="sh-btn ${fol ? "fol" : "pri"}" data-a="fol" type="button">${fol ? "កំពុងតាមដាន" : "+ តាមដាន"}</button><button class="sh-btn" data-a="ask" type="button">សួរម្ចាស់ហាង</button></div><button class="sh-back" data-a="back" type="button">← ត្រឡប់ទៅទំនិញទាំងអស់</button>`;
   el.classList.add("on");
 }
 function openShop(id) {
@@ -3154,7 +3196,7 @@ function renderSeller(i) {
   if (!el || !s) { if (el) el.classList.remove("on"); return; }
   const fol = isFol(id);
   el.dataset.i = i; el.dataset.id = id;
-  el.innerHTML = `<div class="av" ${avStyle(s)}>${avText(s)}</div><div class="nm"><b>${esc(s.name)}</b><small>${shopCount(id)} ទំនិញ</small></div><div class="sl-acts"><button type="button" data-a="fol">${fol ? "តាមដានរួច" : "+ តាមដាន"}</button><button type="button" data-a="ask" class="pri">សួរម្ចាស់ហាង</button><button type="button" data-a="view">មើលហាង</button></div>`;
+  el.innerHTML = `<div class="av" ${avStyle(s)}>${avText(s)}</div><div class="nm"><b>${esc(s.name)}</b><small>${shopRateText(id)}${shopCount(id)} ទំនិញ · ${FOLLOWS[id] || 0} អ្នកតាមដាន</small></div><div class="sl-acts"><button type="button" data-a="fol">${fol ? "តាមដានរួច" : "+ តាមដាន"}</button><button type="button" data-a="ask" class="pri">សួរម្ចាស់ហាង</button><button type="button" data-a="view">មើលហាង</button></div>`;
   el.classList.add("on");
 }
 function openAsk(id, pre) {
@@ -3172,14 +3214,14 @@ function openAsk(id, pre) {
   $("ss-row").addEventListener("click", (e) => { const b = e.target.closest(".ss-item"); if (b) openShop(Number(b.dataset.id)); });
   $("shophead").addEventListener("click", (e) => {
     const b = e.target.closest("button"); if (!b) return;
-    if (b.dataset.a === "fol") { const on = toggleFol(shopFilter); toast(on ? "កំពុងតាមដានហាងនេះ" : "ឈប់តាមដានហើយ"); renderShops(); }
+    if (b.dataset.a === "fol") followAction(shopFilter);
     else if (b.dataset.a === "ask") openAsk(shopFilter, "");
     else if (b.dataset.a === "back") openShop(0);
   });
   $("dt-seller").addEventListener("click", (e) => {
     const b = e.target.closest("button"); if (!b) return;
     const id = Number(e.currentTarget.dataset.id), i = Number(e.currentTarget.dataset.i), p = PRODUCTS[i];
-    if (b.dataset.a === "fol") { const on = toggleFol(id); toast(on ? "កំពុងតាមដានហាងនេះ" : "ឈប់តាមដានហើយ"); renderSeller(i); renderShops(); }
+    if (b.dataset.a === "fol") followAction(id);
     else if (b.dataset.a === "ask") openAsk(id, p ? `សួរអំពី៖ ${p.name}\n` : "");
     else if (b.dataset.a === "view") { closeDetail(); openShop(id); }
   });
@@ -3198,6 +3240,129 @@ function openAsk(id, pre) {
     }
   });
 })();
+
+// ---- ចំនួនអ្នកតាមដាន (រក្សាក្នុង Supabase តារាង shop_follows) ----
+function refreshFollowUI() {
+  renderShops();
+  const sel = document.getElementById("dt-seller");
+  if (sel && sel.classList.contains("on")) renderSeller(Number(sel.dataset.i));
+}
+async function loadFollowCounts() {
+  if (!sbReady()) return;
+  try {
+    const r = await fetch(`${SB_URL}/rest/v1/rpc/shop_follow_counts`, { method: "POST", headers: { apikey: SB_KEY, Authorization: "Bearer " + SB_KEY, "Content-Type": "application/json" }, body: "{}", cache: "no-store" });
+    if (!r.ok) return;
+    const rows = await r.json(); FOLLOWS = {};
+    (rows || []).forEach((x) => { FOLLOWS[x.shop_id] = Number(x.n) || 0; });
+    refreshFollowUI();
+  } catch (e) {}
+}
+async function loadMyFollows() {
+  if (!sbReady() || !CU.sess) return;
+  try {
+    const tok = await cToken();
+    const r = await fetch(`${SB_URL}/rest/v1/shop_follows?select=shop_id&user_id=eq.${CU.sess.uid}`, { headers: { apikey: SB_KEY, Authorization: "Bearer " + tok }, cache: "no-store" });
+    if (!r.ok) return;
+    const rows = await r.json();
+    try { localStorage.setItem("followShops", JSON.stringify(rows.map((x) => x.shop_id))); } catch (e) {}
+    refreshFollowUI();
+  } catch (e) {}
+}
+async function followAction(id) {
+  if (!CU.sess) { afterAuth = () => followAction(id); openAuth("login", "ចូលគណនីដើម្បីតាមដានហាង"); return; }
+  await loadMyFollows();
+  const on = !isFol(id), f = getFol(), k = f.indexOf(id);
+  if (on && k < 0) f.push(id); if (!on && k >= 0) f.splice(k, 1);
+  const prev = FOLLOWS[id] || 0;
+  try { localStorage.setItem("followShops", JSON.stringify(f)); } catch (e) {}
+  FOLLOWS[id] = Math.max(0, prev + (on ? 1 : -1));
+  toast(on ? "កំពុងតាមដានហាងនេះ" : "ឈប់តាមដានហើយ"); refreshFollowUI();
+  try {
+    const tok = await cToken(), h = { apikey: SB_KEY, Authorization: "Bearer " + tok, "Content-Type": "application/json" };
+    const r = on
+      ? await fetch(`${SB_URL}/rest/v1/shop_follows`, { method: "POST", headers: { ...h, Prefer: "resolution=ignore-duplicates,return=minimal" }, body: JSON.stringify({ shop_id: id }) })
+      : await fetch(`${SB_URL}/rest/v1/shop_follows?shop_id=eq.${id}&user_id=eq.${CU.sess.uid}`, { method: "DELETE", headers: h });
+    if (!r.ok && r.status !== 404) throw new Error(r.status);       // 404 = មិនទាន់ run SQL → រក្សាក្នុងឧបករណ៍តែប៉ុណ្ណោះ
+    loadFollowCounts();
+  } catch (e) {
+    const g = getFol(), j = g.indexOf(id);                             // បរាជ័យ → ត្រឡប់ទៅដើមវិញ
+    if (on && j >= 0) g.splice(j, 1); if (!on && j < 0) g.push(id);
+    try { localStorage.setItem("followShops", JSON.stringify(g)); } catch (er) {}
+    FOLLOWS[id] = prev; toast("តាមដានមិនបាន សូមព្យាយាមម្តងទៀត"); refreshFollowUI();
+  }
+}
+loadFollowCounts(); loadMyFollows();
+
+// ================= វាយតម្លៃទំនិញ =================
+// RSUM: "លេខហាង:លេខទំនិញក្នុងហាង" → { avg, n }
+function rKey(p, idx) { return (p.shop || 1) + ":" + (p.ln || (idx + 1)); }
+function rateChip(item) { const r = RSUM[rKey(item, item.idx)]; return r ? `<span class="rate"><i>★</i> ${r.avg.toFixed(1)} <small>(${r.n})</small></span>` : ""; }
+function shopRateText(id) {
+  let s = 0, n = 0;
+  Object.keys(RSUM).forEach((k) => { if (k.split(":")[0] === String(id)) { s += RSUM[k].avg * RSUM[k].n; n += RSUM[k].n; } });
+  return n ? `★ ${(s / n).toFixed(1)} · ` : "";
+}
+async function rpcPost(fn, body, tok) {
+  const r = await fetch(`${SB_URL}/rest/v1/rpc/${fn}`, { method: "POST", headers: { apikey: SB_KEY, Authorization: "Bearer " + (tok || SB_KEY), "Content-Type": "application/json" }, body: JSON.stringify(body || {}), cache: "no-store" });
+  const j = await r.json().catch(() => null);
+  if (!r.ok) { const e = new Error((j && j.message) || r.status); e.status = r.status; throw e; }
+  return j;
+}
+async function loadReviewSummary() {
+  if (!sbReady()) return;
+  try {
+    const rows = await rpcPost("review_summary", {}); RSUM = {};
+    (rows || []).forEach((x) => { RSUM[x.shop_id + ":" + x.product_n] = { avg: Number(x.avg), n: Number(x.n) }; });
+    render();
+    const d = document.getElementById("detailsheet");
+    if (d.classList.contains("open") && dtI >= 0) loadReviews(dtI);
+  } catch (e) {}
+}
+const stars = (n) => "★".repeat(n) + "☆".repeat(5 - n);
+async function loadReviews(i) {
+  const p = PRODUCTS[i], rate = document.getElementById("dt-rate"), list = document.getElementById("dt-rev-list"), sec = document.getElementById("dt-rev-sec");
+  if (!p || !sbReady()) { sec.style.display = "none"; rate.classList.remove("on"); return; }
+  sec.style.display = "";
+  const sid = p.shop || 1, ln = p.ln || (i + 1), r = RSUM[sid + ":" + ln];
+  rate.classList.toggle("on", !!r); rate.innerHTML = r ? `<i>★</i> <b>${r.avg.toFixed(1)}</b> <small>· ${r.n} វាយតម្លៃ</small>` : "";
+  list.innerHTML = '<div class="rv-empty">កំពុងផ្ទុក...</div>';
+  try {
+    const rows = await rpcPost("get_reviews", { p_shop: sid, p_n: ln });
+    if (dtI !== i) return;
+    list.innerHTML = rows.length ? rows.map((x) => `<div class="rv-item"><div class="rv-top"><b>${esc(x.name || "អតិថិជន")}</b><span>${stars(x.rating)}</span></div>${x.comment ? `<p>${esc(x.comment)}</p>` : ""}<small>${esc(String(x.created_at || "").slice(0, 10))}</small></div>`).join("") : '<div class="rv-empty">មិនទាន់មានវាយតម្លៃ។ មានតែអ្នកដែលបានទិញ និងទទួលទំនិញរួចទេ ទើបអាចវាយតម្លៃបាន។</div>';
+  } catch (e) { list.innerHTML = '<div class="rv-empty">មិនទាន់មានវាយតម្លៃ</div>'; }
+}
+(function bindReviews() {
+  const $ = (id) => document.getElementById(id);
+  let cur = null, pick = 0;
+  const paint = () => $("rv-stars").querySelectorAll("button").forEach((b, k) => b.classList.toggle("on", k < pick));
+  $("rv-stars").innerHTML = [1, 2, 3, 4, 5].map((n) => `<button type="button" data-n="${n}" aria-label="${n} ផ្កាយ">★</button>`).join("");
+  $("rv-stars").addEventListener("click", (e) => { const b = e.target.closest("button"); if (!b) return; pick = Number(b.dataset.n); paint(); });
+  $("rv-close").onclick = () => $("rvsheet").classList.remove("open");
+  $("rvsheet").addEventListener("click", (e) => { if (e.target.id === "rvsheet") e.target.classList.remove("open"); });
+  $("dt-rev-write").addEventListener("click", async () => {
+    const i = dtI, p = PRODUCTS[i]; if (!p) return;
+    if (!CU.sess) { afterAuth = () => $("dt-rev-write").click(); openAuth("login", "ចូលគណនីដើម្បីវាយតម្លៃ"); return; }
+    cur = { shop: p.shop || 1, n: p.ln || (i + 1), name: p.name };
+    try {
+      const st = await rpcPost("review_status", { p_shop: cur.shop, p_n: cur.n }, await cToken());
+      if (st === "already") { toast("អ្នកបានវាយតម្លៃទំនិញនេះរួចហើយ"); return; }
+      if (st !== "ok") { toast("មានតែអ្នកដែលបានទិញ និងទទួលទំនិញរួចទេ ទើបវាយតម្លៃបាន"); return; }
+    } catch (e) { toast("ពិនិត្យមិនបាន សូមព្យាយាមម្តងទៀត"); return; }
+    pick = 5; paint(); $("rv-text").value = ""; $("rv-msg").textContent = ""; $("rv-title").textContent = "វាយតម្លៃ · " + cur.name;
+    $("rvsheet").classList.add("open");
+  });
+  $("rv-send").addEventListener("click", async () => {
+    if (!cur) return;
+    const b = $("rv-send"); b.disabled = true;
+    try {
+      await rpcPost("submit_review", { p_shop: cur.shop, p_n: cur.n, p_rating: pick, p_comment: $("rv-text").value.trim() }, await cToken());
+      $("rvsheet").classList.remove("open"); toast("អរគុណសម្រាប់ការវាយតម្លៃ"); loadReviewSummary();
+    } catch (e) { $("rv-msg").style.color = "#B8213F"; $("rv-msg").textContent = /not_bought/.test(e.message) ? "មានតែអ្នកដែលបានទិញ និងទទួលទំនិញរួចទេ ទើបវាយតម្លៃបាន" : /already/.test(e.message) ? "អ្នកបានវាយតម្លៃរួចហើយ" : "ផ្ញើមិនបាន សូមព្យាយាមម្តងទៀត"; }
+    b.disabled = false;
+  });
+})();
+loadReviewSummary();
 
 renderShops();
 // ត្រឡប់មកពី admin → ផ្ទុកទំព័រឡើងវិញ ដើម្បីឃើញរូបថ្មី
