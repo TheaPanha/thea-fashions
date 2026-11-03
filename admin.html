@@ -1074,6 +1074,7 @@ function openAdminPanel() {
     <div class="ad-tabs" id="ad-tabs">
       <button class="ad-tab active" data-tab="orders" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7.5 12 3l9 4.5v9L12 21l-9-4.5v-9Z"/><path d="M3 7.5 12 12l9-4.5M12 12v9"/></svg>ការកម្មង់<b class="bd" id="od-badge" hidden></b></button>
       <button class="ad-tab" data-tab="products" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8h14l-1 12H6L5 8Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>ទំនិញ</button>
+      ${SHOP_ID !== 1 ? `<button class="ad-tab" data-tab="profile" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg> ហាងខ្ញុំ</button>` : ""}
       ${SHOP_ID === 1 ? `<button class="ad-tab" data-tab="design" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18c1.2 0 2-.8 2-1.8 0-.6-.3-1-.6-1.4-.3-.4-.4-.8-.4-1.3 0-1 .8-1.8 1.8-1.8H17a4 4 0 0 0 4-4C21 6.5 17 3 12 3Z"/><circle cx="7.5" cy="11" r="1"/><circle cx="10" cy="7" r="1"/><circle cx="15" cy="7.5" r="1"/></svg>រចនា</button>` : ""}
       ${SHOP_ID === 1 ? `<button class="ad-tab" data-tab="shop" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5 5.5 4h13L20 9.5"/><path d="M4 9.5a2.7 2.7 0 0 0 5.3 0 2.7 2.7 0 0 0 5.4 0 2.7 2.7 0 0 0 5.3 0"/><path d="M5 12.5V20h14v-7.5M10 20v-4.5h4V20"/></svg>ហាង</button>` : ""}
       ${sbOn() && acIsOwner() ? `<button class="ad-tab" data-tab="access" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="8" cy="15" r="4"/><path d="m11 12 9-9M16 7l3 3M14 9l2 2"/></svg> សិទ្ធិ</button>` : ""}
@@ -1155,7 +1156,18 @@ function openAdminPanel() {
     <div class="ad-panel" data-tab="promo" style="display:none"><div id="cp-box"></div></div>
     <div class="ad-panel" data-tab="access" style="display:none"><div id="ac-body"></div></div>
 
+    ${SHOP_ID !== 1 ? `<div class="ad-panel" data-tab="profile" style="display:none">
+      <div class="ad-label" style="margin-top:0">ប្រវត្តិហាងរបស់អ្នក (អតិថិជនឃើញពេលចុច "មើលហាង")</div>
+      <label class="ad-field">ឈ្មោះហាង<input class="ad-input" data-s="name" value="${esc(settings.name)}" /></label>
+      <label class="ad-field">អក្សរ Logo ១ តួ (បើគ្មានរូប)<input class="ad-input" data-s="logoText" maxlength="2" value="${esc(settings.logoText || "")}" /></label>
+      <div style="display:flex;gap:8px;margin:4px 0 12px"><button class="ad-btn" id="pf-logo" type="button">ដាក់រូប Logo</button><button class="ad-btn" id="pf-logo-x" type="button">លុបរូប</button></div>
+      <label class="ad-field">ពិពណ៌នាហាង<textarea class="ad-input" data-s="about" rows="3" style="min-height:84px">${esc(settings.about || "")}</textarea></label>
+      <label class="ad-field">លេខទូរស័ព្ទ<input class="ad-input" data-s="phone" inputmode="tel" value="${esc(settings.phone)}" /></label>
+      <label class="ad-field">Username Telegram (គ្មាន @)<input class="ad-input" data-s="telegram" value="${esc(settings.telegram)}" /></label>
+      <label class="ad-field">តំណ Messenger / Facebook<input class="ad-input" data-s="messenger" value="${esc(settings.messenger)}" /></label>
+    </div>` : ""}
     <div class="ad-panel" data-tab="shop" style="display:none">
+      <label class="ad-field">ពិពណ៌នាហាង (បង្ហាញក្នុងទំព័រហាង)<textarea class="ad-input" data-s="about" rows="3" style="min-height:84px">${esc(settings.about || "")}</textarea></label>
       <label class="ad-field">លេខទូរស័ព្ទ<input class="ad-input" data-s="phone" inputmode="tel" value="${esc(settings.phone)}" /></label>
       <label class="ad-field">Username Telegram (គ្មាន @)<input class="ad-input" data-s="telegram" value="${esc(settings.telegram)}" /></label>
       <label class="ad-field">តំណ Messenger / Facebook<input class="ad-input" data-s="messenger" value="${esc(settings.messenger)}" /></label>
@@ -1435,6 +1447,9 @@ function openAdminPanel() {
   };
   document.getElementById("ad-logo-file").addEventListener("change", (e) => { imgSetting(e.target.files[0], "logoImg", 256, "logo.jpg"); e.target.value = ""; });
   document.getElementById("ad-logo-clear").addEventListener("click", () => { adminData.settings.logoImg = ""; commitSetting("logoImg"); });
+  { const pl = document.getElementById("pf-logo"), px = document.getElementById("pf-logo-x");
+    if (pl) pl.addEventListener("click", () => document.getElementById("ad-logo-file").click());
+    if (px) px.addEventListener("click", () => document.getElementById("ad-logo-clear").click()); }
   updPrev();
   body.querySelectorAll(".ad-sw").forEach((b) => b.addEventListener("click", () => {
     adminData.settings.accent = b.dataset.c;

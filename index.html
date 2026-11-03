@@ -1471,6 +1471,46 @@
   .wrap > header h1, .wrap > header #hero-name { color: var(--ink) !important; -webkit-text-fill-color: var(--ink) !important; background: none !important; text-shadow: none !important; }
   .wrap > header .tagline { color: #6B574C !important; text-indent: 0; }
   .wrap > header .eyebrow { color: var(--clay-dark) !important; }
+
+  /* ===== ហាង · តាមដាន · សួរម្ចាស់ហាង (បែប Shopee) ===== */
+  .shopstrip { display: none; margin: 4px 0 18px; }
+  .shopstrip.on { display: block; }
+  .shopstrip h3 { font-size: 15px; margin: 0 0 10px; font-weight: 700; }
+  .ss-row { display: flex; gap: 12px; overflow-x: auto; padding: 2px 2px 8px; scrollbar-width: none; }
+  .ss-row::-webkit-scrollbar { display: none; }
+  .ss-item { flex: 0 0 auto; width: 76px; text-align: center; background: none; border: none; padding: 0; cursor: pointer; font: inherit; color: var(--ink); }
+  .ss-item .av { width: 56px; height: 56px; margin: 0 auto 6px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; font-size: 20px; color: #fff; background: var(--clay) center/cover; border: 2px solid transparent; }
+  .ss-item.fol .av { border-color: var(--clay); box-shadow: 0 0 0 2px #fff inset; }
+  .ss-item span { display: block; font-size: 12px; line-height: 1.35; max-height: 2.7em; overflow: hidden; }
+  .shophead { display: none; background: #fff; border: 1px solid var(--line); border-radius: 20px; padding: 16px; margin: 0 0 16px; }
+  .shophead.on { display: block; }
+  .sh-top { display: flex; gap: 14px; align-items: center; }
+  .sh-top .av { flex: 0 0 auto; width: 60px; height: 60px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; font-size: 22px; color: #fff; background: var(--clay) center/cover; }
+  .sh-top b { display: block; font-size: 17px; }
+  .sh-top small { color: var(--muted); font-size: 12.5px; }
+  .sh-about { margin: 12px 0 0; color: #6B574C; font-size: 13.5px; line-height: 1.7; white-space: pre-line; }
+  .sh-acts { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+  .sh-btn { flex: 1 1 0; min-width: 96px; height: 40px; border-radius: 999px; border: 1px solid var(--line); background: #fff; color: var(--ink); font: 600 13.5px inherit; cursor: pointer; }
+  .sh-btn.pri { background: var(--ink); border-color: var(--ink); color: #fff; }
+  .sh-btn.fol { background: rgba(var(--clay-rgb), .12); border-color: transparent; color: var(--clay-dark); }
+  .sh-back { background: none; border: none; color: var(--clay-dark); font: 600 13px inherit; cursor: pointer; padding: 10px 0 0; }
+  .dt-seller { display: none; align-items: center; gap: 12px; margin: 14px 0 4px; padding: 12px; border: 1px solid var(--line); border-radius: 16px; background: #FBF8F4; }
+  .dt-seller.on { display: flex; }
+  .dt-seller .av { flex: 0 0 auto; width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; color: #fff; background: var(--clay) center/cover; }
+  .dt-seller .nm { flex: 1; min-width: 0; }
+  .dt-seller .nm b { display: block; font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .dt-seller .nm small { color: var(--muted); font-size: 12px; }
+  .dt-seller button { height: 34px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--line); background: #fff; font: 600 12.5px inherit; cursor: pointer; color: var(--ink); }
+  .dt-seller button.pri { background: var(--ink); border-color: var(--ink); color: #fff; }
+  .asksheet textarea { width: 100%; min-height: 96px; border: 1px solid var(--line); border-radius: 14px; padding: 12px; font: inherit; resize: vertical; margin: 6px 0 12px; background: #fff; }
+  .ask-links { display: grid; gap: 8px; }
+  .ask-links a, .ask-links button { display: block; text-align: center; padding: 12px; border-radius: 14px; border: 1px solid var(--line); background: #fff; color: var(--ink); font: 600 14px inherit; text-decoration: none; cursor: pointer; }
+  .ask-links .tg { background: #229ED9; border-color: #229ED9; color: #fff; }
+  .ask-links .ms { background: #0A7CFF; border-color: #0A7CFF; color: #fff; }
+  .dt-seller { flex-wrap: wrap; }
+  .dt-seller .nm { flex: 1 1 120px; }
+  .dt-seller .sl-acts { display: flex; gap: 8px; width: 100%; }
+  .dt-seller .sl-acts button { flex: 1 1 0; white-space: nowrap; padding: 0 8px; }
 </style>
 </head>
 <body>
@@ -1525,6 +1565,8 @@
         <span id="t-h">00</span><i>:</i><span id="t-m">00</span><i>:</i><span id="t-s">00</span>
       </div>
     </div>
+    <section class="shopstrip" id="shopstrip" aria-label="ហាង"><h3>ហាងទាំងអស់</h3><div class="ss-row" id="ss-row"></div></section>
+    <div class="shophead" id="shophead"></div>
     <div id="sale-section">
       <div class="section-head sale-head" id="products">
         <h2>ទំនិញបញ្ចុះតម្លៃ</h2>
@@ -1586,6 +1628,7 @@
           <h2 id="dt-name"></h2>
           <div class="dt-price" id="dt-price"></div>
           <div class="dt-stock" id="dt-stock"></div>
+          <div class="dt-seller" id="dt-seller"></div>
 
           <div class="dt-sec" id="dt-size-sec">
             <div class="dt-h">ជ្រើសរើសទំហំ</div>
@@ -1716,7 +1759,16 @@
       <button class="sheet-cancel" id="add-close" type="button">បិទ</button>
     </div>
   </div>
-  <div id="toast"></div>
+  <div class="sheet-backdrop" id="asksheet">
+  <div class="sheet asksheet" role="dialog" aria-label="សួរម្ចាស់ហាង">
+    <div class="sheet-handle"></div>
+    <h3 id="ask-title" style="margin:6px 0 2px">សួរម្ចាស់ហាង</h3>
+    <textarea id="ask-text" placeholder="វាយសំណួររបស់អ្នក..."></textarea>
+    <div class="ask-links" id="ask-links"></div>
+    <button class="sheet-cancel" id="ask-close" type="button">បិទ</button>
+  </div>
+</div>
+<div id="toast"></div>
 
 
   <div class="sheet-backdrop" id="sheet">
@@ -1883,6 +1935,7 @@ async function saveOrderRemote(o) {
   if (!sbReady()) return;
   try { await fetch(`${SB_URL}/rest/v1/orders`, { method: "POST", keepalive: true, headers: { apikey: SB_KEY, Authorization: "Bearer " + SB_KEY, "Content-Type": "application/json", Prefer: "return=minimal" }, body: JSON.stringify(o) }); } catch (e) {}
 }
+let SHOPS = {}, shopFilter = 0;
 function applyShared(d, others) {                    // d = ទិន្នន័យហាងលេខ 1 · others = [{id, data}] ហាងរបស់ admin ផ្សេង (បង្ហាញរួមគ្នា)
   if (!d) return;
   PRODUCTS.length = ORIG_PRODUCTS.length;
@@ -1891,6 +1944,10 @@ function applyShared(d, others) {                    // d = ទិន្នន�
   adminImages = d.imgs || {};
   Object.entries(adminData.edits).forEach(([k, v]) => { if (PRODUCTS[k]) Object.assign(PRODUCTS[k], v); });
   adminData.added.forEach((a) => PRODUCTS.push({ name: a.name, place: a.place, price: a.price, desc: a.desc || "" }));
+  SHOPS = {};
+  const prof = (id, s) => ({ id, name: String(s.name || ("ហាង " + id)), logoImg: s.logoImg || "", logoText: s.logoText || "", phone: s.phone || "", telegram: s.telegram || "", messenger: s.messenger || "", about: s.about || "" });
+  SHOPS[1] = prof(1, { ...SETTINGS, ...(d.settings || {}) });
+  (others || []).forEach((o) => { SHOPS[o.id] = prof(o.id, (o.data && o.data.settings) || {}); });
   const ownerManual = Object.keys(adminData.sale || {}).length > 0;
   (others || []).forEach((o) => {                      // ទំនិញ admin ផ្សេង ចូលបញ្ជីរួម · ចងលេខទំនិញឲ្យត្រូវនឹងហាងរបស់វា
     const dd = (o && o.data) || {}, sid = o.id, has = (arr, n) => (arr || []).some((x) => Number(x) === n);
@@ -2607,9 +2664,10 @@ function renderCatNav() {
 }
 
 function render() {
+  renderShops();
   const hidden = hiddenSet();
   const fvs = favOnly ? new Set(getFavs()) : null;
-  const all = PRODUCTS.map((p, idx) => ({ ...p, idx })).filter((p) => !hidden.has(p.idx + 1) && (!fvs || fvs.has(p.idx + 1)));
+  const all = PRODUCTS.map((p, idx) => ({ ...p, idx })).filter((p) => !hidden.has(p.idx + 1) && (!fvs || fvs.has(p.idx + 1)) && (!shopFilter || (p.shop || 1) === shopFilter));
   const saleGrid = document.getElementById("sale-grid");
   const title = document.getElementById("all-title");
   const grid = document.getElementById("grid");
@@ -2804,6 +2862,7 @@ function openDetail(i) {
   const fb = dt$("dt-fav"), on = isFav(n);
   fb.classList.toggle("on", on); fb.firstElementChild.className = (on ? "fa-solid" : "fa-regular") + " fa-heart";
   dt$("dt-cart").disabled = stock === 0; dt$("dt-buy").disabled = stock === 0;
+  renderSeller(i);
   updateDtBuy();
   dt$("dt-scroll").scrollTop = 0;
   dt$("detailsheet").classList.add("open");
@@ -3045,7 +3104,7 @@ document.addEventListener("keydown", (e) => {
     const r = await fetch(`${SB_URL}/rest/v1/shop?select=id,data&order=id`, { headers: { apikey: SB_KEY, Authorization: "Bearer " + SB_KEY }, cache: "no-store" });
     const j = await r.json(), rows = Array.isArray(j) ? j : [], d = (rows.find((x) => x.id === 1) || {}).data;
     if (!d) return;
-    const o = rows.filter((x) => x.id !== 1 && x.data && (x.data.added || []).length).map((x) => ({ id: x.id, data: { added: x.data.added, hidden: x.data.hidden, deleted: x.data.deleted, sale: x.data.sale, stock: x.data.stock, imgs: x.data.imgs } }));
+    const o = rows.filter((x) => x.id !== 1 && x.data && (x.data.added || []).length).map((x) => ({ id: x.id, data: { settings: x.data.settings, added: x.data.added, hidden: x.data.hidden, deleted: x.data.deleted, sale: x.data.sale, stock: x.data.stock, imgs: x.data.imgs } }));
     const s = JSON.stringify({ d, o });
     if (localStorage.getItem("sharedAll") === s) return;      // គ្មានអ្វីថ្មី
     try { localStorage.setItem("sharedAll", s); } catch (e) {}
@@ -3053,6 +3112,94 @@ document.addEventListener("keydown", (e) => {
   } catch (e) {}
 })();
 
+
+// ================= ហាង · តាមដាន · សួរម្ចាស់ហាង (បែប Shopee) =================
+function getFol() { try { return JSON.parse(localStorage.getItem("followShops") || "[]"); } catch (e) { return []; } }
+function isFol(id) { return getFol().includes(id); }
+function toggleFol(id) {
+  const f = getFol(), k = f.indexOf(id);
+  if (k >= 0) f.splice(k, 1); else f.push(id);
+  try { localStorage.setItem("followShops", JSON.stringify(f)); } catch (e) {}
+  return k < 0;
+}
+function shopCount(id) { const h = hiddenSet(); return PRODUCTS.reduce((s, p, k) => s + (((p.shop || 1) === id && !h.has(k + 1)) ? 1 : 0), 0); }
+function avStyle(s) { return s.logoImg ? `style="background-image:url('${esc(s.logoImg)}')"` : ""; }
+function avText(s) { return s.logoImg ? "" : esc((String(s.logoText || "").trim()[0] || String(s.name).trim()[0] || "H").toUpperCase()); }
+function renderShops() {
+  const ids = Object.keys(SHOPS).map(Number).filter((id) => shopCount(id) > 0);
+  const strip = document.getElementById("shopstrip"), row = document.getElementById("ss-row");
+  if (!strip || !row) return;
+  const fol = getFol();
+  ids.sort((a, b) => (fol.includes(b) - fol.includes(a)) || a - b);
+  strip.classList.toggle("on", ids.length > 1 && !shopFilter);
+  row.innerHTML = ids.length > 1 ? ids.map((id) => { const s = SHOPS[id]; return `<button type="button" class="ss-item${fol.includes(id) ? " fol" : ""}" data-id="${id}"><div class="av" ${avStyle(s)}>${avText(s)}</div><span>${esc(s.name)}</span></button>`; }).join("") : "";
+  renderShopHead();
+}
+function renderShopHead() {
+  const el = document.getElementById("shophead");
+  if (!el) return;
+  if (!shopFilter || !SHOPS[shopFilter]) { el.classList.remove("on"); el.innerHTML = ""; return; }
+  const s = SHOPS[shopFilter], fol = isFol(s.id);
+  el.innerHTML = `<div class="sh-top"><div class="av" ${avStyle(s)}>${avText(s)}</div><div><b>${esc(s.name)}</b><small>${shopCount(s.id)} ទំនិញ${fol ? " · កំពុងតាមដាន" : ""}</small></div></div>${s.about ? `<p class="sh-about">${esc(s.about)}</p>` : ""}<div class="sh-acts"><button class="sh-btn ${fol ? "fol" : "pri"}" data-a="fol" type="button">${fol ? "កំពុងតាមដាន" : "+ តាមដាន"}</button><button class="sh-btn" data-a="ask" type="button">សួរម្ចាស់ហាង</button></div><button class="sh-back" data-a="back" type="button">← ត្រឡប់ទៅទំនិញទាំងអស់</button>`;
+  el.classList.add("on");
+}
+function openShop(id) {
+  shopFilter = id || 0; activeCat = "all"; query = "";
+  const q = document.getElementById("search"); if (q) q.value = "";
+  render(); renderCatNav();
+  const t = document.getElementById(shopFilter ? "shophead" : "products"); if (t) t.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+function renderSeller(i) {
+  const el = document.getElementById("dt-seller"), p = PRODUCTS[i], id = (p && p.shop) || 1, s = SHOPS[id];
+  if (!el || !s) { if (el) el.classList.remove("on"); return; }
+  const fol = isFol(id);
+  el.dataset.i = i; el.dataset.id = id;
+  el.innerHTML = `<div class="av" ${avStyle(s)}>${avText(s)}</div><div class="nm"><b>${esc(s.name)}</b><small>${shopCount(id)} ទំនិញ</small></div><div class="sl-acts"><button type="button" data-a="fol">${fol ? "តាមដានរួច" : "+ តាមដាន"}</button><button type="button" data-a="ask" class="pri">សួរម្ចាស់ហាង</button><button type="button" data-a="view">មើលហាង</button></div>`;
+  el.classList.add("on");
+}
+function openAsk(id, pre) {
+  const s = SHOPS[id] || SHOPS[1]; if (!s) return;
+  const asked = document.getElementById("asksheet"), tx = document.getElementById("ask-text"), box = document.getElementById("ask-links");
+  asked.dataset.id = s.id; document.getElementById("ask-title").textContent = "សួរម្ចាស់ហាង · " + s.name;
+  tx.value = pre || "";
+  const tg = String(s.telegram || "").trim().replace(/^@/, "").replace(/^https?:\/\/t\.me\//, ""), ph = String(s.phone || "").replace(/\s+/g, "");
+  box.innerHTML = (tg ? `<a class="tg" data-k="tg" href="#">ផ្ញើតាម Telegram</a>` : "") + (s.messenger ? `<a class="ms" data-k="ms" href="#">ផ្ញើតាម Messenger</a>` : "") + (ph ? `<a data-k="call" href="tel:${esc(ph)}">ទូរស័ព្ទទៅហាង</a>` : "");
+  if (!box.innerHTML) box.innerHTML = `<div class="of-hint">ហាងនេះមិនទាន់ដាក់ព័ត៌មានទំនាក់ទំនងទេ</div>`;
+  asked.classList.add("open");
+}
+(function bindShops() {
+  const $ = (id) => document.getElementById(id);
+  $("ss-row").addEventListener("click", (e) => { const b = e.target.closest(".ss-item"); if (b) openShop(Number(b.dataset.id)); });
+  $("shophead").addEventListener("click", (e) => {
+    const b = e.target.closest("button"); if (!b) return;
+    if (b.dataset.a === "fol") { const on = toggleFol(shopFilter); toast(on ? "កំពុងតាមដានហាងនេះ" : "ឈប់តាមដានហើយ"); renderShops(); }
+    else if (b.dataset.a === "ask") openAsk(shopFilter, "");
+    else if (b.dataset.a === "back") openShop(0);
+  });
+  $("dt-seller").addEventListener("click", (e) => {
+    const b = e.target.closest("button"); if (!b) return;
+    const id = Number(e.currentTarget.dataset.id), i = Number(e.currentTarget.dataset.i), p = PRODUCTS[i];
+    if (b.dataset.a === "fol") { const on = toggleFol(id); toast(on ? "កំពុងតាមដានហាងនេះ" : "ឈប់តាមដានហើយ"); renderSeller(i); renderShops(); }
+    else if (b.dataset.a === "ask") openAsk(id, p ? `សួរអំពី៖ ${p.name}\n` : "");
+    else if (b.dataset.a === "view") { closeDetail(); openShop(id); }
+  });
+  $("ask-close").onclick = () => $("asksheet").classList.remove("open");
+  $("asksheet").addEventListener("click", (e) => { if (e.target.id === "asksheet") e.target.classList.remove("open"); });
+  $("ask-links").addEventListener("click", async (e) => {
+    const a = e.target.closest("a[data-k]"); if (!a || a.dataset.k === "call") return;
+    e.preventDefault();
+    const s = SHOPS[Number($("asksheet").dataset.id)] || SHOPS[1], text = $("ask-text").value.trim() || "សួស្តី";
+    if (a.dataset.k === "tg") {
+      const u = String(s.telegram).trim().replace(/^@/, "").replace(/^https?:\/\/t\.me\//, "");
+      window.open(`https://t.me/${u}?text=${encodeURIComponent(text)}`, "_blank", "noopener");
+    } else {
+      try { await navigator.clipboard.writeText(text); toast("បានចម្លងសំណួរ សូមបិទភ្ជាប់ក្នុង Messenger"); } catch (er) {}
+      window.open(s.messenger, "_blank", "noopener");
+    }
+  });
+})();
+
+renderShops();
 // ត្រឡប់មកពី admin → ផ្ទុកទំព័រឡើងវិញ ដើម្បីឃើញរូបថ្មី
 window.addEventListener("pageshow", (e) => { if (e.persisted && adminOn) location.reload(); });
 window.addEventListener("storage", (e) => { if (e.key === "adminImages" && adminOn) location.reload(); });
