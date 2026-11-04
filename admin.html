@@ -770,17 +770,25 @@ async function acApi(path, opt = {}) {
   });
 })();
 
-const NT_HTML = `<div class="ac-item" id="nt-box"><b>ជូនដំណឹងការកម្មង់ទៅ Telegram</b><small id="nt-bot"></small><small>១) បើក Bot ខាងលើ ហើយចុច Start · ២) រក Chat ID របស់អ្នកតាម @userinfobot · ៣) បញ្ចូលលេខនោះខាងក្រោម</small><input class="ad-input" id="nt-chat" inputmode="numeric" placeholder="Chat ID (លេខ)" style="margin-top:8px" /><div class="ac-acts"><button class="ad-btn" id="nt-save" type="button">រក្សាទុក</button><button class="ad-btn" id="nt-test" type="button">ផ្ញើសារសាកល្បង</button></div><small id="nt-msg" style="margin-top:6px"></small></div>`;
+const NT_HTML = `<div class="ac-item" id="nt-box"><b>ជូនដំណឹងការកម្មង់ទៅ Telegram</b><small id="nt-bot"></small><small>១) បើក Bot ខាងលើ ហើយចុច Start · ២) រក Chat ID របស់អ្នកតាម @userinfobot · ៣) បញ្ចូលលេខនោះខាងក្រោម</small><input class="ad-input" id="nt-chat" inputmode="numeric" placeholder="Chat ID (លេខ)" style="margin-top:8px" /><small style="display:block;margin-top:10px">Group ជជែកជាមួយភ្ញៀវ (ស្រេចចិត្ត)៖ ដាក់ Chat ID របស់ group ដើម្បីទទួលសារភ្ញៀវ និងឆ្លើយតបនៅទីនោះ។ បើទទេ សារភ្ញៀវទៅ Chat ID ខាងលើ។</small><input class="ad-input" id="nt-support" inputmode="numeric" placeholder="Chat ID group ជជែក (ស្រេចចិត្ត)" style="margin-top:6px" /><div class="ac-acts"><button class="ad-btn" id="nt-save" type="button">រក្សាទុក</button><button class="ad-btn" id="nt-test" type="button">ផ្ញើសារសាកល្បង</button></div><small id="nt-msg" style="margin-top:6px"></small></div>`;
 async function bindNotify() {
   const $ = (id) => document.getElementById(id), msg = $("nt-msg");
   if (!$("nt-box")) return;
   if (!sbOn()) { $("nt-box").style.display = "none"; return; }
-  try { const r = await acApi(`shop_notify?select=chat_id&shop_id=eq.${SHOP_ID}`); $("nt-chat").value = (r[0] && r[0].chat_id) || ""; } catch (e) {}
+  let hasSup = false;
+  try {
+    let r;
+    try { r = await acApi(`shop_notify?select=chat_id,support_chat_id&shop_id=eq.${SHOP_ID}`); hasSup = true; }
+    catch (e2) { r = await acApi(`shop_notify?select=chat_id&shop_id=eq.${SHOP_ID}`); }
+    $("nt-chat").value = (r[0] && r[0].chat_id) || "";
+    $("nt-support").value = (r[0] && r[0].support_chat_id) || "";
+  } catch (e) {}
   try { const bu = await acApi("rpc/notify_bot", { method: "POST", body: "{}" }); if (bu && !/^ដាក់-/.test(bu)) $("nt-bot").innerHTML = `Bot៖ <a href="https://t.me/${esc(bu)}" target="_blank" rel="noopener">@${esc(bu)}</a>`; } catch (e) {}
   $("nt-save").onclick = async () => {
-    const v = $("nt-chat").value.trim(); msg.style.color = "";
+    const v = $("nt-chat").value.trim(), sv = $("nt-support").value.trim(); msg.style.color = "";
+    if (sv && !/^-?\d+$/.test(sv)) { msg.textContent = "Chat ID group មិនត្រឹមត្រូវ"; return; }
     if (v && !/^-?\d+$/.test(v)) { msg.textContent = "Chat ID ត្រូវជាលេខ"; return; }
-    try { await acApi("shop_notify?on_conflict=shop_id", { method: "POST", headers: { Prefer: "resolution=merge-duplicates,return=minimal" }, body: JSON.stringify({ shop_id: SHOP_ID, chat_id: v }) }); msg.textContent = "បានរក្សាទុក"; }
+    try { await acApi("shop_notify?on_conflict=shop_id", { method: "POST", headers: { Prefer: "resolution=merge-duplicates,return=minimal" }, body: JSON.stringify(sv || hasSup ? { shop_id: SHOP_ID, chat_id: v, support_chat_id: sv } : { shop_id: SHOP_ID, chat_id: v }) }); msg.textContent = "បានរក្សាទុក"; }
     catch (e) { msg.style.color = "#B8213F"; msg.textContent = "រក្សាមិនបាន (តើបាន run admin-telegram.sql ហើយឬនៅ?)"; }
   };
   $("nt-test").onclick = async () => {
