@@ -962,17 +962,27 @@ function downloadPhoto(n) {
 }
 
 let adFilter = "all";
+let adSort = "default";
+function adOrder() {
+  const ix = PRODUCTS.map((_, k) => k);
+  const stk = (k) => { const v = adminData.stock[k + 1]; return v === undefined || v === "" ? Infinity : Number(v); };
+  if (adSort === "name") ix.sort((a, b) => PRODUCTS[a].name.localeCompare(PRODUCTS[b].name, "km"));
+  else if (adSort === "price-asc") ix.sort((a, b) => Number(PRODUCTS[a].price) - Number(PRODUCTS[b].price));
+  else if (adSort === "price-desc") ix.sort((a, b) => Number(PRODUCTS[b].price) - Number(PRODUCTS[a].price));
+  else if (adSort === "stock") ix.sort((a, b) => stk(a) - stk(b));
+  return ix;
+}
 function adminRows(q) {
   const hidden = new Set(adminData.hidden), gone = new Set(adminData.deleted || []);
   const needle = (q || "").trim().toLowerCase();
-  const out = PRODUCTS.map((p, k) => {
-    const n = k + 1;
+  const out = adOrder().map((k) => {
+    const p = PRODUCTS[k], n = k + 1;
     if (gone.has(n)) return "";
     const h = hidden.has(n), onSale = Number(adminData.sale[n]) > 0, out = adminData.stock[n] !== undefined && adminData.stock[n] !== "" && Number(adminData.stock[n]) === 0;
     if (adFilter === "sale" && !onSale) return "";
     if (adFilter === "hidden" && !h) return "";
     if (adFilter === "out" && !out) return "";
-    if (needle && !(p.name.toLowerCase().includes(needle) || String(n) === needle)) return "";
+    if (needle && !(p.name.toLowerCase().includes(needle) || String(p.place || "").toLowerCase().includes(needle) || String(n) === needle)) return "";
     return `<div class="ad-row${h ? " is-hidden" : ""}" data-n="${n}">
       <div class="ad-side">
         <div class="ad-thumbwrap"><img class="ad-thumb" src="${photoOf(n)}" alt="" decoding="async" onerror="this.style.display='none'" /></div>
@@ -1219,6 +1229,13 @@ function openAdminPanel() {
         <button type="button" data-flt="hidden">ទំនិញលាក់</button>
         <button type="button" data-flt="out">អស់ស្តុក</button>
       </div>
+      <select class="ad-input" id="ad-sort" aria-label="តម្រៀប" style="margin:0 0 8px">
+        <option value="default">តម្រៀប៖ លំដាប់ដើម</option>
+        <option value="name">ឈ្មោះ ក → អ</option>
+        <option value="price-asc">តម្លៃ ទាប → ខ្ពស់</option>
+        <option value="price-desc">តម្លៃ ខ្ពស់ → ទាប</option>
+        <option value="stock">ស្តុកតិចបំផុត</option>
+      </select>
       <div class="ad-list" id="ad-list">${adminRows("")}</div>
     </div>
 
@@ -1387,9 +1404,10 @@ function openAdminPanel() {
     }
     saveAdmin(); refreshSite(); stats();
   };
-  adFilter = "all";
+  adFilter = "all"; adSort = "default";
   const searchEl = document.getElementById("ad-search");
   searchEl.addEventListener("input", (e) => { list.innerHTML = adminRows(e.target.value); });
+  document.getElementById("ad-sort").addEventListener("change", (e) => { adSort = e.target.value; list.innerHTML = adminRows(searchEl.value); list.scrollTop = 0; });
   document.querySelectorAll("#ad-filters button").forEach((b) => b.addEventListener("click", () => {
     adFilter = b.dataset.flt;
     document.querySelectorAll("#ad-filters button").forEach((x) => x.classList.toggle("on", x === b));

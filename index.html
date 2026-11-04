@@ -1422,6 +1422,10 @@
   .section-head { margin: 30px 0 14px; align-items: center; }
   .section-head h2 { font-size: 24px; letter-spacing: -.005em; }
   .section-head .line { background: var(--line); height: 1px; opacity: 1; }
+  .fbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 0 0 14px; }
+  .fchip { height: 34px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--line); background: #fff; font-size: 13px; cursor: pointer; }
+  .fchip.on { background: #111; color: #fff; border-color: #111; }
+  .fnum { width: 96px; height: 34px; border-radius: 999px; border: 1px solid var(--line); background: #fff; padding: 0 12px; font-size: 13px; }
   .sort { height: 38px; border-radius: 999px; border: 1px solid var(--line); background: #fff; padding: 0 14px; font-size: 13px; }
   .flash { border-radius: 20px; }
 
@@ -1644,8 +1648,17 @@
         <option value="default">តម្រៀប៖ ធម្មតា</option>
         <option value="price-asc">តម្លៃ ទាប → ខ្ពស់</option>
         <option value="price-desc">តម្លៃ ខ្ពស់ → ទាប</option>
+        <option value="new">ថ្មីបំផុត</option>
+        <option value="name">ឈ្មោះ ក → អ</option>
         <option value="disc">បញ្ចុះច្រើនបំផុត</option>
       </select>
+    </div>
+    <div class="fbar" id="fbar">
+      <button type="button" class="fchip" id="f-sale">បញ្ចុះតម្លៃ</button>
+      <button type="button" class="fchip" id="f-stock">មានស្តុក</button>
+      <input class="fnum" id="f-min" type="number" inputmode="numeric" min="0" placeholder="តម្លៃពី" aria-label="តម្លៃពី" />
+      <input class="fnum" id="f-max" type="number" inputmode="numeric" min="0" placeholder="ដល់" aria-label="ដល់" />
+      <button type="button" class="fchip fclr" id="f-clr" style="display:none">សម្អាត</button>
     </div>
     <div class="grid" id="grid"></div>
   </div>
@@ -1755,6 +1768,8 @@
       <button type="button" class="of-btn" id="au-facebook" style="width:100%;display:flex;align-items:center;justify-content:center;gap:10px;padding:12px;font-size:15px;margin-bottom:10px;background:#1877F2;border-color:#1877F2;color:#fff">
         <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path fill="#fff" d="M24 12.07C24 5.4 18.63 0 12 0S0 5.4 0 12.07C0 18.1 4.39 23.1 10.13 24v-8.44H7.08v-3.49h3.05V9.41c0-3.02 1.79-4.69 4.53-4.69 1.31 0 2.69.24 2.69.24v2.97h-1.51c-1.49 0-1.96.93-1.96 1.89v2.25h3.33l-.53 3.49h-2.8V24C19.61 23.1 24 18.1 24 12.07z"/></svg>
         បន្តជាមួយ Facebook</button>
+      <button type="button" class="of-btn" id="au-telegram" style="width:100%;display:flex;align-items:center;justify-content:center;gap:10px;padding:12px;font-size:15px;margin-bottom:10px;background:#229ED9;border-color:#229ED9;color:#fff">
+        <i class="fa-brands fa-telegram" style="font-size:18px"></i> Telegram</button>
       <div class="of-hint" id="au-err" style="color:#B8213F;text-align:center"></div>
       <button class="sheet-cancel" id="au-close" type="button">បិទ</button>
     </div>
@@ -2596,7 +2611,7 @@ async function cToken() {
 function openAuth(mode, sub) {
   $c("au-title").textContent = "ចូលគណនី";
   $c("au-sub").textContent = sub || "ចូលដោយគណនី Google ឬ Facebook របស់អ្នក";
-  $c("au-err").textContent = ""; $c("authsheet").classList.add("open");
+  $c("au-err").textContent = ""; $c("authsheet").classList.add("open"); tgPrep().catch(() => {});
 }
 function oauth(provider) {
   try { sessionStorage.setItem("authResume", afterAuth === openCheckout ? "cart" : (afterAuth && afterAuth.ord ? "ord" : "")); } catch (e) {}
@@ -2604,6 +2619,29 @@ function oauth(provider) {
 }
 $c("au-google").onclick = () => oauth("google");
 $c("au-facebook").onclick = () => oauth("facebook");
+// ---- ចូលគណនីតាម Telegram ----
+var tgCfg = null;
+const TG_FN = `${SB_URL}/functions/v1/telegram-login`;
+function loadTgSdk() { return new Promise((res, rej) => { if (window.Telegram && Telegram.Login) return res(); const s = document.createElement("script"); s.src = "https://telegram.org/js/telegram-widget.js?22"; s.onload = res; s.onerror = rej; document.head.appendChild(s); }); }
+async function tgPrep() {
+  if (!tgCfg) { const r = await fetch(TG_FN, { headers: { apikey: SB_KEY } }); tgCfg = await r.json(); if (!tgCfg.bot_id) { tgCfg = null; throw new Error("cfg"); } }
+  await loadTgSdk();
+}
+$c("au-telegram").onclick = () => {
+  const er = $c("au-err"); er.style.color = "#B8213F"; er.textContent = "";
+  if (!tgCfg || !(window.Telegram && Telegram.Login)) { tgPrep().then(() => { er.textContent = "សូមចុចម្តងទៀត"; }).catch(() => { er.textContent = "មិនអាចតភ្ជាប់ Telegram បានទេ"; }); return; }
+  Telegram.Login.auth({ bot_id: tgCfg.bot_id, request_access: "write", lang: "en" }, async (u) => {
+    if (!u) { er.textContent = "Telegram មិនបានអនុញ្ញាត"; return; }
+    try {
+      const r = await fetch(TG_FN, { method: "POST", headers: { apikey: SB_KEY, "Content-Type": "application/json" }, body: JSON.stringify(u) });
+      const j = await r.json();
+      if (!r.ok || !j.access_token) throw new Error(j.error || "error");
+      setSess(j); toast("✓ ចូលគណនីរួចរាល់"); loadProfile();
+      const f = afterAuth; afterAuth = null; $c("authsheet").classList.remove("open");
+      if (typeof f === "function") setTimeout(f, 300);
+    } catch (e) { er.textContent = "ចូលតាម Telegram មិនបានសម្រេច · " + String(e.message).slice(0, 80); }
+  });
+};
 $c("au-close").onclick = () => { $c("authsheet").classList.remove("open"); afterAuth = null; };
 $c("authsheet").addEventListener("click", (e) => { if (e.target.id === "authsheet") $c("au-close").onclick(); });
 async function loadMine() {
@@ -2834,10 +2872,15 @@ document.addEventListener("keydown", (e) => {
 const CATS = [["all", "ទាំងអស់"], ["sale", "បញ្ចុះតម្លៃ"], ["top", "អាវ"], ["bottom", "ខោ"], ["dress", "សំពត់ · រ៉ូប"], ["set", "ឈុត"], ["acc", "គ្រឿងបន្ថែម"]];
 let activeCat = "all";
 let query = "", sortBy = "default";
+let fSale = false, fStock = false, pMin = 0, pMax = 0;
+const filtersActive = () => fSale || fStock || pMin > 0 || pMax > 0;
+const passFilters = (p) => (!fSale || saleOf(p) > 0) && (!fStock || stockOf(p.idx) !== 0) && (!pMin || finalPrice(p) >= pMin) && (!pMax || finalPrice(p) <= pMax);
 function sortList(list) {
   const arr = list.slice();
   if (sortBy === "price-asc") arr.sort((a, b) => finalPrice(a) - finalPrice(b));
   else if (sortBy === "price-desc") arr.sort((a, b) => finalPrice(b) - finalPrice(a));
+  else if (sortBy === "new") arr.sort((a, b) => b.idx - a.idx);
+  else if (sortBy === "name") arr.sort((a, b) => a.name.localeCompare(b.name, "km"));
   else if (sortBy === "disc") arr.sort((a, b) => saleOf(b) / b.price - saleOf(a) / a.price);
   return arr;
 }
@@ -2872,12 +2915,12 @@ function render() {
   renderShops();
   const hidden = hiddenSet();
   const fvs = favOnly ? new Set(getFavs()) : null;
-  const all = PRODUCTS.map((p, idx) => ({ ...p, idx })).filter((p) => !hidden.has(p.idx + 1) && (!fvs || fvs.has(p.idx + 1)) && (!shopFilter || (p.shop || 1) === shopFilter));
+  const all = PRODUCTS.map((p, idx) => ({ ...p, idx })).filter((p) => !hidden.has(p.idx + 1) && (!fvs || fvs.has(p.idx + 1)) && (!shopFilter || (p.shop || 1) === shopFilter) && passFilters(p));
   const saleGrid = document.getElementById("sale-grid");
   const title = document.getElementById("all-title");
   const grid = document.getElementById("grid");
   const q = query.trim().toLowerCase();
-  if (activeCat === "all" && !q && !favOnly) {
+  if (activeCat === "all" && !q && !favOnly && !filtersActive()) {
     const onSale = all.filter((p) => saleOf(p) > 0);
     const rest = all.filter((p) => saleOf(p) === 0);
     title.textContent = "ខោអាវផ្សេងទៀត";
@@ -2889,7 +2932,7 @@ function render() {
     fillGrid(grid, sortList(rest), false);
   } else {
     const base = activeCat === "all" ? all : activeCat === "sale" ? all.filter((p) => saleOf(p) > 0) : all.filter((p) => catOf(p) === activeCat);
-    const list = sortList(base.filter((p) => !q || p.name.toLowerCase().includes(q)));
+    const list = sortList(base.filter((p) => !q || p.name.toLowerCase().includes(q) || String(p.place || "").toLowerCase().includes(q) || String(p.idx + 1) === q));
     title.textContent = favOnly ? "ទំនិញដែលចូលចិត្ត ♥" : q ? `ស្វែងរក "${query.trim()}"` : (CATS.find((c) => c[0] === activeCat) || [0, ""])[1];
     document.getElementById("count").textContent = `${list.length} ទំនិញ`;
     document.getElementById("sale-section").style.display = "none";
@@ -3159,6 +3202,15 @@ document.getElementById("search").addEventListener("input", (e) => {
   if (!had && query.trim()) { const t = document.getElementById("all-products"); if (t) t.scrollIntoView({ behavior: "smooth", block: "start" }); }
 });
 document.getElementById("sort").addEventListener("change", (e) => { sortBy = e.target.value; render(); });
+(function () {
+  const $ = (id) => document.getElementById(id);
+  const sync = () => { $("f-sale").classList.toggle("on", fSale); $("f-stock").classList.toggle("on", fStock); $("f-clr").style.display = filtersActive() ? "" : "none"; render(); };
+  $("f-sale").addEventListener("click", () => { fSale = !fSale; sync(); });
+  $("f-stock").addEventListener("click", () => { fStock = !fStock; sync(); });
+  $("f-min").addEventListener("input", (e) => { pMin = Number(e.target.value) || 0; sync(); });
+  $("f-max").addEventListener("input", (e) => { pMax = Number(e.target.value) || 0; sync(); });
+  $("f-clr").addEventListener("click", () => { fSale = fStock = false; pMin = pMax = 0; $("f-min").value = ""; $("f-max").value = ""; sync(); });
+})();
 
 // ---------- ផ្ទាំងផ្សព្វផ្សាយធំ 3 ----------
 const bannerImg = (n) => (useData() && adminImages["b" + n]) ? adminImages["b" + n] : `Banner${n}.jpg`;
