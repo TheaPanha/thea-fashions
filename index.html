@@ -1791,6 +1791,9 @@
         <select class="of-input" id="pf-comm" aria-label="ឃុំ / សង្កាត់" style="display:none"></select>
         <select class="of-input" id="pf-vill" aria-label="ភូមិ" style="display:none"></select>
         <input class="of-input" id="pf-addr" type="text" placeholder="ផ្ទះលេខ ផ្លូវ ឬចំណុចសម្គាល់" style="margin-bottom:12px" />
+        <div class="pf-lb">Telegram</div>
+        <div class="of-hint" id="tg-st" style="margin:0 0 6px"></div>
+        <button type="button" class="of-btn" id="tg-link" style="width:100%;padding:11px;margin-bottom:12px;background:#229ED9;border-color:#229ED9;color:#fff">ភ្ជាប់ Telegram</button>
                 <button class="sheet-confirm" id="pf-save" type="button" style="margin-top:2px">រក្សាទុកព័ត៌មាន</button>
         <div class="of-hint" id="pf-msg" style="text-align:center;margin:8px 0 0"></div>
       </div>
@@ -2625,28 +2628,41 @@ const TG_FN = `${SB_URL}/functions/v1/telegram-login`;
 async function tgPrep() { if (!tgCfg) { const r = await fetch(TG_FN, { headers: { apikey: SB_KEY } }); const c = await r.json(); if (!c.client_id) throw new Error("cfg"); tgCfg = c; } }
 const b64u = (buf) => btoa(String.fromCharCode.apply(null, new Uint8Array(buf))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
 const tgRedirect = () => location.origin + location.pathname;
-$c("au-telegram").onclick = async () => {
-  const er = $c("au-err"); er.style.color = "#B8213F"; er.textContent = "";
+async function tgStart(link) {
+  const er = $c(link ? "pf-msg" : "au-err"); er.style.color = "#B8213F"; er.textContent = "";
   try {
     await tgPrep();
     const rnd = (n) => b64u(crypto.getRandomValues(new Uint8Array(n)));
     const ver = rnd(48), st = rnd(16);
     const chal = b64u(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(ver)));
-    sessionStorage.setItem("tgV", ver); sessionStorage.setItem("tgS", st);
-    sessionStorage.setItem("authResume", afterAuth === openCheckout ? "cart" : (afterAuth && afterAuth.ord ? "ord" : ""));
+    sessionStorage.setItem("tgV", ver); sessionStorage.setItem("tgS", st); sessionStorage.setItem("tgLink", link ? "1" : "");
+    sessionStorage.setItem("authResume", !link && afterAuth === openCheckout ? "cart" : (!link && afterAuth && afterAuth.ord ? "ord" : ""));
     location.href = "https://oauth.telegram.org/auth?" + new URLSearchParams({ client_id: tgCfg.client_id, redirect_uri: tgRedirect(), response_type: "code", scope: "openid profile telegram:bot_access", state: st, code_challenge: chal, code_challenge_method: "S256" });
   } catch (e) { er.textContent = "មិនអាចតភ្ជាប់ Telegram បានទេ"; }
-};
+}
+$c("au-telegram").onclick = () => tgStart(false);
+$c("tg-link").onclick = () => tgStart(true);
+async function tgStatus() {
+  const st = $c("tg-st"), b = $c("tg-link"); if (!st || !CU.sess) return;
+  try {
+    const t = await cToken();
+    const r = await fetch(`${SB_URL}/rest/v1/customer_telegram?user_id=eq.${CU.sess.uid}&select=chat_id`, { headers: { apikey: SB_KEY, Authorization: "Bearer " + t }, cache: "no-store" });
+    const j = r.ok ? await r.json() : [];
+    st.textContent = j.length ? "បានភ្ជាប់ Telegram ហើយ អ្នកនឹងទទួលដំណឹងការកម្មង់" : "មិនទាន់ភ្ជាប់ Telegram ដើម្បីទទួលដំណឹងការកម្មង់";
+    b.textContent = j.length ? "ភ្ជាប់ Telegram ឡើងវិញ" : "ភ្ជាប់ Telegram";
+  } catch (e) {}
+}
 (async function () {
   const q = new URLSearchParams(location.search), code = q.get("code"), st = q.get("state");
   if (!code || !st) return;
-  let ver = "", ss = "";
-  try { ver = sessionStorage.getItem("tgV") || ""; ss = sessionStorage.getItem("tgS") || ""; } catch (e) {}
+  let ver = "", ss = "", lk = "";
+  try { ver = sessionStorage.getItem("tgV") || ""; ss = sessionStorage.getItem("tgS") || ""; lk = sessionStorage.getItem("tgLink") || ""; } catch (e) {}
   if (!ver || st !== ss) return;
-  try { sessionStorage.removeItem("tgV"); sessionStorage.removeItem("tgS"); history.replaceState(null, "", location.pathname); } catch (e) {}
+  try { sessionStorage.removeItem("tgV"); sessionStorage.removeItem("tgS"); sessionStorage.removeItem("tgLink"); history.replaceState(null, "", location.pathname); } catch (e) {}
   try {
-    const r = await fetch(TG_FN, { method: "POST", headers: { apikey: SB_KEY, "Content-Type": "application/json" }, body: JSON.stringify({ code, verifier: ver, redirect_uri: tgRedirect() }) });
+    const r = await fetch(TG_FN, { method: "POST", headers: { apikey: SB_KEY, "Content-Type": "application/json" }, body: JSON.stringify({ code, verifier: ver, redirect_uri: tgRedirect(), link_token: lk ? await cToken() : undefined }) });
     const j = await r.json();
+    if (lk) { if (!r.ok || !j.linked) throw new Error(j.error || "error"); toast("✓ ភ្ជាប់ Telegram រួចរាល់"); tgStatus(); return; }
     if (!r.ok || !j.access_token) throw new Error(j.error || "error");
     setSess(j); toast("✓ ចូលគណនីរួចរាល់"); loadProfile();
     let rs = ""; try { rs = sessionStorage.getItem("authResume") || ""; sessionStorage.removeItem("authResume"); } catch (e) {}
@@ -2744,7 +2760,7 @@ async function loadProfile() {
     const r = await fetch(`${SB_URL}/rest/v1/profiles?id=eq.${CU.sess.uid}&select=*`, { headers: { apikey: SB_KEY, Authorization: "Bearer " + t }, cache: "no-store" });
     if (r.ok) { const j = await r.json(); PF = j[0] || null; if (PF && PF.name) { CU.sess.name = PF.name; try { localStorage.setItem("custSess", JSON.stringify(CU.sess)); } catch (e) {} } }
   } catch (e) {}
-  pfFill();
+  pfFill(); tgStatus();
 }
 async function saveProfile(extra) {
   const msg = pfEl("pf-msg"); msg.style.color = ""; msg.textContent = "";
