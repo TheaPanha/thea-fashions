@@ -2622,18 +2622,18 @@ $c("au-facebook").onclick = () => oauth("facebook");
 // ---- ចូលគណនីតាម Telegram ----
 var tgCfg = null;
 const TG_FN = `${SB_URL}/functions/v1/telegram-login`;
-function loadTgSdk() { return new Promise((res, rej) => { if (window.Telegram && Telegram.Login) return res(); const s = document.createElement("script"); s.src = "https://telegram.org/js/telegram-widget.js?22"; s.onload = res; s.onerror = rej; document.head.appendChild(s); }); }
+function loadTgSdk() { return new Promise((res, rej) => { if (window.Telegram && Telegram.Login) return res(); const s = document.createElement("script"); s.src = "https://oauth.telegram.org/js/telegram-login.js?6"; s.onload = res; s.onerror = rej; document.head.appendChild(s); }); }
 async function tgPrep() {
-  if (!tgCfg) { const r = await fetch(TG_FN, { headers: { apikey: SB_KEY } }); tgCfg = await r.json(); if (!tgCfg.bot_id) { tgCfg = null; throw new Error("cfg"); } }
+  if (!tgCfg) { const r = await fetch(TG_FN, { headers: { apikey: SB_KEY } }); tgCfg = await r.json(); if (!tgCfg.client_id) { tgCfg = null; throw new Error("cfg"); } }
   await loadTgSdk();
 }
 $c("au-telegram").onclick = () => {
   const er = $c("au-err"); er.style.color = "#B8213F"; er.textContent = "";
   if (!tgCfg || !(window.Telegram && Telegram.Login)) { tgPrep().then(() => { er.textContent = "សូមចុចម្តងទៀត"; }).catch(() => { er.textContent = "មិនអាចតភ្ជាប់ Telegram បានទេ"; }); return; }
-  Telegram.Login.auth({ bot_id: tgCfg.bot_id, request_access: "write", lang: "en" }, async (u) => {
-    if (!u) { er.textContent = "Telegram មិនបានអនុញ្ញាត"; return; }
+  Telegram.Login.auth({ client_id: Number(tgCfg.client_id), scope: ["profile", "write"], lang: "en" }, async (u) => {
+    if (!u || u.error || !u.id_token) { er.textContent = "Telegram មិនបានអនុញ្ញាត"; return; }
     try {
-      const r = await fetch(TG_FN, { method: "POST", headers: { apikey: SB_KEY, "Content-Type": "application/json" }, body: JSON.stringify(u) });
+      const r = await fetch(TG_FN, { method: "POST", headers: { apikey: SB_KEY, "Content-Type": "application/json" }, body: JSON.stringify({ id_token: u.id_token }) });
       const j = await r.json();
       if (!r.ok || !j.access_token) throw new Error(j.error || "error");
       setSess(j); toast("✓ ចូលគណនីរួចរាល់"); loadProfile();
