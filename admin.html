@@ -814,6 +814,73 @@ async function bindNotify() {
     } catch (e) { msg.style.color = "#B8213F"; msg.textContent = "ផ្ញើមិនបាន (តើបាន run admin-telegram.sql ហើយឬនៅ?)"; }
   };
 }
+const BOT_CHK = [
+  ["welcome_on", "ស្វាគមន៍សមាជិកថ្មី"], ["goodbye_on", "សារលាពេលសមាជិកចេញ"], ["delete_service", "លុបសារ \"ចូល/ចេញ\" ស្វ័យប្រវត្តិ"],
+  ["antilink", "ហាមផ្ញើតំណ (link)"], ["antiforward", "ហាម forward សារ"], ["antispam", "ការពារ spam (ផ្ញើញឹកពេក)"],
+];
+async function renderBot() {
+  const box = document.getElementById("bot-body"); if (!box) return;
+  if (!sbOn()) { box.innerHTML = '<div class="ad-empty">មុខងារនេះត្រូវការ Supabase</div>'; return; }
+  box.innerHTML = '<div class="ad-empty">កំពុងផ្ទុក...</div>';
+  let cfg = {}, cmds = [];
+  try {
+    const r = await acApi(`bot_settings?select=*&shop_id=eq.${SHOP_ID}`); cfg = (r && r[0]) || {};
+    cmds = await acApi(`bot_commands?select=*&shop_id=eq.${SHOP_ID}&order=id.asc`);
+  } catch (e) { box.innerHTML = '<div class="ad-empty">ផ្ទុកមិនបាន (តើបាន run telegram-bot.sql ហើយឬនៅ?)</div>'; return; }
+  const v = (k, d) => esc(cfg[k] != null ? cfg[k] : d);
+  const on = (k, d) => (cfg[k] != null ? cfg[k] : d) ? "checked" : "";
+  box.innerHTML = `
+    <div class="ac-item"><b>Webhook</b><small>ភ្ជាប់ម្ដងប៉ុណ្ណោះ (មើលរបៀបក្នុងឯកសារ telegram-bot/index.ts)។ ដាក់ Bot ក្នុង group ជា Admin រួចវាយ /id ដើម្បីបានលេខ Chat ID។</small>
+      <input class="ad-input" readonly value="${esc(SB_URL + "/functions/v1/telegram-bot")}" style="margin-top:8px;font-size:12px" /></div>
+    <div class="ac-item"><b>Group ដែល Bot គ្រប់គ្រង</b>
+      <input class="ad-input" id="bt-group_chat_id" inputmode="numeric" placeholder="Chat ID group (ឧ. -1001234567890)" value="${v("group_chat_id", "")}" style="margin-top:8px" />
+      <input class="ad-input" id="bt-log_chat_id" inputmode="numeric" placeholder="Chat ID group កត់ត្រា Log (ស្រេចចិត្ត)" value="${v("log_chat_id", "")}" />
+      <input class="ad-input" id="bt-site_url" placeholder="តំណហាង សម្រាប់ពាក្យបញ្ជា /shop" value="${v("site_url", "")}" /></div>
+    <div class="ac-item"><b>សារស្វាគមន៍ / លា</b><small>អថេរ៖ {name} {mention} {group} {count}</small>
+      ${["welcome_on", "goodbye_on", "delete_service"].map((k) => `<label class="ad-check" style="display:block;margin-top:8px"><input type="checkbox" id="bt-${k}" ${on(k, k !== "goodbye_on")}> ${BOT_CHK.find((x) => x[0] === k)[1]}</label>`).join("")}
+      <textarea class="ad-input" id="bt-welcome_text" placeholder="សារស្វាគមន៍" style="margin-top:8px">${v("welcome_text", "👋 សូមស្វាគមន៍ {mention} មកកាន់ {group}! អ្នកជាសមាជិកទី {count}។")}</textarea>
+      <textarea class="ad-input" id="bt-goodbye_text" placeholder="សារលា">${v("goodbye_text", "{name} បានចាកចេញពី group។")}</textarea>
+      <textarea class="ad-input" id="bt-rules_text" placeholder="ច្បាប់ group (បង្ហាញពេលវាយ /rules)">${v("rules_text", "")}</textarea></div>
+    <div class="ac-item"><b>ការគ្រប់គ្រងស្វ័យប្រវត្តិ (Auto-mod)</b><small>មិនប៉ះពាល់ Admin ទេ។ ល្មើសម្ដងៗ = ព្រមាន ដល់កំណត់ = ទណ្ឌកម្ម។</small>
+      ${["antilink", "antiforward", "antispam"].map((k) => `<label class="ad-check" style="display:block;margin-top:8px"><input type="checkbox" id="bt-${k}" ${on(k, false)}> ${BOT_CHK.find((x) => x[0] === k)[1]}</label>`).join("")}
+      <div class="ad-two" style="margin-top:8px">
+        <label>សារអតិបរមា/១០វិ<input class="ad-input" id="bt-spam_limit" inputmode="numeric" value="${v("spam_limit", 5)}" /></label>
+        <label>ព្រមានអតិបរមា<input class="ad-input" id="bt-warn_limit" inputmode="numeric" value="${v("warn_limit", 3)}" /></label></div>
+      <label style="font-size:12px;color:var(--muted)">ទណ្ឌកម្មពេលដល់កំណត់
+        <select class="ad-input" id="bt-warn_action" style="margin-top:3px">${[["mute", "បិទសំឡេង ១ ម៉ោង"], ["kick", "បណ្ដេញ"], ["ban", "ហាមឃាត់"]].map(([k, t]) => `<option value="${k}" ${(cfg.warn_action || "mute") === k ? "selected" : ""}>${t}</option>`).join("")}</select></label>
+      <textarea class="ad-input" id="bt-badwords" placeholder="ពាក្យហាម (ញែកដោយក្បៀស ឬបន្ទាត់ថ្មី)" style="margin-top:8px">${v("badwords", "")}</textarea>
+      <div class="ac-acts"><button class="ad-btn" id="bt-save" type="button">រក្សាទុក</button></div><small id="bt-msg" style="margin-top:6px"></small></div>
+    <div class="ad-label">ពាក្យបញ្ជា និងចម្លើយស្វ័យប្រវត្តិ (${cmds.length})</div>
+    ${cmds.map((c) => `<div class="ac-item"><b>${c.kind === "command" ? "/" : "🔎 "}${esc(c.trigger)}</b><small>${esc(c.reply)}</small><div class="ac-acts"><button class="ad-btn danger" data-del="${c.id}" type="button">លុប</button></div></div>`).join("") || '<div class="ad-empty">មិនទាន់មាន</div>'}
+    <div class="ac-item"><b>បន្ថែមថ្មី</b>
+      <select class="ad-input" id="bc-kind" style="margin-top:8px"><option value="command">ពាក្យបញ្ជា (/តម្លៃ)</option><option value="keyword">ពាក្យគន្លឹះ (ឆ្លើយពេលមានពាក្យនេះក្នុងសារ)</option></select>
+      <input class="ad-input" id="bc-trigger" placeholder="ឧ. delivery" />
+      <textarea class="ad-input" id="bc-reply" placeholder="ចម្លើយ (ប្រើ {mention} {name} បាន)"></textarea>
+      <div class="ac-acts"><button class="ad-btn" id="bc-add" type="button">បន្ថែម</button></div><small id="bc-msg" style="margin-top:6px"></small></div>`;
+
+  const $ = (id) => document.getElementById(id), msg = $("bt-msg");
+  $("bt-save").onclick = async () => {
+    const row = { shop_id: SHOP_ID };
+    ["group_chat_id", "log_chat_id"].forEach((k) => (row[k] = $("bt-" + k).value.trim()));
+    if ((row.group_chat_id && !/^-?\d+$/.test(row.group_chat_id)) || (row.log_chat_id && !/^-?\d+$/.test(row.log_chat_id))) { msg.style.color = "#B8213F"; msg.textContent = "Chat ID ត្រូវជាលេខ"; return; }
+    ["site_url", "welcome_text", "goodbye_text", "rules_text", "badwords", "warn_action"].forEach((k) => (row[k] = $("bt-" + k).value.trim()));
+    BOT_CHK.forEach(([k]) => (row[k] = $("bt-" + k).checked));
+    row.spam_limit = Math.max(2, parseInt($("bt-spam_limit").value, 10) || 5);
+    row.warn_limit = Math.max(1, parseInt($("bt-warn_limit").value, 10) || 3);
+    try { await acApi("bot_settings?on_conflict=shop_id", { method: "POST", headers: { Prefer: "resolution=merge-duplicates,return=minimal" }, body: JSON.stringify(row) }); msg.style.color = ""; msg.textContent = "បានរក្សាទុក"; }
+    catch (e) { msg.style.color = "#B8213F"; msg.textContent = "រក្សាមិនបាន"; }
+  };
+  $("bc-add").onclick = async () => {
+    const m2 = $("bc-msg"), tr = $("bc-trigger").value.trim().replace(/^\//, ""), rp = $("bc-reply").value.trim();
+    if (!tr || !rp) { m2.style.color = "#B8213F"; m2.textContent = "សូមបញ្ចូលពាក្យ និងចម្លើយ"; return; }
+    try { await acApi("bot_commands?on_conflict=shop_id,trigger", { method: "POST", headers: { Prefer: "resolution=merge-duplicates,return=minimal" }, body: JSON.stringify({ shop_id: SHOP_ID, trigger: tr, reply: rp, kind: $("bc-kind").value }) }); renderBot(); }
+    catch (e) { m2.style.color = "#B8213F"; m2.textContent = "បន្ថែមមិនបាន"; }
+  };
+  box.onclick = async (e) => {
+    const b = e.target.closest("button[data-del]"); if (!b) return;
+    try { await acApi(`bot_commands?id=eq.${b.dataset.del}`, { method: "DELETE" }); renderBot(); } catch (er) {}
+  };
+}
 async function renderReviews() {
   const box = document.getElementById("rv-body"); if (!box) return;
   if (!sbOn()) { box.innerHTML = '<div class="ad-empty">មុខងារនេះត្រូវការ Supabase</div>'; return; }
@@ -1225,6 +1292,7 @@ function openAdminPanel() {
       ${SHOP_ID === 1 ? `<button class="ad-tab" data-tab="design" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18c1.2 0 2-.8 2-1.8 0-.6-.3-1-.6-1.4-.3-.4-.4-.8-.4-1.3 0-1 .8-1.8 1.8-1.8H17a4 4 0 0 0 4-4C21 6.5 17 3 12 3Z"/><circle cx="7.5" cy="11" r="1"/><circle cx="10" cy="7" r="1"/><circle cx="15" cy="7.5" r="1"/></svg>រចនា</button>` : ""}
       ${SHOP_ID === 1 ? `<button class="ad-tab" data-tab="shop" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5 5.5 4h13L20 9.5"/><path d="M4 9.5a2.7 2.7 0 0 0 5.3 0 2.7 2.7 0 0 0 5.4 0 2.7 2.7 0 0 0 5.3 0"/><path d="M5 12.5V20h14v-7.5M10 20v-4.5h4V20"/></svg>ហាង</button>` : ""}
       ${sbOn() && acIsOwner() ? `<button class="ad-tab" data-tab="access" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="8" cy="15" r="4"/><path d="m11 12 9-9M16 7l3 3M14 9l2 2"/></svg> សិទ្ធិ</button>` : ""}
+      ${sbOn() ? `<button class="ad-tab" data-tab="bot" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="8" width="16" height="11" rx="3"/><path d="M12 4v4M9 13h.01M15 13h.01M9 16.5h6"/></svg>Bot</button>` : ""}
       <button class="ad-tab" data-tab="reviews" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9L12 3Z"/></svg> វាយតម្លៃ</button>
       <button class="ad-tab" data-tab="promo" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10v4h3l8 4V6L7 10H4Z"/><path d="M18.5 9.5a4 4 0 0 1 0 5"/></svg>ផ្សព្វផ្សាយ</button>
     </div>
@@ -1310,6 +1378,7 @@ function openAdminPanel() {
     </div>
 
     <div class="ad-panel" data-tab="reviews" style="display:none"><div id="rv-body"></div></div>
+    <div class="ad-panel" data-tab="bot" style="display:none"><div id="bot-body"></div></div>
     <div class="ad-panel" data-tab="promo" style="display:none"><div id="cp-box"></div></div>
     <div class="ad-panel" data-tab="access" style="display:none"><div id="ac-body"></div></div>
 
@@ -1538,6 +1607,7 @@ function openAdminPanel() {
     if (t.dataset.tab === "orders") odLoad();
     if (t.dataset.tab === "access") renderAccess();
     if (t.dataset.tab === "reviews") renderReviews();
+    if (t.dataset.tab === "bot") renderBot();
     if (t.dataset.tab === "promo") window.cpLoad && cpLoad();
     if (t.dataset.tab === "products" && sbOn() && window.__sd.size === 0) {
       sbPull().then((rd) => {
