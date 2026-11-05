@@ -770,25 +770,40 @@ async function acApi(path, opt = {}) {
   });
 })();
 
-const NT_HTML = `<div class="ac-item" id="nt-box"><b>ជូនដំណឹងការកម្មង់ទៅ Telegram</b><small id="nt-bot"></small><small>១) បើក Bot ខាងលើ ហើយចុច Start · ២) រក Chat ID របស់អ្នកតាម @userinfobot · ៣) បញ្ចូលលេខនោះខាងក្រោម</small><input class="ad-input" id="nt-chat" inputmode="numeric" placeholder="Chat ID (លេខ)" style="margin-top:8px" /><small style="display:block;margin-top:10px">Group ជជែកជាមួយភ្ញៀវ (ស្រេចចិត្ត)៖ ដាក់ Chat ID របស់ group ដើម្បីទទួលសារភ្ញៀវ និងឆ្លើយតបនៅទីនោះ។ បើទទេ សារភ្ញៀវទៅ Chat ID ខាងលើ។</small><input class="ad-input" id="nt-support" inputmode="numeric" placeholder="Chat ID group ជជែក (ស្រេចចិត្ត)" style="margin-top:6px" /><div class="ac-acts"><button class="ad-btn" id="nt-save" type="button">រក្សាទុក</button><button class="ad-btn" id="nt-test" type="button">ផ្ញើសារសាកល្បង</button></div><small id="nt-msg" style="margin-top:6px"></small></div>`;
+const NT_HTML = `<div class="ac-item" id="nt-box"><b>ជូនដំណឹងការកម្មង់ទៅ Telegram</b><small id="nt-bot"></small><small>១) បើក Bot ខាងលើ ហើយចុច Start · ២) រក Chat ID របស់អ្នកតាម @userinfobot · ៣) បញ្ចូលលេខនោះខាងក្រោម</small><input class="ad-input" id="nt-chat" inputmode="numeric" placeholder="Chat ID (លេខ)" style="margin-top:8px" /><small style="display:block;margin-top:10px">Group ជជែកជាមួយភ្ញៀវ (ស្រេចចិត្ត)៖ ដាក់ Chat ID របស់ group ដើម្បីទទួលសារភ្ញៀវ និងឆ្លើយតបនៅទីនោះ។ បើទទេ សារភ្ញៀវទៅ Chat ID ខាងលើ។</small><input class="ad-input" id="nt-support" inputmode="numeric" placeholder="Chat ID group ជជែក (ស្រេចចិត្ត)" style="margin-top:6px" /><small style="display:block;margin-top:10px">Group ព័ត៌មាន (ស្រេចចិត្ត)៖ ដាក់ Chat ID របស់ group ដើម្បីឱ្យទំនិញថ្មីដែលអ្នកបន្ថែមត្រូវផ្សាយចូលទីនោះដោយស្វ័យប្រវត្តិ។</small><input class="ad-input" id="nt-news" inputmode="numeric" placeholder="Chat ID group ព័ត៌មាន (ស្រេចចិត្ត)" style="margin-top:6px" /><div class="ac-acts"><button class="ad-btn" id="nt-save" type="button">រក្សាទុក</button><button class="ad-btn" id="nt-test" type="button">ផ្ញើសារសាកល្បង</button></div><small id="nt-msg" style="margin-top:6px"></small></div>`;
+async function announceProduct(p) {
+  try {
+    const t = await sbToken();
+    const base = /^https?:/.test(location.href) ? location.href.replace(/admin\.html.*$/, "").replace(/[?#].*$/, "") : "";
+    const r = await fetch(`${SB_URL}/functions/v1/telegram-news`, { method: "POST", headers: { apikey: SB_KEY, "Content-Type": "application/json" }, body: JSON.stringify({ token: t, name: p.name, place: p.place, price: p.price, photo: p.photo || "", link: base }) });
+    const j = await r.json();
+    if (j && j.ok) alert("ផ្សាយទៅ group ព័ត៌មានរួចរាល់");
+    else if (j && j.error === "no_news_chat") alert("មិនទាន់កំណត់ Chat ID group ព័ត៌មាន ក្នុងការជូនដំណឹង Telegram");
+  } catch (e) {}
+}
 async function bindNotify() {
   const $ = (id) => document.getElementById(id), msg = $("nt-msg");
   if (!$("nt-box")) return;
   if (!sbOn()) { $("nt-box").style.display = "none"; return; }
-  let hasSup = false;
+  let hasSup = false, hasNews = false;
   try {
     let r;
-    try { r = await acApi(`shop_notify?select=chat_id,support_chat_id&shop_id=eq.${SHOP_ID}`); hasSup = true; }
-    catch (e2) { r = await acApi(`shop_notify?select=chat_id&shop_id=eq.${SHOP_ID}`); }
+    try { r = await acApi(`shop_notify?select=chat_id,support_chat_id,news_chat_id&shop_id=eq.${SHOP_ID}`); hasSup = true; hasNews = true; }
+    catch (e2) {
+      try { r = await acApi(`shop_notify?select=chat_id,support_chat_id&shop_id=eq.${SHOP_ID}`); hasSup = true; }
+      catch (e3) { r = await acApi(`shop_notify?select=chat_id&shop_id=eq.${SHOP_ID}`); }
+    }
     $("nt-chat").value = (r[0] && r[0].chat_id) || "";
     $("nt-support").value = (r[0] && r[0].support_chat_id) || "";
+    $("nt-news").value = (r[0] && r[0].news_chat_id) || "";
   } catch (e) {}
   try { const bu = await acApi("rpc/notify_bot", { method: "POST", body: "{}" }); if (bu && !/^ដាក់-/.test(bu)) $("nt-bot").innerHTML = `Bot៖ <a href="https://t.me/${esc(bu)}" target="_blank" rel="noopener">@${esc(bu)}</a>`; } catch (e) {}
   $("nt-save").onclick = async () => {
-    const v = $("nt-chat").value.trim(), sv = $("nt-support").value.trim(); msg.style.color = "";
+    const v = $("nt-chat").value.trim(), sv = $("nt-support").value.trim(), nv = $("nt-news").value.trim(); msg.style.color = "";
+    if (nv && !/^-?\d+$/.test(nv)) { msg.textContent = "Chat ID group ព័ត៌មាន មិនត្រឹមត្រូវ"; return; }
     if (sv && !/^-?\d+$/.test(sv)) { msg.textContent = "Chat ID group មិនត្រឹមត្រូវ"; return; }
     if (v && !/^-?\d+$/.test(v)) { msg.textContent = "Chat ID ត្រូវជាលេខ"; return; }
-    try { await acApi("shop_notify?on_conflict=shop_id", { method: "POST", headers: { Prefer: "resolution=merge-duplicates,return=minimal" }, body: JSON.stringify(sv || hasSup ? { shop_id: SHOP_ID, chat_id: v, support_chat_id: sv } : { shop_id: SHOP_ID, chat_id: v }) }); msg.textContent = "បានរក្សាទុក"; }
+    try { await acApi("shop_notify?on_conflict=shop_id", { method: "POST", headers: { Prefer: "resolution=merge-duplicates,return=minimal" }, body: JSON.stringify(Object.assign({ shop_id: SHOP_ID, chat_id: v }, (sv || hasSup) ? { support_chat_id: sv } : {}, (nv || hasNews) ? { news_chat_id: nv } : {})) }); msg.textContent = "បានរក្សាទុក"; }
     catch (e) { msg.style.color = "#B8213F"; msg.textContent = "រក្សាមិនបាន (តើបាន run admin-telegram.sql ហើយឬនៅ?)"; }
   };
   $("nt-test").onclick = async () => {
@@ -1079,7 +1094,7 @@ function flashSaved() {
     const rows = orders.filter((o) => flt === "all" || o.status === flt);
     $("od-list").innerHTML = rows.length ? rows.map((o) => `<div class="od-card ${e2(o.status)}" data-id="${o.id}">
       <div class="od-top"><div class="od-name">${e2(o.product)}${o.size ? " · " + e2(o.size) : ""}</div><div class="od-time">${when(o.created_at)}</div></div>
-      <div class="od-meta"><span class="od-price">${money(o.price)}</span> · #${e2(o.product_no)}${o.order_code ? " · <b>" + e2(o.order_code) + "</b>" : ""}${o.pay_method ? " · " + (o.pay_method === "qr" ? "បង់ឥឡូវ" : "បង់ពេលទទួល") : ""}<br>
+      <div class="od-meta"><span class="od-price">${money(o.price)}</span> · #${e2(o.product_no)}${o.order_code ? " · <b>" + e2(o.order_code) + "</b>" : ""}${o.received_at ? ' <b style="color:#3F7D5C">· អតិថិជនបានទទួលទំនិញហើយ</b>' : ""}${o.pay_method ? " · " + (o.pay_method === "qr" ? "បង់ឥឡូវ" : "បង់ពេលទទួល") : ""}<br>
         ${Array.isArray(o.items) && o.items.length ? o.items.map((it) => "• " + e2(it.name) + (it.size ? " · " + e2(it.size) : "") + " ×" + it.qty + " — " + money(it.price * it.qty)).join("<br>") + "<br>" : ""}${o.coupon ? "" + e2(o.coupon) + " −" + money(o.discount) + "<br>" : ""}${o.customer_name ? "" + e2(o.customer_name) + " (គណនី)<br>" : ""}<a href="tel:${e2(String(o.phone).replace(/[^\d+]/g, ""))}">${e2(o.phone)}</a><br>${o.location ? "" + e2(o.location) + "<br>" : ""}${/^https?:\/\//.test(o.map_link || "") ? `<a href="${e2(o.map_link)}" target="_blank" rel="noopener">បើក Google Map</a>` : ""}</div>
       ${payBox(o)}
       <div class="od-box"><div class="od-row"><input data-courier value="${e2(o.courier)}" placeholder="ក្រុមហ៊ុនដឹក"><input data-trackno value="${e2(o.courier_no)}" placeholder="លេខតាមដាន"></div>
@@ -1225,6 +1240,7 @@ function openAdminPanel() {
         <input class="ad-input" id="ad-new-name" placeholder="ឈ្មោះទំនិញ" />
         <input class="ad-input" id="ad-new-place" placeholder="ទំហំ ឧ. ទំហំ S - XL ឬ Free Size" />
         <input class="ad-input" id="ad-new-price" type="number" inputmode="numeric" placeholder="តម្លៃ (៛)" />
+        <label style="display:flex;gap:8px;align-items:center;margin:8px 0;font-size:14px"><input type="checkbox" id="ad-new-tg" checked /> ផ្សាយទៅ group ព័ត៌មាន Telegram</label>
         <div class="ad-addrow">
           <button class="sheet-confirm" id="ad-add-save" type="button">ផុសទំនិញ</button>
           <button class="sheet-cancel" id="ad-add-cancel" type="button">បោះបង់</button>
@@ -1571,6 +1587,7 @@ function openAdminPanel() {
       if (adminImages[n] && !saveImages()) delete adminImages[n];
     }
     saveAdmin(); refreshSite(); stats();
+    if (document.getElementById("ad-new-tg").checked && sbOn()) announceProduct({ name, place, price, photo: /^https?:/.test(adminImages[n] || "") ? adminImages[n] : "" });
     resetAddForm(); addForm.style.display = "none";
     searchEl.value = "";
     adFilter = "all";
