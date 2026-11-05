@@ -2620,6 +2620,17 @@ const TG_FN = `${SB_URL}/functions/v1/telegram-login`;
 async function tgPrep() { if (!tgCfg) { const r = await fetch(TG_FN, { headers: { apikey: SB_KEY } }); const c = await r.json(); if (!c.client_id) throw new Error("cfg"); tgCfg = c; } }
 const b64u = (buf) => btoa(String.fromCharCode.apply(null, new Uint8Array(buf))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
 const tgRedirect = () => location.origin + location.pathname;
+var tgBot = "";
+async function tgBotName() {
+  if (tgBot) return tgBot;
+  try {
+    const r = await fetch(`${SB_URL}/rest/v1/rpc/notify_bot`, { method: "POST", headers: { apikey: SB_KEY, "Content-Type": "application/json" }, body: "{}" });
+    const v = r.ok ? await r.json() : "";
+    if (v && typeof v === "string" && !/^ដាក់-/.test(v)) tgBot = v.replace(/^@/, "");
+  } catch (e) {}
+  return tgBot;
+}
+tgBotName().then((b) => { if (b && typeof applySettings === "function") applySettings(); }).catch(() => {});
 async function tgStart(link) {
   const er = $c(link ? "pf-msg" : "au-err"); er.style.color = "#B8213F"; er.textContent = "";
   try {
@@ -3357,7 +3368,7 @@ function applySettings() {
   const digits = String(S.phone).replace(/\s+/g, "");
   ["tb-call", "ft-call"].forEach((id) => { const a = document.getElementById(id); if (a) a.href = "tel:" + digits; });
   setText("#ft-phone-text", digits.replace(/^(\d{3})(\d{3})(\d+)$/, "$1 $2 $3"));
-  const tg = "https://t.me/" + String(S.telegram).replace(/^@/, "");
+  const tg = "https://t.me/" + (tgBot || String(S.telegram).replace(/^@/, ""));
   ["tb-tg", "ft-tg"].forEach((id) => { const a = document.getElementById(id); if (a) a.href = tg; });
   ["tb-msg", "ft-msg"].forEach((id) => { const a = document.getElementById(id); if (a) a.href = S.messenger; });
   const items = String(S.marquee).split("|").map((x) => x.trim()).filter(Boolean);
@@ -3492,6 +3503,24 @@ function openAsk(id, pre) {
     e.preventDefault();
     const s = SHOPS[Number($("asksheet").dataset.id)] || SHOPS[1], text = $("ask-text").value.trim() || "សួស្តី";
     if (a.dataset.k === "tg") {
+      const bot = await tgBotName(), typed = $("ask-text").value.trim();
+      if (bot && CU.sess && typed) {
+        // ផ្ញើតាម Bot ដោយផ្ទាល់ (អតិថិជនបានភ្ជាប់ Telegram) ចម្លើយមកក្នុង Telegram របស់គាត់
+        try {
+          const tk = await cToken();
+          const r = await fetch(`${SB_URL}/functions/v1/telegram-bot`, { method: "POST", headers: { apikey: SB_KEY, "Content-Type": "application/json" }, body: JSON.stringify({ web_ask: { shop_id: s.id, text: typed, token: tk } }) });
+          const j = await r.json();
+          if (r.ok && j.ok) { toast("✓ បានផ្ញើសារទៅហាង ចម្លើយនឹងមកក្នុង Telegram របស់អ្នក"); $("asksheet").classList.remove("open"); return; }
+        } catch (er) {}
+      }
+      if (bot) {
+        // បើក Bot ហើយជ្រើសហាងនេះ ចម្លងសារឱ្យបិទភ្ជាប់
+        let copied = false;
+        if (typed) { try { await navigator.clipboard.writeText(typed); copied = true; } catch (er) {} }
+        if (copied) toast("បានចម្លងសារ សូមបិទភ្ជាប់ក្នុង Bot ក្រោយចុច Start");
+        window.open(`https://t.me/${bot}?start=s${s.id}`, "_blank", "noopener");
+        return;
+      }
       const u = String(s.telegram).trim().replace(/^@/, "").replace(/^https?:\/\/t\.me\//, "");
       window.open(`https://t.me/${u}?text=${encodeURIComponent(text)}`, "_blank", "noopener");
     } else {
