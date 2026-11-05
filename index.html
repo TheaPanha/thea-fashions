@@ -2118,6 +2118,7 @@ function track(type, n) {
 // បញ្ចុះតម្លៃប្តូរទំនិញរៀងរាល់ saleHours ម៉ោង តាមម៉ោងកម្ពុជា
 // SALE = { លេខទំនិញ: តម្លៃថ្មីក្រោយបញ្ចុះ } ត្រូវបង្កើតដោយស្វ័យប្រវត្តិតាមរង្វង់ម៉ោង
 const SALE_PERCENTS = [10, 15, 20, 25, 30];
+const AUTO_SALE = false;      // false = បិទការបញ្ចុះតម្លៃស្វ័យប្រវត្តិ (ប្តូរទៅ true ដើម្បីបើកវិញ)
 
 // ម៉ោងកម្ពុជា (UTC+7 គ្មានម៉ោងរដូវក្តៅ) មិនអាស្រ័យលើម៉ោងទូរស័ព្ទរបស់អតិថិជនទេ
 const KH_OFFSET_MS = 7 * 3600 * 1000;
@@ -2145,6 +2146,7 @@ function buildSale() {
     });
     return map;
   }
+  if (!AUTO_SALE) return {};   // បិទការបញ្ចុះតម្លៃស្វ័យប្រវត្តិ៖ មានតែតម្លៃដែលកំណត់ក្នុង admin ប៉ុណ្ណោះ
   const rnd = seededRandom(periodKey());
   const ids = PRODUCTS.map((_, k) => k + 1);
   for (let k = ids.length - 1; k > 0; k--) {
@@ -3376,7 +3378,7 @@ function applySettings() {
   document.getElementById("mq-track").innerHTML = unit.repeat(4);
   document.querySelector(".marquee").style.display = S.showMarquee ? "" : "none";
   const pr = document.getElementById("promo"); if (pr) pr.style.display = S.showPromo === false ? "none" : "";
-  document.getElementById("flash").style.display = S.showFlash ? "" : "none";
+  document.getElementById("flash").style.display = (S.showFlash && Object.keys(SALE).length) ? "" : "none";
   applyTheme(S.accent);
 }
 
