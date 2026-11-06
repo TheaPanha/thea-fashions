@@ -1775,6 +1775,7 @@
         <div id="pay-qr"></div>
       </div>
       <p class="of-hint" id="pay-st">កំពុងរង់ចាំការបង់ប្រាក់...</p>
+      <button class="sheet-confirm" id="pay-retry" type="button" style="display:none;margin-bottom:8px">ព្យាយាមម្តងទៀត</button>
       <button class="sheet-cancel" id="pay-close" type="button">បិទ (បង់ពេលក្រោយ)</button>
     </div>
   </div>
@@ -2414,7 +2415,13 @@ function shrink(file, max = 1200) {
 let payMethod = "cod";
 document.querySelectorAll("#pay-opts .pay-opt").forEach((b) => b.addEventListener("click", () => { payMethod = b.dataset.pm; document.querySelectorAll("#pay-opts .pay-opt").forEach((x) => x.classList.toggle("on", x === b)); }));
 let payTimer = null;
-const khqrApi = async (action, order_code) => { const r = await fetch(`${SB_URL}/functions/v1/khqr`, { method: "POST", headers: { apikey: SB_KEY, Authorization: "Bearer " + SB_KEY, "Content-Type": "application/json" }, body: JSON.stringify({ action, order_code }) }); return r.json(); };
+const khqrApi = async (action, order_code) => {
+  const ac = new AbortController(), tm = setTimeout(() => ac.abort(), 12000);
+  try {
+    const r = await fetch(`${SB_URL}/functions/v1/khqr`, { method: "POST", signal: ac.signal, headers: { apikey: SB_KEY, Authorization: "Bearer " + SB_KEY, "Content-Type": "application/json" }, body: JSON.stringify({ action, order_code }) });
+    const j = await r.json().catch(() => ({})); if (!r.ok) { const e = new Error(j.error || "HTTP " + r.status); e.status = r.status; throw e; } return j;
+  } finally { clearTimeout(tm); }
+};
 function stopPay() { clearInterval(payTimer); payTimer = null; document.getElementById("paysheet").classList.remove("open"); }
 async function showPay(code, phone) {
   const box = document.getElementById("pay-qr"), st = document.getElementById("pay-st");
@@ -2427,7 +2434,11 @@ async function showPay(code, phone) {
     st.textContent = "សូមស្កេនដោយកម្មវិធីធនាគារ ហើយរង់ចាំបញ្ជាក់";
     clearInterval(payTimer);
     payTimer = setInterval(async () => { try { const c = await khqrApi("check", code); if (c.paid) { stopPay(); orderDone(null, code, phone); toast("បានទទួលការបង់ប្រាក់ ✓"); } } catch (e) {} }, 4000);
-  } catch (e) { st.textContent = "បង្កើត QR មិនបាន សូមទាក់ទងហាង"; }
+  } catch (e) {
+    const why = e.name === "AbortError" ? "ចាំយូរពេក (អ៊ីនធឺណិតយឺត)" : e.status === 404 && /not found/i.test(e.message) ? "រកមិនឃើញការកម្មង់ (pay_method ត្រូវជា qr)" : e.status === 404 ? "Function khqr មិនទាន់ deploy" : /script|undefined|qrcode/i.test(String(e.message)) ? "ទាញបណ្ណាល័យ QR មិនបាន" : "កំហុស៖ " + e.message;
+    st.textContent = "បង្កើត QR មិនបាន · " + why; document.getElementById("pay-retry").style.display = "";
+    document.getElementById("pay-retry").onclick = () => { document.getElementById("pay-retry").style.display = "none"; showPay(code, phone); };
+  }
 }
 document.getElementById("pay-close").addEventListener("click", () => { stopPay(); document.getElementById("donesheet").classList.add("open"); });
 let submitting = false;
