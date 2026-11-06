@@ -770,8 +770,7 @@ async function acApi(path, opt = {}) {
   });
 })();
 
-const QR_HTML = `<div class="ac-item" id="qr-box"><b>គណនីទទួលប្រាក់ KHQR</b><small>ដាក់រូប QR របស់ហាង (ពី ABA / Bakong / ធនាគារ) ប្រព័ន្ធនឹងអានលេខគណនី និងឈ្មោះដោយខ្លួនឯង</small><input id="qr-file" type="file" accept="image/*" style="margin-top:8px;max-width:100%" /><div id="qr-info" style="margin-top:8px;font-size:14px;line-height:1.7"></div><div class="ac-acts"><button class="ad-btn" id="qr-save" type="button" disabled>រក្សាទុក</button></div><small id="qr-msg" style="margin-top:6px"></small></div>`;
-const NT_HTML = `<div class="ac-item" id="nt-box"><b>ជូនដំណឹងការកម្មង់ទៅ Telegram</b><small id="nt-bot"></small><small>១) បើក Bot ខាងលើ ហើយចុច Start · ២) រក Chat ID របស់អ្នកតាម @userinfobot · ៣) បញ្ចូលលេខនោះខាងក្រោម</small><input class="ad-input" id="nt-chat" inputmode="numeric" placeholder="Chat ID (លេខ)" style="margin-top:8px" /><small style="display:block;margin-top:10px">Group ជជែកជាមួយភ្ញៀវ (ស្រេចចិត្ត)៖ ដាក់ Chat ID របស់ group ដើម្បីទទួលសារភ្ញៀវ និងឆ្លើយតបនៅទីនោះ។ បើទទេ សារភ្ញៀវទៅ Chat ID ខាងលើ។</small><input class="ad-input" id="nt-support" inputmode="numeric" placeholder="Chat ID group ជជែក (ស្រេចចិត្ត)" style="margin-top:6px" /><small style="display:block;margin-top:10px">Group ព័ត៌មាន (ស្រេចចិត្ត)៖ ដាក់ Chat ID របស់ group ដើម្បីឱ្យទំនិញថ្មីដែលអ្នកបន្ថែមត្រូវផ្សាយចូលទីនោះដោយស្វ័យប្រវត្តិ។</small><input class="ad-input" id="nt-news" inputmode="numeric" placeholder="Chat ID group ព័ត៌មាន (ស្រេចចិត្ត)" style="margin-top:6px" /><div class="ac-acts"><button class="ad-btn" id="nt-save" type="button">រក្សាទុក</button><button class="ad-btn" id="nt-test" type="button">ផ្ញើសារសាកល្បង</button></div><small id="nt-msg" style="margin-top:6px"></small></div>${QR_HTML}`;
+const NT_HTML = `<div class="ac-item" id="nt-box"><b>ជូនដំណឹងការកម្មង់ទៅ Telegram</b><small id="nt-bot"></small><small>១) បើក Bot ខាងលើ ហើយចុច Start · ២) រក Chat ID របស់អ្នកតាម @userinfobot · ៣) បញ្ចូលលេខនោះខាងក្រោម</small><input class="ad-input" id="nt-chat" inputmode="numeric" placeholder="Chat ID (លេខ)" style="margin-top:8px" /><small style="display:block;margin-top:10px">Group ជជែកជាមួយភ្ញៀវ (ស្រេចចិត្ត)៖ ដាក់ Chat ID របស់ group ដើម្បីទទួលសារភ្ញៀវ និងឆ្លើយតបនៅទីនោះ។ បើទទេ សារភ្ញៀវទៅ Chat ID ខាងលើ។</small><input class="ad-input" id="nt-support" inputmode="numeric" placeholder="Chat ID group ជជែក (ស្រេចចិត្ត)" style="margin-top:6px" /><small style="display:block;margin-top:10px">Group ព័ត៌មាន (ស្រេចចិត្ត)៖ ដាក់ Chat ID របស់ group ដើម្បីឱ្យទំនិញថ្មីដែលអ្នកបន្ថែមត្រូវផ្សាយចូលទីនោះដោយស្វ័យប្រវត្តិ។</small><input class="ad-input" id="nt-news" inputmode="numeric" placeholder="Chat ID group ព័ត៌មាន (ស្រេចចិត្ត)" style="margin-top:6px" /><div class="ac-acts"><button class="ad-btn" id="nt-save" type="button">រក្សាទុក</button><button class="ad-btn" id="nt-test" type="button">ផ្ញើសារសាកល្បង</button></div><small id="nt-msg" style="margin-top:6px"></small></div>`;
 async function announceProduct(p) {
   try {
     const t = await sbToken();
@@ -813,41 +812,6 @@ async function bindNotify() {
       const st = await acApi("rpc/send_test_notify", { method: "POST", body: "{}" });
       msg.textContent = st === "ok" ? "បានផ្ញើហើយ បើមិនទទួលបានសារ សូមពិនិត្យថាបានចុច Start ក្នុង Bot និង Chat ID ត្រឹមត្រូវ" : st === "no_chat" ? "សូមបញ្ចូល និងរក្សាទុក Chat ID ជាមុនសិន" : "ម្ចាស់ហាងមិនទាន់កំណត់ Bot ទេ";
     } catch (e) { msg.style.color = "#B8213F"; msg.textContent = "ផ្ញើមិនបាន (តើបាន run admin-telegram.sql ហើយឬនៅ?)"; }
-  };
-}
-
-// ---- KHQR: អានរូប QR → បង្ហាញឈ្មោះ លេខគណនី → រក្សាទុកក្នុង shop_notify.khqr ----
-function khqrCrc(s) { let c = 0xffff; for (const ch of new TextEncoder().encode(s)) { c ^= ch << 8; for (let i = 0; i < 8; i++) c = c & 0x8000 ? ((c << 1) ^ 0x1021) & 0xffff : (c << 1) & 0xffff; } return c.toString(16).toUpperCase().padStart(4, "0"); }
-function khqrTlv(s) { const o = {}; for (let i = 0; i < s.length;) { const l = parseInt(s.slice(i + 2, i + 4), 10); if (!(l >= 0)) break; o[s.slice(i, i + 2)] = s.slice(i + 4, i + 4 + l); i += 4 + l; } return o; }
-function khqrParse(str) {
-  if (!/^000201/.test(str) || str.slice(-8, -4) !== "6304" || khqrCrc(str.slice(0, -4)) !== str.slice(-4).toUpperCase()) return null;
-  const t = khqrTlv(str), acc = khqrTlv(t["29"] || t["30"] || t["15"] || ""), cur = t["53"];
-  return { name: t["59"] || "", city: t["60"] || "", cur, account: acc["01"] || acc["00"] || "", bank: acc["02"] || (acc["00"] || "").split("@")[1] || "" };
-}
-async function bindKhqr() {
-  const $ = (id) => document.getElementById(id); if (!$("qr-box")) return;
-  if (!sbOn()) { $("qr-box").style.display = "none"; return; }
-  let cur = "", pending = "";
-  const show = (p, note) => { $("qr-info").innerHTML = p ? `ឈ្មោះ៖ <b>${esc(p.name)}</b><br>លេខគណនី៖ <b>${esc(p.account)}</b><br>ធនាគារ៖ <b>${esc(p.bank)}</b><br>ទីក្រុង៖ ${esc(p.city)} · រូបិយប័ណ្ណ៖ ${p.cur === "116" ? "៛ រៀល" : p.cur === "840" ? "$ ដុល្លារ" : esc(p.cur || "")}${note ? "<br><span style=\"color:var(--muted)\">" + note + "</span>" : ""}` : ""; };
-  try { const r = await acApi(`shop_notify?select=khqr&shop_id=eq.${SHOP_ID}`); cur = (r[0] && r[0].khqr) || ""; if (cur) show(khqrParse(cur), "(កំពុងប្រើ)"); } catch (e) {}
-  $("qr-file").onchange = async (ev) => {
-    const f = ev.target.files[0], msg = $("qr-msg"); msg.style.color = ""; msg.textContent = "កំពុងអាន..."; pending = ""; $("qr-save").disabled = true; if (!f) return;
-    try {
-      if (!window.jsQR) await new Promise((ok, no) => { const sc = document.createElement("script"); sc.src = "https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.4.0/jsQR.min.js"; sc.onload = ok; sc.onerror = no; document.head.appendChild(sc); });
-      const im = await new Promise((ok, no) => { const u = URL.createObjectURL(f), i = new Image(); i.onload = () => ok(i); i.onerror = no; i.src = u; });
-      const k = Math.min(1, 1400 / Math.max(im.width, im.height)), c = document.createElement("canvas"); c.width = Math.round(im.width * k); c.height = Math.round(im.height * k);
-      const x = c.getContext("2d"); x.fillStyle = "#fff"; x.fillRect(0, 0, c.width, c.height); x.drawImage(im, 0, 0, c.width, c.height);
-      const d = x.getImageData(0, 0, c.width, c.height), q = jsQR(d.data, d.width, d.height, { inversionAttempts: "attemptBoth" });
-      const p = q && khqrParse(q.data);
-      if (!p) { show(null); msg.style.color = "#B8213F"; msg.textContent = "អានមិនបាន ឬមិនមែន KHQR សូមថតរូប QR ឱ្យច្បាស់ទាំងមូល"; return; }
-      if (p.cur !== "116") { show(p); msg.style.color = "#B8213F"; msg.textContent = "ហាងគិតជារៀល ត្រូវប្រើ QR ជារូបិយប័ណ្ណរៀល (៛)"; return; }
-      pending = q.data; show(p); msg.textContent = "ពិនិត្យឈ្មោះ និងលេខគណនីឱ្យត្រូវ រួចចុចរក្សាទុក"; $("qr-save").disabled = false;
-    } catch (e) { msg.style.color = "#B8213F"; msg.textContent = "អានរូបមិនបាន"; }
-  };
-  $("qr-save").onclick = async () => {
-    const msg = $("qr-msg"); if (!pending) return; msg.style.color = "";
-    try { await acApi("shop_notify?on_conflict=shop_id", { method: "POST", headers: { Prefer: "resolution=merge-duplicates,return=minimal" }, body: JSON.stringify({ shop_id: SHOP_ID, khqr: pending }) }); cur = pending; msg.textContent = "បានរក្សាទុក"; $("qr-save").disabled = true; }
-    catch (e) { msg.style.color = "#B8213F"; msg.textContent = "រក្សាទុកមិនបាន (ត្រូវ run SQL ជាមុន)"; }
   };
 }
 async function renderReviews() {
@@ -1671,7 +1635,7 @@ function openAdminPanel() {
   { const pl = document.getElementById("pf-logo"), px = document.getElementById("pf-logo-x");
     if (pl) pl.addEventListener("click", () => document.getElementById("ad-logo-file").click());
     if (px) px.addEventListener("click", () => document.getElementById("ad-logo-clear").click()); }
-  bindNotify(); bindKhqr();
+  bindNotify();
   updPrev();
   body.querySelectorAll(".ad-sw").forEach((b) => b.addEventListener("click", () => {
     adminData.settings.accent = b.dataset.c;
