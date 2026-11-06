@@ -3512,6 +3512,7 @@ function openAsk(id, pre) {
           const tk = await cToken();
           const r = await fetch(`${SB_URL}/functions/v1/telegram-bot`, { method: "POST", headers: { apikey: SB_KEY, "Content-Type": "application/json" }, body: JSON.stringify({ web_ask: { shop_id: s.id, text: typed, token: tk } }) });
           const j = await r.json();
+          if (j && j.error === "closed") { toast("ហាងបានបិទការជជែកនេះ"); return; }
           if (r.ok && j.ok) { toast("✓ បានផ្ញើសារទៅហាង ចម្លើយនឹងមកក្នុង Telegram របស់អ្នក"); $("asksheet").classList.remove("open"); return; }
         } catch (er) {}
       }
