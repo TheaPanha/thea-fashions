@@ -1082,7 +1082,7 @@ function flashSaved() {
     if (o.pay_method !== "qr") return "";
     const [t, c] = payState(o), short = o.paid_amount != null && o.paid_amount < (o.price || 0);
     return `<div class="od-box"><div class="od-row"><input data-payer value="${e2(o.payer_name)}" placeholder="ឈ្មោះអ្នកបង់ (លើបង្កាន់ដៃ)"><input data-paid type="text" inputmode="decimal" value="${o.paid_amount == null ? "" : o.paid_amount}" placeholder="ទឹកប្រាក់ ៛"><button class="od-sm" data-savepay="1" type="button">រក្សា</button></div>
-      <div class="od-stat2" style="color:${c}">${t}</div>${short ? `<button class="od-sm" data-sms="1" type="button" style="margin-top:8px;border-color:#B8213F;color:#B8213F">ប្រាប់ភ្ញៀវថាបង់មិនទាន់គ្រប់</button>` : ""}</div>`;
+      <div class="od-stat2" style="color:${c}">${t}</div>${o.paid_amount == null && o.order_code ? `<button class="od-sm" data-chk="1" type="button" style="margin-top:8px">ពិនិត្យការបង់ប្រាក់ជាមួយ Bakong</button>` : ""}${short ? `<button class="od-sm" data-sms="1" type="button" style="margin-top:8px;border-color:#B8213F;color:#B8213F">ប្រាប់ភ្ញៀវថាបង់មិនទាន់គ្រប់</button>` : ""}</div>`;
   }
   function draw() {
     const today = dayKey(new Date()), live = orders.filter((o) => o.status !== "cancel"), td = live.filter((o) => dayKey(o.created_at) === today);
@@ -1094,7 +1094,7 @@ function flashSaved() {
     const rows = orders.filter((o) => flt === "all" || o.status === flt);
     $("od-list").innerHTML = rows.length ? rows.map((o) => `<div class="od-card ${e2(o.status)}" data-id="${o.id}">
       <div class="od-top"><div class="od-name">${e2(o.product)}${o.size ? " · " + e2(o.size) : ""}</div><div class="od-time">${when(o.created_at)}</div></div>
-      <div class="od-meta"><span class="od-price">${money(o.price)}</span> · #${e2(o.product_no)}${o.order_code ? " · <b>" + e2(o.order_code) + "</b>" : ""}${o.received_at ? ' <b style="color:#3F7D5C">· អតិថិជនបានទទួលទំនិញហើយ</b>' : ""}${o.pay_method ? " · " + (o.pay_method === "qr" ? "បង់ឥឡូវ" : "បង់ពេលទទួល") : ""}<br>
+      <div class="od-meta"><span class="od-price">${money(o.price)}</span> · #${e2(o.product_no)}${o.order_code ? " · <b>" + e2(o.order_code) + "</b>" : ""}${o.received_at ? ' <b style="color:#3F7D5C">· អតិថិជនបានទទួលទំនិញហើយ</b>' : ""}${o.pay_method ? " · " + (o.pay_method === "qr" ? "KHQR" : "បង់ពេលទទួល") : ""}<br>
         ${Array.isArray(o.items) && o.items.length ? o.items.map((it) => "• " + e2(it.name) + (it.size ? " · " + e2(it.size) : "") + " ×" + it.qty + " — " + money(it.price * it.qty)).join("<br>") + "<br>" : ""}${o.coupon ? "" + e2(o.coupon) + " −" + money(o.discount) + "<br>" : ""}${o.customer_name ? "" + e2(o.customer_name) + " (គណនី)<br>" : ""}<a href="tel:${e2(String(o.phone).replace(/[^\d+]/g, ""))}">${e2(o.phone)}</a><br>${o.location ? "" + e2(o.location) + "<br>" : ""}${/^https?:\/\//.test(o.map_link || "") ? `<a href="${e2(o.map_link)}" target="_blank" rel="noopener">បើក Google Map</a>` : ""}</div>
       ${payBox(o)}
       <div class="od-box"><div class="od-row"><input data-courier value="${e2(o.courier)}" placeholder="ក្រុមហ៊ុនដឹក"><input data-trackno value="${e2(o.courier_no)}" placeholder="លេខតាមដាន"></div>
@@ -1189,6 +1189,16 @@ function flashSaved() {
           const body = { courier: g("[data-courier]") || null, courier_no: g("[data-trackno]") || null, tracking_note: g("[data-note]") || null };
           await api(`orders?id=eq.${id}`, { method: "PATCH", body: JSON.stringify(body) }); Object.assign(o, body);
           b.textContent = "រួច"; setTimeout(() => { b.textContent = "រក្សា"; }, 1200); return;
+        }
+        if (b.dataset.chk) {
+          b.disabled = true; b.textContent = "កំពុងពិនិត្យ...";
+          try {
+            const r = await fetch(`${SB_URL}/functions/v1/khqr`, { method: "POST", headers: { apikey: SB_KEY, Authorization: "Bearer " + SB_KEY, "Content-Type": "application/json" }, body: JSON.stringify({ action: "check", order_code: o.order_code }) });
+            const j = await r.json();
+            if (j.paid) { o.paid_amount = o.price; draw(); return; }
+            b.textContent = "មិនទាន់ឃើញការបង់ប្រាក់"; setTimeout(() => { if (b.isConnected) { b.disabled = false; b.textContent = "ពិនិត្យការបង់ប្រាក់ជាមួយ Bakong"; } }, 2500);
+          } catch (x) { b.disabled = false; b.textContent = "ពិនិត្យមិនបាន"; }
+          return;
         }
         if (b.dataset.savepay) {
           const payer = g("[data-payer]"), paid = parseAmount(g("[data-paid]"));
