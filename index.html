@@ -1772,8 +1772,8 @@
         <h3 style="margin:8px 0 4px;color:#3F7D5C">បង់ប្រាក់ជោគជ័យ!</h3>
         <div id="pay-ok-amt" style="font-size:26px;font-weight:800;margin:2px 0"></div>
         <p class="of-hint" id="pay-ok-code" style="margin:4px 0 14px"></p>
-        <p class="of-hint" style="margin-bottom:14px">យើងបានទទួលប្រាក់របស់អ្នកហើយ ហើយនឹងទំនាក់ទំនងអ្នកតាមលេខទូរស័ព្ទ ដើម្បីដឹកជញ្ជូន។ សូមអរគុណ!</p>
-        <button class="sheet-confirm" id="pay-ok-btn" type="button">យល់ព្រម</button>
+        <p class="of-hint" style="margin-bottom:14px">យើងបានទទួលប្រាក់របស់អ្នកហើយ។ សូមចុចបន្តការកម្មង់ ដើម្បីបញ្ចប់។</p>
+        <button class="sheet-confirm" id="pay-ok-btn" type="button">បន្តការកម្មង់</button>
       </div>
       <div class="khqr-card">
         <div class="khqr-h">KHQR</div>
@@ -1783,7 +1783,7 @@
       </div>
       <p class="of-hint" id="pay-st">កំពុងរង់ចាំការបង់ប្រាក់...</p>
       <button class="sheet-confirm" id="pay-retry" type="button" style="display:none;margin-bottom:8px">ព្យាយាមម្តងទៀត</button>
-      <button class="sheet-cancel" id="pay-close" type="button">បិទ (បង់ពេលក្រោយ)</button>
+      <button class="sheet-cancel" id="pay-close" type="button">បោះបង់ (មិនទាន់បង់)</button>
     </div>
   </div>
 
@@ -2421,41 +2421,52 @@ function shrink(file, max = 1200) {
 }
 let payMethod = "cod";
 document.querySelectorAll("#pay-opts .pay-opt").forEach((b) => b.addEventListener("click", () => { payMethod = b.dataset.pm; document.querySelectorAll("#pay-opts .pay-opt").forEach((x) => x.classList.toggle("on", x === b)); }));
-let payTimer = null, payAmt = 0;
-function payDone(code, amt) {
-  clearInterval(payTimer); payTimer = null;
-  document.querySelector("#paysheet .khqr-card").style.display = "none"; document.getElementById("pay-st").style.display = "none"; document.getElementById("pay-retry").style.display = "none"; document.getElementById("pay-close").style.display = "none";
-  document.getElementById("pay-ok-amt").textContent = amt ? formatRiel(amt) : ""; document.getElementById("pay-ok-code").textContent = "លេខកូដកម្មង់ " + code;
-  document.getElementById("pay-ok").style.display = ""; try { navigator.vibrate && navigator.vibrate([120, 60, 120]); } catch (e) {}
-}
-document.getElementById("pay-ok-btn").addEventListener("click", stopPay);
-const khqrApi = async (action, order_code) => {
+const khqrApi = async (action, order_code, extra = {}) => {
   const ac = new AbortController(), tm = setTimeout(() => ac.abort(), 12000);
   try {
-    const r = await fetch(`${SB_URL}/functions/v1/khqr`, { method: "POST", signal: ac.signal, headers: { apikey: SB_KEY, Authorization: "Bearer " + SB_KEY, "Content-Type": "application/json" }, body: JSON.stringify({ action, order_code }) });
+    const r = await fetch(`${SB_URL}/functions/v1/khqr`, { method: "POST", signal: ac.signal, headers: { apikey: SB_KEY, Authorization: "Bearer " + SB_KEY, "Content-Type": "application/json" }, body: JSON.stringify({ action, order_code, ...extra }) });
     const j = await r.json().catch(() => ({})); if (!r.ok) { const e = new Error(j.error || "HTTP " + r.status); e.status = r.status; throw e; } return j;
   } finally { clearTimeout(tm); }
 };
-function stopPay() { clearInterval(payTimer); payTimer = null; document.getElementById("paysheet").classList.remove("open"); }
-async function showPay(code, phone) {
-  const box = document.getElementById("pay-qr"), st = document.getElementById("pay-st");
-  box.innerHTML = ""; st.textContent = "កំពុងបង្កើត QR..."; document.getElementById("paysheet").classList.add("open");
-  document.getElementById("pay-ok").style.display = "none"; document.querySelector("#paysheet .khqr-card").style.display = ""; st.style.display = ""; document.getElementById("pay-close").style.display = "";
-  try {
-    if (!window.qrcode) await new Promise((ok, no) => { const sc = document.createElement("script"); sc.src = "https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"; sc.onload = ok; sc.onerror = no; document.head.appendChild(sc); });
-    const j = await khqrApi("qr", code); if (!j.qr) throw new Error(j.error || "qr");
-    const q = qrcode(0, "M"); q.addData(j.qr); q.make(); box.innerHTML = q.createSvgTag({ cellSize: 5, margin: 0, scalable: true }); box.firstChild.style.cssText = "width:100%;height:auto;display:block";
-    document.getElementById("pay-acc").textContent = formatRiel(j.amount); payAmt = j.amount; if (j.name) document.querySelector(".khqr-n").textContent = j.name;
-    st.textContent = "សូមស្កេនដោយកម្មវិធីធនាគារ ហើយរង់ចាំបញ្ជាក់";
-    clearInterval(payTimer);
-    payTimer = setInterval(async () => { try { const c = await khqrApi("check", code); if (c.paid) { payDone(code, payAmt); } } catch (e) {} }, 4000);
-  } catch (e) {
-    const why = e.name === "AbortError" ? "ចាំយូរពេក (អ៊ីនធឺណិតយឺត)" : e.status === 404 && /not found/i.test(e.message) ? "រកមិនឃើញការកម្មង់ (pay_method ត្រូវជា qr)" : e.status === 404 ? "Function khqr មិនទាន់ deploy" : /script|undefined|qrcode/i.test(String(e.message)) ? "ទាញបណ្ណាល័យ QR មិនបាន" : "កំហុស៖ " + e.message;
-    st.textContent = "បង្កើត QR មិនបាន · " + why; document.getElementById("pay-retry").style.display = "";
-    document.getElementById("pay-retry").onclick = () => { document.getElementById("pay-retry").style.display = "none"; showPay(code, phone); };
-  }
+// បង់ប្រាក់មុន រួចទើបបន្តការកម្មង់ (ការកម្មង់មិនត្រូវបានបង្កើត បើមិនទាន់បង់)
+const PAID_KEY = "tf_khqr_paid";
+const loadPaidTok = (amount) => { try { const t = JSON.parse(localStorage.getItem(PAID_KEY) || "null"); return t && t.amount === amount && Date.now() - t.created < 3 * 86400000 ? t : null; } catch (e) { return null; } };
+const savePaidTok = (t) => { try { localStorage.setItem(PAID_KEY, JSON.stringify(t)); } catch (e) {} };
+const clearPaidTok = () => { try { localStorage.removeItem(PAID_KEY); } catch (e) {} };
+let payTimer = null;
+function payFirst(amount) {
+  return new Promise((resolve) => {
+    const $p = (id) => document.getElementById(id), sheet = $p("paysheet"), box = $p("pay-qr"), st = $p("pay-st"), retry = $p("pay-retry");
+    let done = false, tok = null, busy = false;
+    const finish = (v) => { if (done) return; done = true; clearInterval(payTimer); payTimer = null; sheet.classList.remove("open"); resolve(v); };
+    $p("pay-ok").style.display = "none"; sheet.querySelector(".khqr-card").style.display = ""; st.style.display = ""; $p("pay-close").style.display = ""; retry.style.display = "none";
+    box.innerHTML = ""; st.textContent = "កំពុងបង្កើត QR..."; $p("pay-acc").textContent = formatRiel(amount); sheet.classList.add("open");
+    $p("pay-close").onclick = () => finish(null);
+    $p("pay-ok-btn").onclick = () => finish(tok);
+    const paid = () => {
+      clearInterval(payTimer); payTimer = null; savePaidTok(tok);
+      sheet.querySelector(".khqr-card").style.display = "none"; st.style.display = "none"; retry.style.display = "none"; $p("pay-close").style.display = "none";
+      $p("pay-ok-amt").textContent = formatRiel(amount); $p("pay-ok").style.display = ""; try { navigator.vibrate && navigator.vibrate([120, 60, 120]); } catch (e) {}
+    };
+    const start = async () => {
+      retry.style.display = "none"; st.textContent = "កំពុងបង្កើត QR...";
+      try {
+        if (!window.qrcode) await new Promise((ok, no) => { const sc = document.createElement("script"); sc.src = "https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"; sc.onload = ok; sc.onerror = no; document.head.appendChild(sc); });
+        const j = await khqrApi("new", null, { amount }); if (!j.qr) throw new Error(j.error || "qr");
+        tok = { amount: j.amount, created: j.created };
+        const q = qrcode(0, "M"); q.addData(j.qr); q.make(); box.innerHTML = q.createSvgTag({ cellSize: 5, margin: 0, scalable: true }); box.firstChild.style.cssText = "width:100%;height:auto;display:block";
+        if (j.name) sheet.querySelector(".khqr-n").textContent = j.name;
+        st.textContent = "សូមស្កេនបង់ប្រាក់ ហើយរង់ចាំបញ្ជាក់ ទើបអាចបន្តការកម្មង់";
+        clearInterval(payTimer);
+        payTimer = setInterval(async () => { if (busy || done) return; busy = true; try { const c = await khqrApi("status", null, tok); if (c.paid) paid(); } catch (e) {} busy = false; }, 4000);
+      } catch (e) {
+        const why = e.name === "AbortError" ? "ចាំយូរពេក (អ៊ីនធឺណិតយឺត)" : e.status === 404 ? "Function khqr មិនទាន់ deploy" : /script|undefined|qrcode/i.test(String(e.message)) ? "ទាញបណ្ណាល័យ QR មិនបាន" : "កំហុស៖ " + e.message;
+        st.textContent = "បង្កើត QR មិនបាន · " + why; retry.style.display = ""; retry.onclick = start;
+      }
+    };
+    start();
+  });
 }
-document.getElementById("pay-close").addEventListener("click", () => { stopPay(); document.getElementById("donesheet").classList.add("open"); });
 let submitting = false;
 sheetConfirm.addEventListener("click", async () => {
   if (!sheetCtx || sheetConfirm.disabled || submitting) return;
@@ -2467,6 +2478,11 @@ sheetConfirm.addEventListener("click", async () => {
     : [{ n: sheetCtx.i + 1, name: sheetCtx.item.name, size: variantOf(chosenSize, chosenColor), qty: 1, price: finalPrice(sheetCtx.item) }];
   const sub = items.reduce((s, x) => s + x.price * x.qty, 0), disc = sheetCtx.cart && cartCoupon ? Math.min(cartCoupon.discount, sub) : 0;
   const P = { items, sub, disc, coupon: sheetCtx.cart && cartCoupon ? cartCoupon.code : null, btn: sheetCtx.btn, cart: !!sheetCtx.cart, contact: { phone, loc, isLink: false, link: rawUrl ? raw : mapLinkOf(loc), name: CU.sess ? CU.sess.name : "" } };
+  let ptok = null;
+  if (payMethod === "qr" && sbReady()) {
+    submitting = true; try { ptok = loadPaidTok(P.sub - P.disc) || await payFirst(P.sub - P.disc); } finally { submitting = false; }
+    if (!ptok) return;   // មិនទាន់បង់ → មិនបង្កើតការកម្មង់
+  }
   const code = sbReady() ? newCode() : null;
   if (sbReady()) {
     submitting = true; sheetConfirm.disabled = true; sheetConfirm.textContent = "កំពុងបញ្ជូនការកម្មង់...";
@@ -2476,7 +2492,7 @@ sheetConfirm.addEventListener("click", async () => {
   }
   closeSizeSheet();
   if (P.cart) { cart = []; saveCart(); cartCoupon = null; renderCartUI(); }
-  if (payMethod === "qr" && code) { orderDone(null, code, P.contact.phone); document.getElementById("donesheet").classList.remove("open"); showPay(code, P.contact.phone); return; }
+  if (ptok && code) { try { await khqrApi("claim", code, ptok); } catch (e) { /* ការកម្មង់ត្រូវបានបង្កើត admin អាចបញ្ជាក់ដោយដៃ */ } clearPaidTok(); }
   orderDone(P.btn, code, P.contact.phone);
 });
 document.getElementById("done-ok").addEventListener("click", () => document.getElementById("donesheet").classList.remove("open"));
