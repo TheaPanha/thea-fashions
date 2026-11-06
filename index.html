@@ -2471,7 +2471,7 @@ function refreshPay() {
   if (!ok) payMode = "cod";
   $c("pay-opts").querySelectorAll("[data-pay]").forEach((b) => b.classList.toggle("active", b.dataset.pay === payMode));
 }
-$c("pay-opts").onclick = (e) => { const b = e.target.closest("[data-pay]"); if (!b) return; payMode = b.dataset.pay; refreshPay(); };
+document.getElementById("pay-opts").onclick = (e) => { const b = e.target.closest("[data-pay]"); if (!b) return; payMode = b.dataset.pay; refreshPay(); };
 function loadQrLib() {
   return new Promise((res, rej) => {
     if (window.qrcode) return res();
