@@ -1895,8 +1895,9 @@
         <div class="sheet-label">វិធីបង់ប្រាក់</div>
         <div class="sizes" id="pay-opts">
           <button type="button" class="size-chip active" data-pay="cod">បង់ពេលទទួលទំនិញ</button>
-          <button type="button" class="size-chip" data-pay="qr">បង់តាម QR (Bakong)</button>
+          <button type="button" class="size-chip" data-pay="qr">បង់តាម KHQR</button>
         </div>
+        <div class="of-hint" id="pay-hint" style="margin:6px 0 10px"></div>
       </div>
       <div class="of-hint" id="of-hint"></div>
       <div class="of-hint" style="text-align:center;margin:0 0 8px">បង់ប្រាក់ជូនអ្នកដឹកពេលទទួលអីវ៉ាន់</div>
@@ -2465,11 +2466,19 @@ async function qrEnabledFor(sid) {
 function refreshPay() {
   const blk = $c("pay-block"); if (!blk || !sheetCtx) return;
   const ids = [...new Set(checkoutShops())];
+  if (!ids.length) { blk.style.display = "none"; return; }
   if (ids.length === 1 && qrInfo[ids[0]] === undefined) qrEnabledFor(ids[0]);
   const ok = ids.length === 1 && qrInfo[ids[0]] === true;
-  blk.style.display = ok ? "" : "none";
+  blk.style.display = "";
   if (!ok) payMode = "cod";
-  $c("pay-opts").querySelectorAll("[data-pay]").forEach((b) => b.classList.toggle("active", b.dataset.pay === payMode));
+  const hint = $c("pay-hint");
+  if (ids.length > 1) hint.textContent = "ការបង់តាម KHQR ត្រូវកម្មង់ពីហាងតែមួយក្នុងពេលតែមួយ";
+  else if (qrInfo[ids[0]] === undefined) hint.textContent = "";
+  else hint.textContent = ok ? "" : "ហាងនេះមិនទាន់បើកការបង់តាម KHQR ទេ";
+  $c("pay-opts").querySelectorAll("[data-pay]").forEach((b) => {
+    b.classList.toggle("active", b.dataset.pay === payMode);
+    if (b.dataset.pay === "qr") { b.style.opacity = ok ? "" : ".45"; b.style.pointerEvents = ok ? "" : "none"; }
+  });
 }
 document.getElementById("pay-opts").onclick = (e) => { const b = e.target.closest("[data-pay]"); if (!b) return; payMode = b.dataset.pay; refreshPay(); };
 function loadQrLib() {
