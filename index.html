@@ -2526,7 +2526,7 @@ async function showQr(code, P) {
     }, 4000);
   } catch (e) {
     msg.style.color = "#B8213F"; paidBtn.style.display = "";
-    msg.textContent = "មិនអាចបង្កើត QR បានទេ។ ការកម្មង់របស់អ្នកត្រូវបានទទួលហើយ ហាងនឹងទាក់ទងអ្នកដើម្បីបង់ប្រាក់។";
+    msg.textContent = "មិនអាចបង្កើត QR បានទេ (" + String(e && e.message || "error").slice(0, 40) + ")។ ការកម្មង់របស់អ្នកត្រូវបានទទួលហើយ ហាងនឹងទាក់ទងអ្នកដើម្បីបង់ប្រាក់។";
   }
 }
 async function placeOrder(P, code) {
