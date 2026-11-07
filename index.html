@@ -2458,23 +2458,27 @@ function checkoutShops() {
   if (sheetCtx.cart) return cartLines().map((l) => (PRODUCTS[l.n - 1] || {}).shop || 1);
   return [((PRODUCTS[sheetCtx.i] || {}).shop) || 1];
 }
+var qrLoading = {};
 async function qrEnabledFor(sid) {
-  qrInfo[sid] = false;
-  try { const j = await kqPost({ action: "info", shop_id: sid }); qrInfo[sid] = !!j.enabled; } catch (e) {}
+  qrLoading[sid] = true;
+  let en = false;
+  try { const j = await kqPost({ action: "info", shop_id: sid }); en = !!j.enabled; } catch (e) {}
+  qrInfo[sid] = en; delete qrLoading[sid];
   refreshPay();
 }
 function refreshPay() {
   const blk = $c("pay-block"); if (!blk || !sheetCtx) return;
   const ids = [...new Set(checkoutShops())];
   if (!ids.length) { blk.style.display = "none"; return; }
-  if (ids.length === 1 && qrInfo[ids[0]] === undefined) qrEnabledFor(ids[0]);
-  const ok = ids.length === 1 && qrInfo[ids[0]] === true;
+  ids.forEach((id) => { if (qrInfo[id] === undefined && !qrLoading[id]) qrEnabledFor(id); });
+  const known = ids.every((id) => qrInfo[id] !== undefined);
+  const ok = known && ids.every((id) => qrInfo[id] === true);
   blk.style.display = "";
   if (!ok) payMode = "cod";
   const hint = $c("pay-hint");
-  if (ids.length > 1) hint.textContent = "ការបង់តាម KHQR ត្រូវកម្មង់ពីហាងតែមួយក្នុងពេលតែមួយ";
-  else if (qrInfo[ids[0]] === undefined) hint.textContent = "";
-  else hint.textContent = ok ? "" : "ហាងនេះមិនទាន់បើកការបង់តាម KHQR ទេ";
+  if (!known) hint.textContent = "";
+  else if (ok) hint.textContent = ids.length > 1 ? "កន្ត្រកមានទំនិញពីហាងច្រើន អ្នកនឹងទទួល QR ដាច់ដោយឡែកសម្រាប់ហាងនីមួយៗ" : "";
+  else hint.textContent = ids.length > 1 ? "ហាងមួយចំនួនក្នុងកន្ត្រកមិនទាន់បើកការបង់តាម KHQR ទេ" : "ហាងនេះមិនទាន់បើកការបង់តាម KHQR ទេ";
   $c("pay-opts").querySelectorAll("[data-pay]").forEach((b) => {
     b.classList.toggle("active", b.dataset.pay === payMode);
     if (b.dataset.pay === "qr") { b.style.opacity = ok ? "" : ".45"; b.style.pointerEvents = ok ? "" : "none"; }
@@ -2491,43 +2495,76 @@ function loadQrLib() {
 function stopQr() { if (qrTimer) { clearInterval(qrTimer); qrTimer = null; } }
 async function showQr(code, P) {
   const sheetEl = $c("qrsheet"), box = $c("qr-box"), msg = $c("qr-msg"), paidBtn = $c("qr-paid"), amt = $c("qr-amt");
-  box.innerHTML = ""; msg.style.color = ""; msg.textContent = "កំពុងបង្កើត QR..."; paidBtn.style.display = "none"; amt.textContent = "";
+  // ការកម្មង់ម្នាក់ៗក្នុងហាងនីមួយៗ៖ ហាងទីមួយប្រើលេខកូដដើម ហាងបន្ទាប់ប្រើ "លេខកូដ-លេខហាង"
+  const shopOf = (it) => (PRODUCTS[it.n - 1] || {}).shop || 1;
+  const sids = []; P.items.forEach((it) => { const s = shopOf(it); if (!sids.includes(s)) sids.push(s); });
+  const jobs = sids.map((s, i) => ({ sid: s, code: i === 0 ? code : `${code}-${s}`, paid: false, stop: false, until: 0 }));
+  const sname = (s) => (SHOPS[s] || {}).name || (typeof settings !== "undefined" && settings.name) || ("ហាង " + s);
+  const el = (p, i) => $c(`qj-${p}${i}`);
+
+  box.style.flexDirection = "column"; box.style.alignItems = "center";
+  box.innerHTML = jobs.map((j, i) => `<div style="width:100%;margin:0 0 18px"><div style="font-weight:700;margin-bottom:2px">${esc(sname(j.sid))}</div><div class="of-hint" id="qj-a${i}" style="margin:0 0 6px"></div><div id="qj-q${i}" style="display:flex;justify-content:center;min-height:60px"></div><div class="of-hint" id="qj-s${i}" style="margin:6px 0 0">កំពុងបង្កើត QR...</div></div>`).join("");
+  amt.textContent = jobs.length > 1 ? `កន្ត្រករបស់អ្នកមានទំនិញពី ${jobs.length} ហាង សូមបង់ QR នីមួយៗ` : "";
+  msg.style.color = ""; msg.textContent = ""; paidBtn.style.display = "none";
   sheetEl.classList.add("open"); closeSizeSheet();
   lastOrder = { code, phone: P.contact.phone }; try { localStorage.setItem("lastOrder", JSON.stringify(lastOrder)); } catch (e) {}
+
   const finish = () => { stopQr(); sheetEl.classList.remove("open"); orderDone(null, code, P.contact.phone); };
-  paidBtn.onclick = finish;
+  paidBtn.onclick = async () => {
+    for (const j of jobs) if (!j.paid) { try { await kqPost({ action: "claim", order_code: j.code }); } catch (e) {} }
+    finish();
+  };
   $c("qr-close").onclick = () => { stopQr(); sheetEl.classList.remove("open"); };
-  try {
-    await loadQrLib();
-    const j = await kqPost({ action: "create", order_code: code });
-    if (j.paid) { finish(); return; }
-    if (!j.ok) throw new Error(j.error || "create");
-    const q = window.qrcode(0, "M"); q.addData(j.qr); q.make();
-    box.innerHTML = q.createSvgTag(6, 2); const sv = box.querySelector("svg"); if (sv) { sv.style.width = "240px"; sv.style.height = "240px"; }
-    amt.textContent = "ចំនួនទឹកប្រាក់: " + formatRiel(j.amount) + " · លេខការកម្មង់ " + code;
-    msg.textContent = "ស្កេន QR ជាមួយកម្មវិធីធនាគារ ហើយរង់ចាំការបញ្ជាក់ដោយស្វ័យប្រវត្តិ";
-    const until = Number(j.expires_at) || (Date.now() + 15 * 60 * 1000);
-    stopQr();
-    qrTimer = setInterval(async () => {
-      if (!sheetEl.classList.contains("open")) { stopQr(); return; }
-      try {
-        const s = await kqPost({ action: "status", order_code: code });
-        if (s.paid) { finish(); return; }
-        if (s.state === "unavailable") {
-          stopQr(); paidBtn.style.display = "";
-          msg.textContent = "ប្រព័ន្ធមិនអាចផ្ទៀងផ្ទាត់ដោយស្វ័យប្រវត្តិទេ។ បន្ទាប់ពីបង់ សូមចុច 'ខ្ញុំបានបង់ហើយ' ហើយហាងនឹងផ្ទៀងផ្ទាត់ដោយដៃ។";
-          return;
-        }
-      } catch (e) {}
-      if (Date.now() > until + 120000) {
-        stopQr(); msg.style.color = "#B8213F"; paidBtn.style.display = "";
-        msg.textContent = "QR ផុតកំណត់។ ប្រសិនបើអ្នកបានបង់រួច សូមចុច 'ខ្ញុំបានបង់ហើយ' ហើយហាងនឹងផ្ទៀងផ្ទាត់ ឬទាក់ទងអ្នក។";
-      }
-    }, 4000);
-  } catch (e) {
+
+  try { await loadQrLib(); } catch (e) {
     msg.style.color = "#B8213F"; paidBtn.style.display = "";
-    msg.textContent = "មិនអាចបង្កើត QR បានទេ (" + String(e && e.message || "error").slice(0, 40) + ")។ ការកម្មង់របស់អ្នកត្រូវបានទទួលហើយ ហាងនឹងទាក់ទងអ្នកដើម្បីបង់ប្រាក់។";
+    msg.textContent = "មិនអាចផ្ទុកកម្មវិធីបង្កើត QR បានទេ។ ការកម្មង់របស់អ្នកត្រូវបានទទួលហើយ ហាងនឹងទាក់ទងអ្នកដើម្បីបង់ប្រាក់។";
+    return;
   }
+  await Promise.all(jobs.map(async (j, i) => {
+    try {
+      const r = await kqPost({ action: "create", order_code: j.code });
+      if (r.paid) { j.paid = true; el("s", i).textContent = "បានទទួលការបង់ប្រាក់ហើយ"; return; }
+      if (!r.ok) throw new Error(r.error || "create");
+      const q = window.qrcode(0, "M"); q.addData(r.qr); q.make();
+      el("q", i).innerHTML = q.createSvgTag(6, 2);
+      const sv = el("q", i).querySelector("svg"); if (sv) { sv.style.width = "220px"; sv.style.height = "220px"; }
+      el("a", i).textContent = "ចំនួនទឹកប្រាក់: " + formatRiel(r.amount) + " · " + j.code;
+      el("s", i).textContent = "ស្កេន QR ជាមួយកម្មវិធីធនាគារ ហើយរង់ចាំការបញ្ជាក់ដោយស្វ័យប្រវត្តិ";
+      j.until = Number(r.expires_at) || (Date.now() + 15 * 60 * 1000);
+    } catch (e) {
+      j.stop = true; el("s", i).style.color = "#B8213F"; paidBtn.style.display = "";
+      el("s", i).textContent = "មិនអាចបង្កើត QR បាន (" + String((e && e.message) || "error").slice(0, 40) + ")។ ហាងនឹងទាក់ទងអ្នកដើម្បីបង់ប្រាក់។";
+    }
+  }));
+  if (jobs.every((j) => j.paid)) { finish(); return; }
+
+  stopQr();
+  let busy = false;
+  qrTimer = setInterval(async () => {
+    if (!sheetEl.classList.contains("open")) { stopQr(); return; }
+    if (busy) return;
+    busy = true;
+    try {
+      for (let i = 0; i < jobs.length; i++) {
+        const j = jobs[i]; if (j.paid || j.stop) continue;
+        try {
+          const s = await kqPost({ action: "status", order_code: j.code });
+          if (s.paid) { j.paid = true; el("s", i).style.color = "#3F7D5C"; el("s", i).textContent = "បានទទួលការបង់ប្រាក់ហើយ"; continue; }
+          if (s.state === "unavailable") {
+            j.stop = true; paidBtn.style.display = "";
+            el("s", i).textContent = "ប្រព័ន្ធមិនអាចផ្ទៀងផ្ទាត់ដោយស្វ័យប្រវត្តិទេ។ បន្ទាប់ពីបង់ សូមចុច 'ខ្ញុំបានបង់ហើយ' ហើយហាងនឹងផ្ទៀងផ្ទាត់ដោយដៃ។";
+            continue;
+          }
+        } catch (e) {}
+        if (j.until && Date.now() > j.until + 120000) {
+          j.stop = true; paidBtn.style.display = ""; el("s", i).style.color = "#B8213F";
+          el("s", i).textContent = "QR ផុតកំណត់។ បើបានបង់រួច សូមចុច 'ខ្ញុំបានបង់ហើយ' ហើយហាងនឹងផ្ទៀងផ្ទាត់ ឬទាក់ទងអ្នក។";
+        }
+      }
+      if (jobs.every((j) => j.paid)) finish();
+    } finally { busy = false; }
+  }, 4000);
 }
 async function placeOrder(P, code) {
   P = { ...P, items: P.items.map((it) => { const p = PRODUCTS[it.n - 1] || {}; let ph = ""; try { const u = photoOf(it.n); if (u && !/^data:/i.test(u)) ph = new URL(u, location.href).href; } catch (e) {} return { ...it, shop_id: p.shop || 1, n: p.ln || it.n, photo: ph }; }) };   // ការកម្មង់ទៅតាមម្ចាស់ទំនិញ
