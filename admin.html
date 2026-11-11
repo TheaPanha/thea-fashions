@@ -770,7 +770,7 @@ async function acApi(path, opt = {}) {
   });
 })();
 
-const NT_HTML = `<div class="ac-item" id="nt-box"><b>ជូនដំណឹងការកម្មង់ទៅ Telegram</b><small id="nt-bot"></small><small>១) បើក Bot ខាងលើ ហើយចុច Start · ២) រក Chat ID របស់អ្នកតាម @userinfobot · ៣) បញ្ចូលលេខនោះខាងក្រោម</small><input class="ad-input" id="nt-chat" inputmode="numeric" placeholder="Chat ID (លេខ)" style="margin-top:8px" /><small style="display:block;margin-top:10px">Group ជជែកជាមួយភ្ញៀវ (ស្រេចចិត្ត)៖ ដាក់ Chat ID របស់ group ដើម្បីទទួលសារភ្ញៀវ និងឆ្លើយតបនៅទីនោះ។ បើទទេ សារភ្ញៀវទៅ Chat ID ខាងលើ។</small><input class="ad-input" id="nt-support" inputmode="numeric" placeholder="Chat ID group ជជែក (ស្រេចចិត្ត)" style="margin-top:6px" /><small style="display:block;margin-top:10px">Group ព័ត៌មាន (ស្រេចចិត្ត)៖ ដាក់ Chat ID របស់ group ដើម្បីឱ្យទំនិញថ្មីដែលអ្នកបន្ថែមត្រូវផ្សាយចូលទីនោះដោយស្វ័យប្រវត្តិ។</small><input class="ad-input" id="nt-news" inputmode="numeric" placeholder="Chat ID group ព័ត៌មាន (ស្រេចចិត្ត)" style="margin-top:6px" /><small style="display:block;margin-top:10px">បង់ប្រាក់តាម QR (Bakong)៖ ដាក់គណនីដែលប្រាក់ត្រូវចូល។ បើទទេ ហាងនេះប្រើតែបង់ពេលទទួលទំនិញ។</small><input class="ad-input" id="nt-bkacc" placeholder="Bakong Account ID (ឧ. ឈ្មោះ@ធនាគារ)" style="margin-top:6px" /><input class="ad-input" id="nt-bkname" placeholder="ឈ្មោះអាជីវកម្មលើ QR (ក្នុង ២៥ តួ)" style="margin-top:6px" /><input class="ad-input" id="nt-bkcity" placeholder="ទីក្រុង (ឧ. Phnom Penh)" style="margin-top:6px" /><small style="display:block;margin-top:12px">ជំនួយការ AI៖ ឱ្យ AI ឆ្លើយសំណួរអតិថិជនអំពីទំនិញរបស់ហាងនេះ។ បញ្ចីទំនិញត្រូវបានផ្ញើទៅ AI ដោយស្វ័យប្រវត្តិពេលរក្សាទុក។</small><label style="display:flex;gap:8px;align-items:center;margin-top:6px;font-size:14px"><input type="checkbox" id="nt-ai" /> បើក AI សម្រាប់ហាងនេះ</label><textarea class="ad-input" id="nt-aiinfo" rows="5" maxlength="2000" placeholder="ព័ត៌មានហាង៖ ម៉ោងបើក តម្លៃដឹក ការបង់ប្រាក់ គោលការណ៍ប្តូរទំនិញ... (AI ប្រើតែព័ត៌មាននេះ និងបញ្ចីទំនិញ)" style="margin-top:6px"></textarea><div class="ac-acts"><button class="ad-btn" id="nt-save" type="button">រក្សាទុក</button><button class="ad-btn" id="nt-test" type="button">ផ្ញើសារសាកល្បង</button></div><small id="nt-msg" style="margin-top:6px"></small></div>`;
+const NT_HTML = `<div class="ac-item" id="nt-box"><b>ជូនដំណឹងការកម្មង់ទៅ Telegram</b><small id="nt-bot"></small><small>១) បើក Bot ខាងលើ ហើយចុច Start · ២) រក Chat ID របស់អ្នកតាម @userinfobot · ៣) បញ្ចូលលេខនោះខាងក្រោម</small><input class="ad-input" id="nt-chat" inputmode="numeric" placeholder="Chat ID (លេខ)" style="margin-top:8px" /><small style="display:block;margin-top:10px">Group ជជែកជាមួយភ្ញៀវ (ស្រេចចិត្ត)៖ ដាក់ Chat ID របស់ group ដើម្បីទទួលសារភ្ញៀវ និងឆ្លើយតបនៅទីនោះ។ បើទទេ សារភ្ញៀវទៅ Chat ID ខាងលើ។</small><input class="ad-input" id="nt-support" inputmode="numeric" placeholder="Chat ID group ជជែក (ស្រេចចិត្ត)" style="margin-top:6px" /><small style="display:block;margin-top:10px">Group ព័ត៌មាន (ស្រេចចិត្ត)៖ ដាក់ Chat ID របស់ group ដើម្បីឱ្យទំនិញថ្មីដែលអ្នកបន្ថែមត្រូវផ្សាយចូលទីនោះដោយស្វ័យប្រវត្តិ។</small><input class="ad-input" id="nt-news" inputmode="numeric" placeholder="Chat ID group ព័ត៌មាន (ស្រេចចិត្ត)" style="margin-top:6px" /><small style="display:block;margin-top:10px">បង់ប្រាក់តាម QR (Bakong)៖ ដាក់គណនីដែលប្រាក់ត្រូវចូល។ បើទទេ ហាងនេះប្រើតែបង់ពេលទទួលទំនិញ។</small><input class="ad-input" id="nt-bkacc" placeholder="Bakong Account ID (ឧ. ឈ្មោះ@ធនាគារ)" style="margin-top:6px" /><input class="ad-input" id="nt-bkname" placeholder="ឈ្មោះអាជីវកម្មលើ QR (ក្នុង ២៥ តួ)" style="margin-top:6px" /><input class="ad-input" id="nt-bkcity" placeholder="ទីក្រុង (ឧ. Phnom Penh)" style="margin-top:6px" /><div class="ac-acts"><button class="ad-btn" id="nt-save" type="button">រក្សាទុក</button><button class="ad-btn" id="nt-test" type="button">ផ្ញើសារសាកល្បង</button></div><small id="nt-msg" style="margin-top:6px"></small></div>`;
 async function announceProduct(p) {
   try {
     const t = await sbToken();
@@ -781,25 +781,13 @@ async function announceProduct(p) {
     else if (j && j.error === "no_news_chat") alert("មិនទាន់កំណត់ Chat ID group ព័ត៌មាន ក្នុងការជូនដំណឹង Telegram");
   } catch (e) {}
 }
-function buildAiCatalog() {
-  const hidden = new Set(adminData.hidden || []), gone = new Set((adminData.deleted || []).map(String));
-  const rows = [];
-  PRODUCTS.forEach((p, k) => {
-    const n = k + 1; if (hidden.has(n) || gone.has(String(n))) return;
-    const stock = adminData.stock[n], sale = Number(adminData.sale[n]) || 0;
-    const st = stock === undefined || stock === "" ? "" : (Number(stock) <= 0 ? "អស់ស្តុក" : "សល់ " + Number(stock));
-    rows.push([n, String(p.name || "").replace(/\|/g, " "), String(p.place || "").replace(/\|/g, " "), (Number(p.price) || 0) + "៛" + (sale > 0 ? " (បញ្ចុះ " + sale + "%)" : ""), st].join("|"));
-  });
-  return rows.join("\n").slice(0, 24000);
-}
 async function bindNotify() {
   const $ = (id) => document.getElementById(id), msg = $("nt-msg");
   if (!$("nt-box")) return;
   if (!sbOn()) { $("nt-box").style.display = "none"; return; }
-  let hasSup = false, hasNews = false, hasBk = false, hasAi = false;
+  let hasSup = false, hasNews = false, hasBk = false;
   try {
     const SETS = [
-      "chat_id,support_chat_id,news_chat_id,bakong_account,bakong_name,bakong_city,ai_enabled,ai_info",
       "chat_id,support_chat_id,news_chat_id,bakong_account,bakong_name,bakong_city",
       "chat_id,support_chat_id,news_chat_id",
       "chat_id,support_chat_id",
@@ -808,25 +796,22 @@ async function bindNotify() {
     let r = [], cols = "";
     for (const c of SETS) { try { r = await acApi(`shop_notify?select=${c}&shop_id=eq.${SHOP_ID}`); cols = c; break; } catch (e1) {} }
     const has = (name) => cols.split(",").includes(name);
-    hasSup = has("support_chat_id"); hasNews = has("news_chat_id"); hasBk = has("bakong_account"); hasAi = has("ai_enabled");
+    hasSup = has("support_chat_id"); hasNews = has("news_chat_id"); hasBk = has("bakong_account");
     $("nt-chat").value = (r[0] && r[0].chat_id) || "";
     $("nt-support").value = (r[0] && r[0].support_chat_id) || "";
     $("nt-news").value = (r[0] && r[0].news_chat_id) || "";
     $("nt-bkacc").value = (r[0] && r[0].bakong_account) || "";
     $("nt-bkname").value = (r[0] && r[0].bakong_name) || "";
     $("nt-bkcity").value = (r[0] && r[0].bakong_city) || "";
-    $("nt-ai").checked = !!(r[0] && r[0].ai_enabled);
-    $("nt-aiinfo").value = (r[0] && r[0].ai_info) || "";
   } catch (e) {}
   try { const bu = await acApi("rpc/notify_bot", { method: "POST", body: "{}" }); if (bu && !/^ដាក់-/.test(bu)) $("nt-bot").innerHTML = `Bot៖ <a href="https://t.me/${esc(bu)}" target="_blank" rel="noopener">@${esc(bu)}</a>`; } catch (e) {}
   $("nt-save").onclick = async () => {
     const v = $("nt-chat").value.trim(), sv = $("nt-support").value.trim(), nv = $("nt-news").value.trim(); msg.style.color = "";
     const ba = $("nt-bkacc").value.trim(), bn = $("nt-bkname").value.trim(), bcity = $("nt-bkcity").value.trim();
-    const aiOn = $("nt-ai").checked, aiInfo = $("nt-aiinfo").value.trim();
     if (nv && !/^-?\d+$/.test(nv)) { msg.textContent = "Chat ID group ព័ត៌មាន មិនត្រឹមត្រូវ"; return; }
     if (sv && !/^-?\d+$/.test(sv)) { msg.textContent = "Chat ID group មិនត្រឹមត្រូវ"; return; }
     if (v && !/^-?\d+$/.test(v)) { msg.textContent = "Chat ID ត្រូវជាលេខ"; return; }
-    try { await acApi("shop_notify?on_conflict=shop_id", { method: "POST", headers: { Prefer: "resolution=merge-duplicates,return=minimal" }, body: JSON.stringify(Object.assign({ shop_id: SHOP_ID, chat_id: v }, (sv || hasSup) ? { support_chat_id: sv } : {}, (nv || hasNews) ? { news_chat_id: nv } : {}, (ba || bn || bcity || hasBk) ? { bakong_account: ba, bakong_name: bn, bakong_city: bcity } : {}, (aiOn || aiInfo || hasAi) ? { ai_enabled: aiOn, ai_info: aiInfo, ai_catalog: buildAiCatalog() } : {})) }); msg.textContent = "បានរក្សាទុក"; }
+    try { await acApi("shop_notify?on_conflict=shop_id", { method: "POST", headers: { Prefer: "resolution=merge-duplicates,return=minimal" }, body: JSON.stringify(Object.assign({ shop_id: SHOP_ID, chat_id: v }, (sv || hasSup) ? { support_chat_id: sv } : {}, (nv || hasNews) ? { news_chat_id: nv } : {}, (ba || bn || bcity || hasBk) ? { bakong_account: ba, bakong_name: bn, bakong_city: bcity } : {})) }); msg.textContent = "បានរក្សាទុក"; }
     catch (e) { msg.style.color = "#B8213F"; msg.textContent = "រក្សាមិនបាន (តើបាន run admin-telegram.sql ហើយឬនៅ?)"; }
   };
   $("nt-test").onclick = async () => {
@@ -1045,7 +1030,6 @@ function adminRows(q) {
         ${adColorBox(p.place)}
         ${adGallery(n)}
         <textarea class="ad-input ad-desc" data-f="desc" rows="3" placeholder="ពិពណ៌នាទំនិញ (ក្រណាត់ ទ្រង់ទ្រាយ ពណ៌...) · ទុកទទេ = ប្រើអត្ថបទស្វ័យប្រវត្តិ">${esc(p.desc || "")}</textarea>
-        <button type="button" class="od-sm ad-ai-desc" style="margin:4px 0 8px">AI សរសេរពិពណ៌នា</button>
         <div class="ad-three">
           <label>តម្លៃ ៛<input class="ad-input" data-f="price" type="number" inputmode="numeric" value="${p.price}" /></label>
           <label>បញ្ចុះ ៛<input class="ad-input" data-f="sale" type="number" inputmode="numeric" value="${adminData.sale[n] || ""}" placeholder="—" /></label>
@@ -1464,23 +1448,6 @@ function openAdminPanel() {
   }));
   // បញ្ចុះតម្លៃលឿន (-10% / -20% / -30% / លុប)
   list.addEventListener("click", (e) => {
-    const ab = e.target.closest(".ad-ai-desc");
-    if (ab) {                                   // AI សរសេរពិពណ៌នាទំនិញ
-      const row = ab.closest(".ad-row"), ta = row.querySelector('[data-f="desc"]');
-      const body = { action: "describe", name: row.querySelector('[data-f="name"]').value, place: row.querySelector('[data-f="place"]').value, price: row.querySelector('[data-f="price"]').value };
-      const old = ab.textContent; ab.disabled = true; ab.textContent = "កំពុងសរសេរ...";
-      (async () => {
-        try {
-          body.token = await sbToken();
-          const r = await fetch(`${SB_URL}/functions/v1/ai-assist`, { method: "POST", headers: { apikey: SB_KEY, "Content-Type": "application/json" }, body: JSON.stringify(body) });
-          const j = await r.json();
-          if (j.text) { ta.value = j.text; ta.dispatchEvent(new Event("change", { bubbles: true })); }
-          else alert("AI មិនអាចសរសេរបាន៖ " + (j.error || "error"));
-        } catch (er) { alert("AI មិនអាចសរសេរបាន"); }
-        ab.disabled = false; ab.textContent = old;
-      })();
-      return;
-    }
     const cb = e.target.closest(".ad-cbtn, .ad-cx");
     if (cb) {                                   // ពណ៌៖ បន្ថែម / លុប
       const row = cb.closest(".ad-row"), n = Number(row.dataset.n), p = PRODUCTS[n - 1];
