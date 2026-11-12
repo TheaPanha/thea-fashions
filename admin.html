@@ -652,6 +652,7 @@ const SETTINGS = {        // ការកំណត់រចនា និងហ�
   logoText: "",
   logoImg: "",
   ownerImg: "",
+  headerImg: "",
   showTimer: 1,
   requireLogin: 0,
   showPromo: true,          // បង្ហាញផ្ទាំងផ្សព្វផ្សាយធំ
@@ -1342,10 +1343,14 @@ function openAdminPanel() {
       </div>
       <label class="ad-field">ពណ៌ផ្ទាល់ខ្លួន<input type="color" data-s="accent" value="${esc(settings.accent)}" id="ad-color" /></label>
       <label class="ad-field">ឈ្មោះហាង<input class="ad-input" data-s="name" value="${esc(settings.name)}" /></label>
-      <div class="ad-field">Logo ហាង (បង្ហាញលើគេហទំព័រ)
+      <div class="ad-field">Logo ហាង (បញ្ជីហាង និងជម្រើសបម្រុង)
         <div class="ad-imgrow"><span class="ad-logo-prev" id="ad-logo-prev"></span>
           <label class="ad-btn" style="cursor:pointer"><input type="file" id="ad-logo-file" accept="image/*" hidden />ដាក់រូប Logo</label>
           <button type="button" class="ad-btn" id="ad-logo-clear">លុបរូប</button></div></div>
+      <div class="ad-field">រូបរបារលើ (រង្វង់ខាងឆ្វេងលើនៃគេហទំព័រ)
+        <div class="ad-imgrow"><span class="ad-logo-prev" id="ad-header-prev"></span>
+          <label class="ad-btn" style="cursor:pointer"><input type="file" id="ad-header-file" accept="image/*" hidden />ដាក់រូបរបារលើ</label>
+          <button type="button" class="ad-btn" id="ad-header-clear">លុបរូប</button></div></div>
       <div class="ad-field">រូប Admin (បង្ហាញក្នុង Admin និងកាតហាង)
         <div class="ad-imgrow"><span class="ad-logo-prev" id="ad-owner-prev"></span>
           <label class="ad-btn" style="cursor:pointer"><input type="file" id="ad-owner-file" accept="image/*" hidden />ដាក់រូប Admin</label>
@@ -1681,6 +1686,8 @@ function openAdminPanel() {
       if (settings.logoImg) { el.textContent = ""; el.style.backgroundImage = `url("${settings.logoImg}")`; el.style.backgroundSize = "cover"; el.style.backgroundPosition = "center"; }
       else { el.style.backgroundImage = ""; el.textContent = letter; }
     });
+    const hp = document.getElementById("ad-header-prev");
+    if (hp) { if (settings.headerImg) { hp.textContent = ""; hp.style.backgroundImage = `url("${settings.headerImg}")`; hp.style.backgroundSize = "cover"; hp.style.backgroundPosition = "center"; } else { hp.style.backgroundImage = ""; hp.textContent = "\u{1F3E0}"; } }
     const op = document.getElementById("ad-owner-prev"), tl = document.querySelector("#admin-app > .ad-top .ad-logo");
     if (op) { if (settings.ownerImg) { op.textContent = ""; op.style.backgroundImage = `url("${settings.ownerImg}")`; op.style.backgroundSize = "cover"; op.style.backgroundPosition = "center"; } else { op.style.backgroundImage = ""; op.textContent = "\u{1F464}"; } }
     { const ow = document.getElementById("ad-top-owner"); if (ow) ow.remove();
@@ -1714,6 +1721,8 @@ function openAdminPanel() {
   document.getElementById("ad-logo-clear").addEventListener("click", () => { adminData.settings.logoImg = ""; commitSetting("logoImg"); });
   document.getElementById("ad-owner-file").addEventListener("change", (e) => { imgSetting(e.target.files[0], "ownerImg", 256, "owner.jpg"); e.target.value = ""; });
   document.getElementById("ad-owner-clear").addEventListener("click", () => { adminData.settings.ownerImg = ""; commitSetting("ownerImg"); });
+  document.getElementById("ad-header-file").addEventListener("change", (e) => { imgSetting(e.target.files[0], "headerImg", 256, "header.jpg"); e.target.value = ""; });
+  document.getElementById("ad-header-clear").addEventListener("click", () => { adminData.settings.headerImg = ""; commitSetting("headerImg"); });
   document.getElementById("ad-owner-move").addEventListener("click", () => {
     const s = adminData.settings, L = settings.logoImg || "", O = settings.ownerImg || "";
     if (!L && !O) { alert("មិនទាន់មានរូបទាំងពីរទេ សូមដាក់រូបជាមុន"); return; }

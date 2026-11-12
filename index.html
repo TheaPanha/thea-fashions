@@ -3951,7 +3951,7 @@ function applySettings() {
   document.querySelectorAll(".brand-line").forEach((el) => (el.textContent = S.name));
   const lm = document.getElementById("logo-mark");
   if (lm) {
-    if (S.logoImg || S.ownerImg) { lm.textContent = ""; lm.style.backgroundImage = `url("${S.logoImg || S.ownerImg}")`; lm.style.backgroundSize = "cover"; lm.style.backgroundPosition = "center"; }
+    if (S.headerImg || S.logoImg || S.ownerImg) { lm.textContent = ""; lm.style.backgroundImage = `url("${S.headerImg || S.logoImg || S.ownerImg}")`; lm.style.backgroundSize = "cover"; lm.style.backgroundPosition = "center"; }
     else { lm.style.backgroundImage = ""; lm.textContent = (String(S.logoText || "").trim()[0] || String(S.name).trim()[0] || "T").toUpperCase(); }
   }
   const noTimer = String(S.showTimer) === "0";
