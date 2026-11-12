@@ -1998,6 +1998,7 @@ img{-webkit-user-drag:none}
 .dt-count{background:#F3ECDF;border-radius:999px;padding:6px 12px}
 .dt-count button{border-radius:50%!important}
 </style>
+<style id="owner-badge">.dt-seller .av,.sh-top .av{position:relative;overflow:visible!important}.av .ow{position:absolute;right:-3px;bottom:-3px;width:42%;min-width:18px;aspect-ratio:1;border-radius:50%;background:#EFE3D1 center/cover no-repeat;border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.25)}</style>
 </head>
 <body>
   <div class="announce" id="announce"><span id="announce-text"></span></div>
@@ -2465,6 +2466,7 @@ const SETTINGS = {        // ការកំណត់រចនា និងហ�
   saleCount: 16,
   saleHours: 4,
   logoText: "",            // អក្សរ Logo (ទទេ = អក្សរដំបូងនៃឈ្មោះហាង)
+  ownerImg: "",
   logoImg: "",             // រូប Logo (URL)
   showTimer: 1,            // 1 = បង្ហាញម៉ោងរាប់ថយក្រោយបញ្ចុះតម្លៃ
   requireLogin: 0,         // 1 = ភ្ញៀវត្រូវចូលគណនីមុនទិញ
@@ -2517,7 +2519,7 @@ function applyShared(d, others) {                    // d = ទិន្នន�
   Object.entries(adminData.edits).forEach(([k, v]) => { if (PRODUCTS[k]) Object.assign(PRODUCTS[k], v); });
   adminData.added.forEach((a) => PRODUCTS.push({ name: a.name, place: a.place, price: a.price, desc: a.desc || "" }));
   SHOPS = {};
-  const prof = (id, s) => ({ id, name: String(s.name || ("ហាង " + id)), logoImg: s.logoImg || "", logoText: s.logoText || "", phone: s.phone || "", telegram: s.telegram || "", messenger: s.messenger || "", about: s.about || "" });
+  const prof = (id, s) => ({ id, name: String(s.name || ("ហាង " + id)), logoImg: s.logoImg || "", ownerImg: s.ownerImg || "", logoText: s.logoText || "", phone: s.phone || "", telegram: s.telegram || "", messenger: s.messenger || "", about: s.about || "" });
   SHOPS[1] = prof(1, { ...SETTINGS, ...(d.settings || {}) });
   (others || []).forEach((o) => { SHOPS[o.id] = prof(o.id, (o.data && o.data.settings) || {}); });
   const ownerManual = Object.keys(adminData.sale || {}).length > 0;
@@ -4023,6 +4025,7 @@ function toggleFol(id) {
 }
 function shopCount(id) { const h = hiddenSet(); return PRODUCTS.reduce((s, p, k) => s + (((p.shop || 1) === id && !h.has(k + 1)) ? 1 : 0), 0); }
 function avStyle(s) { return s.logoImg ? `style="background-image:url('${esc(s.logoImg)}')"` : ""; }
+function owBadge(s) { return s.ownerImg ? `<i class="ow" style="background-image:url('${esc(s.ownerImg)}')" title="ម្ចាស់ហាង"></i>` : ""; }
 function avText(s) { return s.logoImg ? "" : esc((String(s.logoText || "").trim()[0] || String(s.name).trim()[0] || "H").toUpperCase()); }
 function renderShops() {
   const ids = Object.keys(SHOPS).map(Number).filter((id) => shopCount(id) > 0);
@@ -4039,7 +4042,7 @@ function renderShopHead() {
   if (!el) return;
   if (!shopFilter || !SHOPS[shopFilter]) { el.classList.remove("on"); el.innerHTML = ""; return; }
   const s = SHOPS[shopFilter], fol = isFol(s.id);
-  el.innerHTML = `<div class="sh-top"><div class="av" ${avStyle(s)}>${avText(s)}</div><div><b>${esc(s.name)}</b><small>${shopRateText(s.id)}${shopCount(s.id)} ទំនិញ · ${FOLLOWS[s.id] || 0} អ្នកតាមដាន${fol ? " · កំពុងតាមដាន" : ""}</small></div></div>${s.about ? `<p class="sh-about">${esc(s.about)}</p>` : ""}<div class="sh-acts"><button class="sh-btn ${fol ? "fol" : "pri"}" data-a="fol" type="button">${fol ? "កំពុងតាមដាន" : "+ តាមដាន"}</button><button class="sh-btn" data-a="ask" type="button">សួរម្ចាស់ហាង</button></div><button class="sh-back" data-a="back" type="button">← ត្រឡប់ទៅទំនិញទាំងអស់</button>`;
+  el.innerHTML = `<div class="sh-top"><div class="av" ${avStyle(s)}>${avText(s)}${owBadge(s)}</div><div><b>${esc(s.name)}</b><small>${shopRateText(s.id)}${shopCount(s.id)} ទំនិញ · ${FOLLOWS[s.id] || 0} អ្នកតាមដាន${fol ? " · កំពុងតាមដាន" : ""}</small></div></div>${s.about ? `<p class="sh-about">${esc(s.about)}</p>` : ""}<div class="sh-acts"><button class="sh-btn ${fol ? "fol" : "pri"}" data-a="fol" type="button">${fol ? "កំពុងតាមដាន" : "+ តាមដាន"}</button><button class="sh-btn" data-a="ask" type="button">សួរម្ចាស់ហាង</button></div><button class="sh-back" data-a="back" type="button">← ត្រឡប់ទៅទំនិញទាំងអស់</button>`;
   el.classList.add("on");
 }
 function openShop(id) {
@@ -4053,7 +4056,7 @@ function renderSeller(i) {
   if (!el || !s) { if (el) el.classList.remove("on"); return; }
   const fol = isFol(id);
   el.dataset.i = i; el.dataset.id = id;
-  el.innerHTML = `<div class="av" ${avStyle(s)}>${avText(s)}</div><div class="nm"><b>${esc(s.name)}</b><small>${shopRateText(id)}${shopCount(id)} ទំនិញ · ${FOLLOWS[id] || 0} អ្នកតាមដាន</small></div><div class="sl-acts"><button type="button" data-a="fol">${fol ? "តាមដានរួច" : "+ តាមដាន"}</button><button type="button" data-a="ask" class="pri">សួរម្ចាស់ហាង</button><button type="button" data-a="view">មើលហាង</button></div>`;
+  el.innerHTML = `<div class="av" ${avStyle(s)}>${avText(s)}${owBadge(s)}</div><div class="nm"><b>${esc(s.name)}</b><small>${shopRateText(id)}${shopCount(id)} ទំនិញ · ${FOLLOWS[id] || 0} អ្នកតាមដាន</small></div><div class="sl-acts"><button type="button" data-a="fol">${fol ? "តាមដានរួច" : "+ តាមដាន"}</button><button type="button" data-a="ask" class="pri">សួរម្ចាស់ហាង</button><button type="button" data-a="view">មើលហាង</button></div>`;
   el.classList.add("on");
 }
 function openAsk(id, pre) {
