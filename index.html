@@ -4033,8 +4033,8 @@ function toggleFol(id) {
 }
 function shopCount(id) { const h = hiddenSet(); return PRODUCTS.reduce((s, p, k) => s + (((p.shop || 1) === id && !h.has(k + 1)) ? 1 : 0), 0); }
 function avStyle(s) { return s.logoImg ? `style="background-image:url('${esc(s.logoImg)}')"` : ""; }
-function avStyleO(s) { return s.ownerImg ? `style="background-image:url('${esc(s.ownerImg)}')"` : avStyle(s); }
-function avTextO(s) { return s.ownerImg ? "" : avText(s); }
+function avStyleO(s) { return false ? `style="background-image:url('${esc(s.ownerImg)}')"` : avStyle(s); }
+function avTextO(s) { return false ? "" : avText(s); }
 function owBadge(s) { return false ? `<i class="ow" style="background-image:url('${esc(s.ownerImg)}')" title="ម្ចាស់ហាង"></i>` : ""; }
 function avText(s) { return s.logoImg ? "" : esc((String(s.logoText || "").trim()[0] || String(s.name).trim()[0] || "H").toUpperCase()); }
 function renderShops() {

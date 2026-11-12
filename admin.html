@@ -1356,11 +1356,7 @@ function openAdminPanel() {
         <div class="ad-imgrow"><span class="ad-logo-prev" id="ad-adm-prev"></span>
           <label class="ad-btn" style="cursor:pointer"><input type="file" id="ad-adm-file" accept="image/*" hidden />ដាក់រូប Admin</label>
           <button type="button" class="ad-btn" id="ad-adm-clear">លុបរូប</button></div></div>
-      <div class="ad-field">រូបកាតហាង (បង្ហាញលើ index៖ កាតហាង និងកាតអ្នកលក់)
-        <div class="ad-imgrow"><span class="ad-logo-prev" id="ad-owner-prev"></span>
-          <label class="ad-btn" style="cursor:pointer"><input type="file" id="ad-owner-file" accept="image/*" hidden />ដាក់រូបកាតហាង</label>
-          <button type="button" class="ad-btn" id="ad-owner-clear">លុបរូប</button></div>
-        <button type="button" class="ad-btn" id="ad-owner-move" style="margin-top:8px">ប្តូរទីតាំងរូប៖ Logo ហាង ↔ រូបកាតហាង (ចុចម្តងគត់)</button></div>
+      
       <label class="ad-field">អក្សរ Logo ១ តួ (ប្រើពេលគ្មានរូប)<input class="ad-input" data-s="logoText" maxlength="2" value="${esc(settings.logoText)}" placeholder="${esc((String(settings.name).trim()[0] || "T").toUpperCase())}" /></label>
       <label class="ad-field">ខ្សែប្រកាសខាងលើបំផុត (ទទេ = លាក់)<input class="ad-input" data-s="announce" value="${esc(settings.announce)}" /></label>
       <label class="ad-field">ស្លាកខាងលើចំណងជើង<input class="ad-input" data-s="eyebrow" value="${esc(settings.eyebrow)}" /></label>
@@ -1726,20 +1722,10 @@ function openAdminPanel() {
   };
   document.getElementById("ad-logo-file").addEventListener("change", (e) => { imgSetting(e.target.files[0], "logoImg", 256, "logo.jpg"); e.target.value = ""; });
   document.getElementById("ad-logo-clear").addEventListener("click", () => { adminData.settings.logoImg = ""; commitSetting("logoImg"); });
-  document.getElementById("ad-owner-file").addEventListener("change", (e) => { imgSetting(e.target.files[0], "ownerImg", 256, "owner.jpg"); e.target.value = ""; });
-  document.getElementById("ad-owner-clear").addEventListener("click", () => { adminData.settings.ownerImg = ""; commitSetting("ownerImg"); });
   document.getElementById("ad-adm-file").addEventListener("change", (e) => { imgSetting(e.target.files[0], "adminImg", 256, "admin.jpg"); e.target.value = ""; });
   document.getElementById("ad-adm-clear").addEventListener("click", () => { adminData.settings.adminImg = ""; commitSetting("adminImg"); });
   document.getElementById("ad-header-file").addEventListener("change", (e) => { imgSetting(e.target.files[0], "headerImg", 256, "header.jpg"); e.target.value = ""; });
   document.getElementById("ad-header-clear").addEventListener("click", () => { adminData.settings.headerImg = ""; commitSetting("headerImg"); });
-  document.getElementById("ad-owner-move").addEventListener("click", () => {
-    const s = adminData.settings, L = settings.logoImg || "", O = settings.ownerImg || "";
-    if (!L && !O) { alert("មិនទាន់មានរូបទាំងពីរទេ សូមដាក់រូបជាមុន"); return; }
-    const now = "ឥឡូវ៖ Logo ហាង = " + (L ? "មានរូប" : "ទទេ") + " | រូបកាតហាង = " + (O ? "មានរូប" : "ទទេ");
-    const after = "បន្ទាប់ពីប្តូរ៖ Logo ហាង = " + (O ? "រូបដែលនៅ Admin ឥឡូវ" : "ទទេ") + " | រូបកាតហាង = " + (L ? "រូបដែលនៅ Logo ឥឡូវ" : "ទទេ");
-    if (!confirm(now + "\n" + after + "\n\nបន្តទេ?")) return;
-    s.logoImg = O; s.ownerImg = L; commitSetting("logoImg");
-  });
   { const pl = document.getElementById("pf-logo"), px = document.getElementById("pf-logo-x");
     if (pl) pl.addEventListener("click", () => document.getElementById("ad-logo-file").click());
     if (px) px.addEventListener("click", () => document.getElementById("ad-logo-clear").click()); }
