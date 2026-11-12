@@ -4025,7 +4025,7 @@ function toggleFol(id) {
 }
 function shopCount(id) { const h = hiddenSet(); return PRODUCTS.reduce((s, p, k) => s + (((p.shop || 1) === id && !h.has(k + 1)) ? 1 : 0), 0); }
 function avStyle(s) { return s.logoImg ? `style="background-image:url('${esc(s.logoImg)}')"` : ""; }
-function owBadge(s) { return s.ownerImg ? `<i class="ow" style="background-image:url('${esc(s.ownerImg)}')" title="ម្ចាស់ហាង"></i>` : ""; }
+function owBadge(s) { return false ? `<i class="ow" style="background-image:url('${esc(s.ownerImg)}')" title="ម្ចាស់ហាង"></i>` : ""; }
 function avText(s) { return s.logoImg ? "" : esc((String(s.logoText || "").trim()[0] || String(s.name).trim()[0] || "H").toUpperCase()); }
 function renderShops() {
   const ids = Object.keys(SHOPS).map(Number).filter((id) => shopCount(id) > 0);

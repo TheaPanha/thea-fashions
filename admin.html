@@ -1342,15 +1342,15 @@ function openAdminPanel() {
       </div>
       <label class="ad-field">ពណ៌ផ្ទាល់ខ្លួន<input type="color" data-s="accent" value="${esc(settings.accent)}" id="ad-color" /></label>
       <label class="ad-field">ឈ្មោះហាង<input class="ad-input" data-s="name" value="${esc(settings.name)}" /></label>
-      <div class="ad-field">រូបសញ្ញាហាង (Logo)
+      <div class="ad-field">Logo ហាង (បង្ហាញលើគេហទំព័រ)
         <div class="ad-imgrow"><span class="ad-logo-prev" id="ad-logo-prev"></span>
           <label class="ad-btn" style="cursor:pointer"><input type="file" id="ad-logo-file" accept="image/*" hidden />ដាក់រូប Logo</label>
           <button type="button" class="ad-btn" id="ad-logo-clear">លុបរូប</button></div></div>
-      <div class="ad-field">រូបម្ចាស់ហាង (Owner)
+      <div class="ad-field">Logo Admin (បង្ហាញក្នុង Admin តែប៉ុណ្ណោះ)
         <div class="ad-imgrow"><span class="ad-logo-prev" id="ad-owner-prev"></span>
-          <label class="ad-btn" style="cursor:pointer"><input type="file" id="ad-owner-file" accept="image/*" hidden />ដាក់រូបម្ចាស់ហាង</label>
+          <label class="ad-btn" style="cursor:pointer"><input type="file" id="ad-owner-file" accept="image/*" hidden />ដាក់ Logo Admin</label>
           <button type="button" class="ad-btn" id="ad-owner-clear">លុបរូប</button></div>
-        <button type="button" class="ad-btn" id="ad-owner-move" style="margin-top:8px">ផ្លាស់រូបក្នុង Logo បច្ចុប្បន្ន មកជារូបម្ចាស់ហាង</button></div>
+        <button type="button" class="ad-btn" id="ad-owner-move" style="margin-top:8px">ប្តូរទីតាំង៖ Logo ហាង ↔ Logo Admin</button></div>
       <label class="ad-field">អក្សរ Logo ១ តួ (ប្រើពេលគ្មានរូប)<input class="ad-input" data-s="logoText" maxlength="2" value="${esc(settings.logoText)}" placeholder="${esc((String(settings.name).trim()[0] || "T").toUpperCase())}" /></label>
       <label class="ad-field">ខ្សែប្រកាសខាងលើបំផុត (ទទេ = លាក់)<input class="ad-input" data-s="announce" value="${esc(settings.announce)}" /></label>
       <label class="ad-field">ស្លាកខាងលើចំណងជើង<input class="ad-input" data-s="eyebrow" value="${esc(settings.eyebrow)}" /></label>
@@ -1683,10 +1683,8 @@ function openAdminPanel() {
     });
     const op = document.getElementById("ad-owner-prev"), tl = document.querySelector("#admin-app > .ad-top .ad-logo");
     if (op) { if (settings.ownerImg) { op.textContent = ""; op.style.backgroundImage = `url("${settings.ownerImg}")`; op.style.backgroundSize = "cover"; op.style.backgroundPosition = "center"; } else { op.style.backgroundImage = ""; op.textContent = "\u{1F464}"; } }
-    { const top = document.querySelector("#admin-app > .ad-top"); let ow = document.getElementById("ad-top-owner");
-      if (top && settings.ownerImg) { if (!ow) { ow = document.createElement("span"); ow.id = "ad-top-owner"; const site = top.querySelector(".ad-site"); top.insertBefore(ow, site || null); }
-        ow.style.cssText = `width:30px;height:30px;border-radius:50%;flex:none;background:#EFE3D1 url("${settings.ownerImg}") center/cover no-repeat;border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.25)`; ow.title = "ម្ចាស់ហាង"; }
-      else if (ow) ow.remove(); }
+    { const ow = document.getElementById("ad-top-owner"); if (ow) ow.remove();
+      if (tl && settings.ownerImg) { tl.textContent = ""; tl.style.backgroundImage = `url("${settings.ownerImg}")`; tl.style.backgroundSize = "cover"; tl.style.backgroundPosition = "center"; } }
     const h1 = document.querySelector("#admin-app > .ad-top h1"); if (h1) h1.textContent = nm || "Admin";
   };
   const commitSetting = (k) => {
@@ -1717,10 +1715,9 @@ function openAdminPanel() {
   document.getElementById("ad-owner-file").addEventListener("change", (e) => { imgSetting(e.target.files[0], "ownerImg", 256, "owner.jpg"); e.target.value = ""; });
   document.getElementById("ad-owner-clear").addEventListener("click", () => { adminData.settings.ownerImg = ""; commitSetting("ownerImg"); });
   document.getElementById("ad-owner-move").addEventListener("click", () => {
-    const cur = settings.logoImg;
-    if (!cur) { alert("មិនទាន់មានរូបក្នុង Logo ទេ"); return; }
-    if (!confirm("ផ្លាស់រូបក្នុង Logo បច្ចុប្បន្នទៅជារូបម្ចាស់ហាង ហើយ Logo ហាងនឹងទទេ រួចអ្នកអាចដាក់ Logo ហាងថ្មី។ បន្តទេ?")) return;
-    adminData.settings.ownerImg = cur; adminData.settings.logoImg = ""; commitSetting("logoImg");
+    if (!settings.logoImg && !settings.ownerImg) { alert("មិនទាន់មានរូបទេ"); return; }
+    if (!confirm("ប្តូរទីតាំង Logo ហាង ជាមួយ Logo Admin ។ បន្តទេ?")) return;
+    const s = adminData.settings, t = s.logoImg || ""; s.logoImg = s.ownerImg || ""; s.ownerImg = t; commitSetting("logoImg");
   });
   { const pl = document.getElementById("pf-logo"), px = document.getElementById("pf-logo-x");
     if (pl) pl.addEventListener("click", () => document.getElementById("ad-logo-file").click());
