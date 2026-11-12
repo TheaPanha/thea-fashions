@@ -1352,11 +1352,6 @@ function openAdminPanel() {
         <div class="ad-imgrow"><span class="ad-logo-prev" id="ad-header-prev"></span>
           <label class="ad-btn" style="cursor:pointer"><input type="file" id="ad-header-file" accept="image/*" hidden />ដាក់រូបរបារលើ</label>
           <button type="button" class="ad-btn" id="ad-header-clear">លុបរូប</button></div></div>
-      <div class="ad-field">រូបក្នុងទំព័រ Admin (បង្ហាញក្នុង Admin តែប៉ុណ្ណោះ)
-        <div class="ad-imgrow"><span class="ad-logo-prev" id="ad-adm-prev"></span>
-          <label class="ad-btn" style="cursor:pointer"><input type="file" id="ad-adm-file" accept="image/*" hidden />ដាក់រូប Admin</label>
-          <button type="button" class="ad-btn" id="ad-adm-clear">លុបរូប</button></div></div>
-      
       <label class="ad-field">អក្សរ Logo ១ តួ (ប្រើពេលគ្មានរូប)<input class="ad-input" data-s="logoText" maxlength="2" value="${esc(settings.logoText)}" placeholder="${esc((String(settings.name).trim()[0] || "T").toUpperCase())}" /></label>
       <label class="ad-field">ខ្សែប្រកាសខាងលើបំផុត (ទទេ = លាក់)<input class="ad-input" data-s="announce" value="${esc(settings.announce)}" /></label>
       <label class="ad-field">ស្លាកខាងលើចំណងជើង<input class="ad-input" data-s="eyebrow" value="${esc(settings.eyebrow)}" /></label>
@@ -1687,14 +1682,12 @@ function openAdminPanel() {
       if (settings.logoImg) { el.textContent = ""; el.style.backgroundImage = `url("${settings.logoImg}")`; el.style.backgroundSize = "cover"; el.style.backgroundPosition = "center"; }
       else { el.style.backgroundImage = ""; el.textContent = letter; }
     });
-    const ap = document.getElementById("ad-adm-prev");
-    if (ap) { if (settings.adminImg) { ap.textContent = ""; ap.style.backgroundImage = `url("${settings.adminImg}")`; ap.style.backgroundSize = "cover"; ap.style.backgroundPosition = "center"; } else { ap.style.backgroundImage = ""; ap.textContent = "\u{1F464}"; } }
     const hp = document.getElementById("ad-header-prev");
     if (hp) { if (settings.headerImg) { hp.textContent = ""; hp.style.backgroundImage = `url("${settings.headerImg}")`; hp.style.backgroundSize = "cover"; hp.style.backgroundPosition = "center"; } else { hp.style.backgroundImage = ""; hp.textContent = "\u{1F3E0}"; } }
     const op = document.getElementById("ad-owner-prev"), tl = document.querySelector("#admin-app > .ad-top .ad-logo");
     if (op) { if (settings.ownerImg) { op.textContent = ""; op.style.backgroundImage = `url("${settings.ownerImg}")`; op.style.backgroundSize = "cover"; op.style.backgroundPosition = "center"; } else { op.style.backgroundImage = ""; op.textContent = "\u{1F464}"; } }
     { const ow = document.getElementById("ad-top-owner"); if (ow) ow.remove();
-      if (tl && settings.adminImg) { tl.textContent = ""; tl.style.backgroundImage = `url("${settings.adminImg}")`; tl.style.backgroundSize = "cover"; tl.style.backgroundPosition = "center"; } }
+    }
     const h1 = document.querySelector("#admin-app > .ad-top h1"); if (h1) h1.textContent = nm || "Admin";
   };
   const commitSetting = (k) => {
@@ -1722,8 +1715,6 @@ function openAdminPanel() {
   };
   document.getElementById("ad-logo-file").addEventListener("change", (e) => { imgSetting(e.target.files[0], "logoImg", 256, "logo.jpg"); e.target.value = ""; });
   document.getElementById("ad-logo-clear").addEventListener("click", () => { adminData.settings.logoImg = ""; commitSetting("logoImg"); });
-  document.getElementById("ad-adm-file").addEventListener("change", (e) => { imgSetting(e.target.files[0], "adminImg", 256, "admin.jpg"); e.target.value = ""; });
-  document.getElementById("ad-adm-clear").addEventListener("click", () => { adminData.settings.adminImg = ""; commitSetting("adminImg"); });
   document.getElementById("ad-header-file").addEventListener("change", (e) => { imgSetting(e.target.files[0], "headerImg", 256, "header.jpg"); e.target.value = ""; });
   document.getElementById("ad-header-clear").addEventListener("click", () => { adminData.settings.headerImg = ""; commitSetting("headerImg"); });
   { const pl = document.getElementById("pf-logo"), px = document.getElementById("pf-logo-x");
