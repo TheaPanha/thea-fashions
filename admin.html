@@ -464,6 +464,68 @@
   .ad-empty, .od-empty { line-height: 1.7; }
   @media (min-width: 900px) { .ad-wrap { max-width: 880px; } }
 </style>
+<style id="seller-centre-ui">
+:root{--linen:#F5F5F5;--card:#fff;--border:#E8E8E8;--ink:#222;--muted:#757575;--clay:#EF9F33;--clay-dark:#D98A1F;--clay-light:#FF7337;--clay-rgb:238,77,45;--moss:#26AA99;--brass:#FFB400}
+body{background:#F5F5F5!important;color:#222}
+#admin-app>.ad-top{background:#fff!important;border-bottom:1px solid #E8E8E8!important;box-shadow:0 1px 4px rgba(0,0,0,.08)!important;color:#EF9F33!important}
+#admin-app>.ad-top h1{color:#EF9F33!important;font-weight:700!important;font-size:17px!important}
+#admin-app>.ad-top .ad-logo,.ad-logo{background:#EF9F33!important;color:#fff!important;border-radius:4px!important}
+.ad-site,.ad-linkbtn{color:#EF9F33!important}
+.ad-login{background:linear-gradient(180deg,#F2A63B,#EF9F33)!important}
+.ad-login .ad-card{border-radius:4px!important;box-shadow:0 4px 18px rgba(0,0,0,.2)!important}
+.ad-login .ad-card h1{color:#EF9F33!important}
+.ad-tabs{background:#fff!important;border-bottom:1px solid #E8E8E8!important;gap:0!important;padding:0 6px!important}
+.ad-tab{background:transparent!important;border:0!important;border-radius:0!important;color:#555!important;border-bottom:2px solid transparent!important;box-shadow:none!important}
+.ad-tab.active{color:#EF9F33!important;border-bottom-color:#EF9F33!important;background:transparent!important;font-weight:700!important}
+.ad-tab .bd{background:#EF9F33!important;color:#fff!important}
+.ad-card,.ad-row,.od-card,.ad-panel,.ad-addform,.ad-stats>*{background:#fff!important;border:1px solid #EFEFEF!important;border-radius:3px!important;box-shadow:0 1px 2px rgba(0,0,0,.06)!important}
+.ad-stats b,.ad-stats strong{color:#EF9F33!important}
+.ad-filters button{border-radius:2px!important;background:#fff!important;border:1px solid #E0E0E0!important;color:#555!important}
+.ad-filters button.on{background:#FDF3E1!important;border-color:#EF9F33!important;color:#EF9F33!important}
+.ad-input,.ad-field .ad-input,#ad-search{border-radius:2px!important;border:1px solid #E0E0E0!important;background:#fff!important}
+.ad-input:focus,#ad-search:focus{border-color:#EF9F33!important;box-shadow:0 0 0 2px rgba(239,159,51,.12)!important;outline:0}
+.sheet-confirm,.ad-addbtn,.ad-btn:not(.danger){background:#EF9F33!important;color:#fff!important;border:0!important;border-radius:2px!important;font-weight:600}
+.sheet-confirm:hover,.ad-addbtn:hover,.ad-btn:not(.danger):hover{background:#D98A1F!important}
+.ad-btn.danger{border-radius:2px!important}
+.ad-q{border-radius:2px!important}
+.ad-saved.show{background:#26AA99!important;color:#fff!important;border-radius:2px!important}
+.od-card::before{background:#EF9F33!important}
+.od-card.contacted::before{background:#26AA99!important}
+.ad-sw.on{outline-color:#EF9F33!important}
+</style>
+<meta name="theme-color" content="#EF9F33">
+<style id="admin-polish">
+body{-webkit-font-smoothing:antialiased}
+.ad-card,.ad-row,.od-card,.ad-panel,.ad-addform{border-radius:18px!important;box-shadow:0 3px 12px rgba(120,80,20,.08)!important;border:0!important}
+.sheet-confirm,.ad-addbtn,.ad-btn:not(.danger){border-radius:999px!important;box-shadow:0 3px 0 #B8741A!important}
+.ad-btn.danger,.ad-q,.ad-filters button{border-radius:999px!important}
+.ad-input,#ad-search{border-radius:14px!important}
+.ad-tab{transition:color .2s}
+.ad-tabs{overflow-x:auto;scrollbar-width:none}
+:focus-visible{outline:2px solid #EF9F33;outline-offset:2px}
+</style>
+<style id="admin-polish-2">
+body{background:#F3F0EB!important}
+#admin-app>.ad-top{border-radius:0 0 22px 22px!important;background:linear-gradient(180deg,#F2A63B,#EF9F33)!important;box-shadow:0 6px 18px rgba(217,138,31,.28)!important;border:0!important}
+#admin-app>.ad-top h1,.ad-site,.ad-out{color:#fff!important}
+.ad-top .ad-logo{background:#fff!important;color:#D98A1F!important}
+.ad-tabs{background:#fff!important;margin:12px!important;border-radius:999px!important;padding:5px!important;box-shadow:0 4px 14px rgba(120,80,20,.1);gap:4px!important}
+.ad-tab{border-radius:999px!important;border-bottom:0!important;padding:10px 14px!important;font-weight:700!important}
+.ad-tab.active{background:linear-gradient(180deg,#F5B54F,#EE9A2E)!important;color:#fff!important;box-shadow:0 3px 0 #B8741A}
+.ad-tab.active .bd{background:#fff!important;color:#D98A1F!important}
+.ad-stats>*,.od-stat{border-radius:18px!important;background:#fff!important;text-align:center}
+.ad-stats b,.od-stat b{font-size:22px!important;color:#D98A1F!important}
+.od-card{padding:14px 16px!important;margin:10px 12px!important}
+.od-price{color:#B3261E!important;font-weight:800!important}
+.od-chips *,.ad-cchip{border-radius:999px!important}
+.od-acts button,.od-acts a{border-radius:999px!important;min-height:40px}
+.ad-field label,.ad-label{font-weight:700;color:#4a3820}
+.ad-input{min-height:46px}
+.ad-thumb,.ad-thumbwrap,.ad-gal img{border-radius:14px!important}
+.ad-empty,.od-empty{background:#fff;border-radius:22px;padding:36px 20px;text-align:center;color:#8a7458;margin:12px}
+.ad-saved.show{border-radius:999px!important;box-shadow:0 8px 24px rgba(0,0,0,.2)}
+.ad-login .ad-card{border-radius:28px!important}
+</style>
 </head>
 <body>
   <div class="ad-login" id="admin-login">
