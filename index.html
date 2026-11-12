@@ -1999,6 +1999,14 @@ img{-webkit-user-drag:none}
 .dt-count button{border-radius:50%!important}
 </style>
 <style id="owner-badge">.dt-seller .av,.sh-top .av{position:relative;overflow:visible!important}.av .ow{position:absolute;right:-3px;bottom:-3px;width:42%;min-width:18px;aspect-ratio:1;border-radius:50%;background:#EFE3D1 center/cover no-repeat;border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.25)}</style>
+<style id="sale-box">
+#sale-section{background:#fff;margin:12px;border-radius:22px;overflow:hidden;box-shadow:0 4px 16px rgba(120,80,20,.1)}
+#sale-section .flash{margin:0!important;border-radius:0!important;box-shadow:none!important;background:linear-gradient(180deg,#FFF1D6,#fff)!important;padding:14px 16px 8px!important;animation:none}
+#sale-section .sale-head{margin:0!important;padding:4px 16px 0!important;background:transparent!important}
+#sale-section #sale-grid{padding:8px 14px 16px!important;background:transparent!important}
+@media(min-width:1000px){#sale-section{margin:12px 0}}
+@media(prefers-color-scheme:dark){#sale-section{background:#2b2a28}#sale-section .flash{background:linear-gradient(180deg,#4a3a1e,#2b2a28)!important}}
+</style>
 </head>
 <body>
   <div class="announce" id="announce"><span id="announce-text"></span></div>
@@ -2041,19 +2049,19 @@ img{-webkit-user-drag:none}
       <div><i class="fa-regular fa-comments"></i><span><b>សួរហាងបានភ្លាមៗ</b><small>Telegram · Messenger · ទូរស័ព្ទ</small></span></div>
     </div>
     <div class="marquee"><div class="track" id="mq-track"><span>THEA FASHION</span><i>✦</i><span>NEW COLLECTION</span><i>✦</i><span>ខោអាវទាន់សម័យ</span><i>✦</i><span>THEA FASHION</span><i>✦</i><span>NEW COLLECTION</span><i>✦</i><span>ខោអាវទាន់សម័យ</span><i>✦</i><span>THEA FASHION</span><i>✦</i><span>NEW COLLECTION</span><i>✦</i><span>ខោអាវទាន់សម័យ</span><i>✦</i><span>THEA FASHION</span><i>✦</i><span>NEW COLLECTION</span><i>✦</i><span>ខោអាវទាន់សម័យ</span><i>✦</i></div></div>
-    <div class="flash" id="flash">
-      <div class="flash-icon"><i class="fa-solid fa-bolt"></i></div>
-      <div class="flash-text">
-        <b id="flash-title">បញ្ចុះតម្លៃពិសេសថ្ងៃនេះ</b>
-        <small id="flash-sub">ប្តូរទំនិញថ្មី រៀងរាល់ 4 ម៉ោង · ម៉ោងកម្ពុជា</small>
-      </div>
-      <div class="timer" id="timer">
-        <span id="t-h">00</span><i>:</i><span id="t-m">00</span><i>:</i><span id="t-s">00</span>
-      </div>
-    </div>
     <section class="shopstrip" id="shopstrip" aria-label="ហាង"><h3>ហាងទាំងអស់</h3><div class="ss-row" id="ss-row"></div></section>
     <div class="shophead" id="shophead"></div>
     <div id="sale-section">
+      <div class="flash" id="flash">
+        <div class="flash-icon"><i class="fa-solid fa-bolt"></i></div>
+        <div class="flash-text">
+          <b id="flash-title">បញ្ចុះតម្លៃពិសេសថ្ងៃនេះ</b>
+          <small id="flash-sub">ប្តូរទំនិញថ្មី រៀងរាល់ 4 ម៉ោង · ម៉ោងកម្ពុជា</small>
+        </div>
+        <div class="timer" id="timer">
+          <span id="t-h">00</span><i>:</i><span id="t-m">00</span><i>:</i><span id="t-s">00</span>
+        </div>
+      </div>
       <div class="section-head sale-head" id="products">
         <h2>ទំនិញបញ្ចុះតម្លៃ</h2>
         <span class="line"></span>
