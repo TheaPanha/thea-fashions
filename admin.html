@@ -1682,7 +1682,10 @@ function openAdminPanel() {
     });
     const op = document.getElementById("ad-owner-prev"), tl = document.querySelector("#admin-app > .ad-top .ad-logo");
     if (op) { if (settings.ownerImg) { op.textContent = ""; op.style.backgroundImage = `url("${settings.ownerImg}")`; op.style.backgroundSize = "cover"; op.style.backgroundPosition = "center"; } else { op.style.backgroundImage = ""; op.textContent = "\u{1F464}"; } }
-    if (tl && settings.ownerImg) { tl.textContent = ""; tl.style.backgroundImage = `url("${settings.ownerImg}")`; tl.style.backgroundSize = "cover"; tl.style.backgroundPosition = "center"; }
+    { const top = document.querySelector("#admin-app > .ad-top"); let ow = document.getElementById("ad-top-owner");
+      if (top && settings.ownerImg) { if (!ow) { ow = document.createElement("span"); ow.id = "ad-top-owner"; const site = top.querySelector(".ad-site"); top.insertBefore(ow, site || null); }
+        ow.style.cssText = `width:30px;height:30px;border-radius:50%;flex:none;background:#EFE3D1 url("${settings.ownerImg}") center/cover no-repeat;border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.25)`; ow.title = "ម្ចាស់ហាង"; }
+      else if (ow) ow.remove(); }
     const h1 = document.querySelector("#admin-app > .ad-top h1"); if (h1) h1.textContent = nm || "Admin";
   };
   const commitSetting = (k) => {
