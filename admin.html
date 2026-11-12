@@ -653,6 +653,7 @@ const SETTINGS = {        // ការកំណត់រចនា និងហ�
   logoImg: "",
   ownerImg: "",
   headerImg: "",
+  headerName: "",
   adminImg: "",
   showTimer: 1,
   requireLogin: 0,
@@ -1343,7 +1344,8 @@ function openAdminPanel() {
           .map(([c, n]) => `<button type="button" class="ad-sw${settings.accent.toLowerCase() === c.toLowerCase() ? " on" : ""}" data-c="${c}" style="background:${c}" aria-label="${n}"></button>`).join("")}
       </div>
       <label class="ad-field">ពណ៌ផ្ទាល់ខ្លួន<input type="color" data-s="accent" value="${esc(settings.accent)}" id="ad-color" /></label>
-      <label class="ad-field">ឈ្មោះហាង<input class="ad-input" data-s="name" value="${esc(settings.name)}" /></label>
+      <label class="ad-field">ឈ្មោះហាង (បញ្ជីហាង និងកាតហាង)<input class="ad-input" data-s="name" value="${esc(settings.name)}" /></label>
+      <label class="ad-field">ឈ្មោះរបារលើ (ឈ្មោះខាងឆ្វេងលើនៃគេហទំព័រ)<input class="ad-input" data-s="headerName" value="${esc(settings.headerName || '')}" placeholder="ទុកទទេ = ប្រើឈ្មោះហាង" /></label>
       <div class="ad-field">Logo ហាង (បញ្ជីហាង និងជម្រើសបម្រុង)
         <div class="ad-imgrow"><span class="ad-logo-prev" id="ad-logo-prev"></span>
           <label class="ad-btn" style="cursor:pointer"><input type="file" id="ad-logo-file" accept="image/*" hidden />ដាក់រូប Logo</label>

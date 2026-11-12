@@ -3944,7 +3944,7 @@ function applySettings() {
   const S = settings;
   const setText = (sel, t) => { const el = document.querySelector(sel); if (el) el.textContent = t; };
   document.title = `${S.name} · ${S.eyebrow}`;
-  setText(".brand", S.name); setText("#hero-name", S.name);
+  setText(".brand", S.headerName || S.name); setText("#hero-name", S.name);
   setText("#ft-brand", S.name); setText("#ft-name", S.name);
   const an = document.getElementById("announce");
   if (an) { setText("#announce-text", S.announce || ""); an.style.display = S.announce ? "" : "none"; }
