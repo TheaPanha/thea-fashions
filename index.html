@@ -2519,7 +2519,7 @@ function applyShared(d, others) {                    // d = ទិន្នន�
   Object.entries(adminData.edits).forEach(([k, v]) => { if (PRODUCTS[k]) Object.assign(PRODUCTS[k], v); });
   adminData.added.forEach((a) => PRODUCTS.push({ name: a.name, place: a.place, price: a.price, desc: a.desc || "" }));
   SHOPS = {};
-  const prof = (id, s) => ({ id, name: String(s.name || ("ហាង " + id)), logoImg: s.logoImg || "", ownerImg: s.ownerImg || "", logoText: s.logoText || "", phone: s.phone || "", telegram: s.telegram || "", messenger: s.messenger || "", about: s.about || "" });
+  const prof = (id, s) => ({ id, name: String(s.name || ("ហាង " + id)), logoImg: s.logoImg || s.ownerImg || "", ownerImg: s.ownerImg || "", logoText: s.logoText || "", phone: s.phone || "", telegram: s.telegram || "", messenger: s.messenger || "", about: s.about || "" });
   SHOPS[1] = prof(1, { ...SETTINGS, ...(d.settings || {}) });
   (others || []).forEach((o) => { SHOPS[o.id] = prof(o.id, (o.data && o.data.settings) || {}); });
   const ownerManual = Object.keys(adminData.sale || {}).length > 0;
@@ -3548,8 +3548,11 @@ function render() {
     document.getElementById("sale-count").textContent = `${onSale.length} ទំនិញ`;
     document.getElementById("count").textContent = `${rest.length} ទំនិញ`;
     document.getElementById("sale-section").style.display = onSale.length ? "" : "none";
-    fillGrid(saleGrid, onSale.concat(onSale), true);   // ដាក់ពីរដង ដើម្បីរត់បន្តគ្នាមិនដាច់
-    startAutoScroll(saleGrid, onSale.length);
+    fillGrid(saleGrid, onSale, true);
+    if (saleGrid.scrollWidth > saleGrid.clientWidth + 4) {   // ដាក់ពីរដង តែពេលទំនិញច្រើនជាងទទឹងអេក្រង់ ដើម្បីរត់បន្តគ្នាមិនដាច់
+      fillGrid(saleGrid, onSale.concat(onSale), true);
+      startAutoScroll(saleGrid, onSale.length);
+    } else startAutoScroll(saleGrid, 0);
     fillGrid(grid, sortList(rest), false);
   } else {
     const base = activeCat === "all" ? all : activeCat === "sale" ? all.filter((p) => saleOf(p) > 0) : all.filter((p) => catOf(p) === activeCat);
@@ -3943,7 +3946,7 @@ function applySettings() {
   document.querySelectorAll(".brand-line").forEach((el) => (el.textContent = S.name));
   const lm = document.getElementById("logo-mark");
   if (lm) {
-    if (S.logoImg) { lm.textContent = ""; lm.style.backgroundImage = `url("${S.logoImg}")`; lm.style.backgroundSize = "cover"; lm.style.backgroundPosition = "center"; }
+    if (S.logoImg || S.ownerImg) { lm.textContent = ""; lm.style.backgroundImage = `url("${S.logoImg || S.ownerImg}")`; lm.style.backgroundSize = "cover"; lm.style.backgroundPosition = "center"; }
     else { lm.style.backgroundImage = ""; lm.textContent = (String(S.logoText || "").trim()[0] || String(S.name).trim()[0] || "T").toUpperCase(); }
   }
   const noTimer = String(S.showTimer) === "0";
