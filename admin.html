@@ -1300,6 +1300,7 @@ function openAdminPanel() {
       ${SHOP_ID === 1 ? `<button class="ad-tab" data-tab="shop" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5 5.5 4h13L20 9.5"/><path d="M4 9.5a2.7 2.7 0 0 0 5.3 0 2.7 2.7 0 0 0 5.4 0 2.7 2.7 0 0 0 5.3 0"/><path d="M5 12.5V20h14v-7.5M10 20v-4.5h4V20"/></svg>ហាង</button>` : ""}
       ${sbOn() && acIsOwner() ? `<button class="ad-tab" data-tab="access" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="8" cy="15" r="4"/><path d="m11 12 9-9M16 7l3 3M14 9l2 2"/></svg> សិទ្ធិ</button>` : ""}
       <button class="ad-tab" data-tab="reviews" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9L12 3Z"/></svg> វាយតម្លៃ</button>
+      ${SHOP_ID === 1 ? `<button class="ad-tab" data-tab="tools" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.7 6.3a4 4 0 0 0-5 5L3 18l3 3 6.7-6.7a4 4 0 0 0 5-5l-2.4 2.4-2.6-.6-.6-2.6 2.6-2.2Z"/></svg>ចលនា · ថែរក្សា</button>` : ""}
       <button class="ad-tab" data-tab="promo" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10v4h3l8 4V6L7 10H4Z"/><path d="M18.5 9.5a4 4 0 0 1 0 5"/></svg>ផ្សព្វផ្សាយ</button>
     </div>
     <div class="ad-panel" data-tab="orders"><div id="od-root"></div></div>
@@ -1364,17 +1365,22 @@ function openAdminPanel() {
       <label class="ad-check"><input type="checkbox" data-s="showFlash" ${settings.showFlash ? "checked" : ""}> បង្ហាញខ្សែបញ្ចុះតម្លៃ</label>
     </div>
 
-    <div class="ad-panel" data-tab="promo" style="display:none">
-      <label class="ad-check"><input type="checkbox" data-s="showPromo" ${settings.showPromo === false ? "" : "checked"}> បង្ហាញផ្ទាំងផ្សព្វផ្សាយធំ</label>
-      <div class="ad-field" style="margin-top:14px;font-weight:800">ចលនា (Animation) លើគេហទំព័រ</div>
+    ${SHOP_ID === 1 ? `<div class="ad-panel" data-tab="tools" style="display:none">
+      <div class="ad-card" style="padding:14px 16px;margin:0 0 12px"><div class="ad-label" style="margin:0 0 6px">✨ ចលនា (Animation) លើគេហទំព័រ</div>
       <label class="ad-check"><input type="checkbox" data-s="animOn" ${settings.animOn === false ? "" : "checked"}> បើកចលនាទាំងអស់ (បិទនេះ = គ្មានចលនាសោះ)</label>
       <label class="ad-check"><input type="checkbox" data-s="animCards" ${settings.animCards === false ? "" : "checked"}> កាតទំនិញលេចឡើងពេលរមូល</label>
       <label class="ad-check"><input type="checkbox" data-s="animFx" ${settings.animFx === false ? "" : "checked"}> ចលនាតុបតែង (ផ្គរ, ពន្លឺ HOT DEAL, បេះដូង, ម៉ោង)</label>
-      <div class="ad-field" style="margin-top:14px;font-weight:800">ថែរក្សាគេហទំព័រ (Maintenance)</div>
+      </div>
+      <div class="ad-card" style="padding:14px 16px;margin:0 0 12px"><div class="ad-label" style="margin:0 0 6px">🛠️ ថែរក្សាគេហទំព័រ (Maintenance)</div>
       <label class="ad-check"><input type="checkbox" data-s="maintOn" ${settings.maintOn === true ? "checked" : ""}> បើកការថែរក្សា (អតិថិជនឃើញទំព័រ «កំពុងថែរក្សា» ហើយទិញមិនបាន)</label>
       <label class="ad-field">ចំណងជើង<input class="ad-input" data-s="maintTitle" value="${esc(settings.maintTitle || "")}" placeholder="កំពុងថែរក្សាគេហទំព័រ" /></label>
       <label class="ad-field">សារប្រាប់អតិថិជន<textarea class="ad-input" data-s="maintMsg" rows="3" placeholder="យើងកំពុងធ្វើបច្ចុប្បន្នភាព សូមអរគុណសម្រាប់ការអត់ធ្មត់។">${esc(settings.maintMsg || "")}</textarea></label>
       <label class="ad-field">ពេលត្រឡប់មកវិញ (មិនបំពេញក៏បាន)<input class="ad-input" data-s="maintTime" value="${esc(settings.maintTime || "")}" placeholder="ឧ. ត្រឡប់មកវិញម៉ោង 6:00 ល្ងាច" /></label>
+      </div>
+    </div>` : ""}
+
+    <div class="ad-panel" data-tab="promo" style="display:none">
+      <label class="ad-check"><input type="checkbox" data-s="showPromo" ${settings.showPromo === false ? "" : "checked"}> បង្ហាញផ្ទាំងផ្សព្វផ្សាយធំ</label>
       ${(settings.banners || []).slice(0, 3).map((b, i) => `
         <div class="bn-card" data-bi="${i}">
           <div class="ad-label">ផ្ទាំងទី ${i + 1}</div>
