@@ -2007,6 +2007,86 @@ img{-webkit-user-drag:none}
 @media(min-width:1000px){#sale-section{margin:12px 0}}
 @media(prefers-color-scheme:dark){#sale-section{background:#2b2a28}#sale-section .flash{background:linear-gradient(180deg,#4a3a1e,#2b2a28)!important}}
 </style>
+<style id="polish-3">
+/* Shop profile card */
+.sh-top{display:flex;align-items:center;gap:16px}
+.sh-top .av{width:84px!important;height:84px!important;border:3px solid #fff;box-shadow:0 6px 16px rgba(120,80,20,.2)}
+.shophead{padding:16px!important}
+.shophead button,.shophead a{min-height:46px;border-radius:999px!important;font-weight:700}
+/* Dark mode refinements */
+@media(prefers-color-scheme:dark){
+ .topbar{background:linear-gradient(180deg,#D69A3A,#C58A2B)!important;box-shadow:0 6px 18px rgba(0,0,0,.4)!important}
+ .catnav{background:#C58A2B!important}
+ .topbar .tb-row .tb-search input{background:rgba(255,255,255,.2) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2.6' stroke-linecap='round'%3E%3Ccircle cx='10.5' cy='10.5' r='6.5'/%3E%3Cpath d='M15.5 15.5L21 21'/%3E%3C/svg%3E") no-repeat 16px center/18px 18px!important;background-color:rgba(255,255,255,.2)!important;border:1.5px solid rgba(255,255,255,.45)!important;color:#fff!important;box-shadow:none!important}
+ .tb-search input::placeholder{color:rgba(255,255,255,.85)!important}
+ .logo-mark{box-shadow:0 2px 8px rgba(0,0,0,.35)}
+ .section-head .count{background:#3a3834!important;color:#f1e6d3!important;box-shadow:none!important}
+ .sort{background:#3a3834!important;color:#f1e6d3!important}
+ .fchip,.fbar input{background:#2f2e2b!important;border-color:#4a463f!important;color:#f1e6d3!important}
+ .fchip.on,.fchip.active{background:#4a3a1e!important;border-color:#EF9F33!important;color:#F5B54F!important}
+ .card{box-shadow:0 4px 16px rgba(0,0,0,.35)!important}
+ .card .body h3{color:#f1e6d3!important}
+ .card .price,.card .pricebox.on-sale .price{color:#FF8A7A!important}
+ .card .old{color:#8f8678!important}
+ .sp-tabs{background:linear-gradient(120deg,rgba(60,52,40,.92),rgba(44,40,34,.86))!important;border-color:rgba(255,255,255,.12)!important}
+ .sp-tabs .ic{color:#f1e6d3}
+ .sp-tabs button.on .ic{color:#F5B54F;background:linear-gradient(180deg,rgba(239,159,51,.35),rgba(239,159,51,.2))}
+}
+</style>
+<style id="anim-ui">
+/* header + banner entrance */
+@keyframes slidedown{from{transform:translateY(-100%);opacity:0}}
+@keyframes zoomin{from{opacity:0;transform:scale(.96)}}
+.topbar{animation:slidedown .55s cubic-bezier(.2,.8,.2,1) both}
+.promo{animation:zoomin .6s cubic-bezier(.2,.8,.2,1) .1s backwards!important}
+.promo-slide{transition:opacity .5s ease,transform .6s ease}
+/* sale box: bolt pulse + HOT DEAL shine + timer tick */
+@keyframes bolt{0%,100%{transform:scale(1) rotate(0)}40%{transform:scale(1.18) rotate(-8deg)}60%{transform:scale(1.1) rotate(6deg)}}
+.flash-icon{animation:bolt 1.8s ease-in-out infinite!important}
+@keyframes tick{0%{transform:translateY(-35%);opacity:.3}100%{transform:none;opacity:1}}
+#t-s{display:inline-block;animation:tick .35s ease-out infinite;animation-duration:1s}
+@keyframes shine{0%{background-position:-120% 0}60%,100%{background-position:220% 0}}
+.card:has(.pricebox.on-sale) .body h3::before{background:linear-gradient(110deg,#E85D5D 35%,#FF9A8A 50%,#E85D5D 65%) 0 0/250% 100%;animation:shine 2.8s linear infinite}
+.disc{animation:pop .5s cubic-bezier(.2,1.6,.4,1) both}
+@keyframes pop{from{transform:scale(0)}}
+/* hearts */
+@keyframes heartpop{0%{transform:scale(1)}35%{transform:scale(1.5)}70%{transform:scale(.9)}100%{transform:scale(1)}}
+.fav-btn.on svg,.fav-btn.on i{animation:heartpop .45s ease-out}
+/* scroll reveal */
+.card.pre{opacity:0;transform:translateY(22px) scale(.98);animation:none!important}
+.card.pre.in{opacity:1;transform:none;transition:opacity .5s ease,transform .5s cubic-bezier(.2,.8,.2,1)}
+/* sheets */
+.sheet-backdrop{transition:opacity .3s ease}
+.sheet{animation:sheetup .38s cubic-bezier(.2,.9,.25,1) both}
+@keyframes sheetup{from{transform:translateY(40px);opacity:.6}}
+/* toast */
+.toast{animation:toastin .35s cubic-bezier(.2,1.2,.4,1) both}
+@keyframes toastin{from{transform:translate(-50%,24px);opacity:0}}
+/* tabs */
+@keyframes bump{50%{transform:scale(1.18) translateY(-2px)}}
+.sp-tabs button.on .ic svg,.sp-tabs button.on .ic i{animation:bump .4s ease-out}
+.sp-tabs{animation:tabin .6s cubic-bezier(.2,.9,.25,1) .3s backwards}
+@keyframes tabin{from{transform:translateY(120%)}}
+/* buttons + chips */
+.fchip,.size-chip,.catnav button{transition:transform .15s,background .2s,color .2s,border-color .2s}
+.fchip:active,.size-chip:active{transform:scale(.94)}
+.catnav button.on{animation:bump .35s ease-out}
+.to-top{transition:opacity .25s,transform .25s}
+@media(prefers-reduced-motion:reduce){.card.pre{opacity:1;transform:none}}
+</style>
+<script>
+(function(){
+if(!("IntersectionObserver" in window))return;
+var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add("in");io.unobserve(e.target);}});},{rootMargin:"0px 0px -8% 0px",threshold:.05});
+function prep(c){if(c.dataset.rv)return;c.dataset.rv="1";var r=c.getBoundingClientRect();if(r.top>innerHeight*.95){c.classList.add("pre");io.observe(c);}}
+function scan(){document.querySelectorAll("#grid .card,#sale-grid .card").forEach(prep);}
+document.addEventListener("DOMContentLoaded",function(){
+ scan();
+ ["grid","sale-grid"].forEach(function(id){var el=document.getElementById(id);if(el)new MutationObserver(scan).observe(el,{childList:true});});
+ setTimeout(function(){document.querySelectorAll(".card.pre:not(.in)").forEach(function(c){c.classList.add("in");});},4000);
+});
+})();
+</script>
 </head>
 <body>
   <div class="announce" id="announce"><span id="announce-text"></span></div>
