@@ -1366,6 +1366,15 @@ function openAdminPanel() {
 
     <div class="ad-panel" data-tab="promo" style="display:none">
       <label class="ad-check"><input type="checkbox" data-s="showPromo" ${settings.showPromo === false ? "" : "checked"}> បង្ហាញផ្ទាំងផ្សព្វផ្សាយធំ</label>
+      <div class="ad-field" style="margin-top:14px;font-weight:800">ចលនា (Animation) លើគេហទំព័រ</div>
+      <label class="ad-check"><input type="checkbox" data-s="animOn" ${settings.animOn === false ? "" : "checked"}> បើកចលនាទាំងអស់ (បិទនេះ = គ្មានចលនាសោះ)</label>
+      <label class="ad-check"><input type="checkbox" data-s="animCards" ${settings.animCards === false ? "" : "checked"}> កាតទំនិញលេចឡើងពេលរមូល</label>
+      <label class="ad-check"><input type="checkbox" data-s="animFx" ${settings.animFx === false ? "" : "checked"}> ចលនាតុបតែង (ផ្គរ, ពន្លឺ HOT DEAL, បេះដូង, ម៉ោង)</label>
+      <div class="ad-field" style="margin-top:14px;font-weight:800">ថែរក្សាគេហទំព័រ (Maintenance)</div>
+      <label class="ad-check"><input type="checkbox" data-s="maintOn" ${settings.maintOn === true ? "checked" : ""}> បើកការថែរក្សា (អតិថិជនឃើញទំព័រ «កំពុងថែរក្សា» ហើយទិញមិនបាន)</label>
+      <label class="ad-field">ចំណងជើង<input class="ad-input" data-s="maintTitle" value="${esc(settings.maintTitle || "")}" placeholder="កំពុងថែរក្សាគេហទំព័រ" /></label>
+      <label class="ad-field">សារប្រាប់អតិថិជន<textarea class="ad-input" data-s="maintMsg" rows="3" placeholder="យើងកំពុងធ្វើបច្ចុប្បន្នភាព សូមអរគុណសម្រាប់ការអត់ធ្មត់។">${esc(settings.maintMsg || "")}</textarea></label>
+      <label class="ad-field">ពេលត្រឡប់មកវិញ (មិនបំពេញក៏បាន)<input class="ad-input" data-s="maintTime" value="${esc(settings.maintTime || "")}" placeholder="ឧ. ត្រឡប់មកវិញម៉ោង 6:00 ល្ងាច" /></label>
       ${(settings.banners || []).slice(0, 3).map((b, i) => `
         <div class="bn-card" data-bi="${i}">
           <div class="ad-label">ផ្ទាំងទី ${i + 1}</div>

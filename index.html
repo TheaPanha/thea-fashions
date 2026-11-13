@@ -2087,6 +2087,24 @@ document.addEventListener("DOMContentLoaded",function(){
 });
 })();
 </script>
+<style id="anim-switch">
+.no-anim *,.no-anim *::before,.no-anim *::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+.no-reveal .card.pre,.no-anim .card.pre{opacity:1!important;transform:none!important}
+.no-fx .flash-icon,.no-fx #t-s,.no-fx .fav-btn svg,.no-fx .fav-btn i,.no-fx .disc,.no-fx .card .body h3::before,.no-fx .topbar,.no-fx .promo,.no-fx .sp-tabs,.no-fx .catnav button.on,.no-fx .sp-tabs .ic svg{animation:none!important}
+</style>
+<style id="maint-ui">
+#maint-overlay{position:fixed;inset:0;z-index:99999;display:grid;place-items:center;padding:24px;background:linear-gradient(160deg,#FFF1D6,#F3E3C6 60%,#EFD6A6);text-align:center}
+#maint-overlay.preview{inset:0 0 auto 0;display:block;padding:8px 12px;background:#E85D5D;color:#fff;font-size:13px;font-weight:700;pointer-events:none}
+.mt-box{max-width:360px;background:#fff;border-radius:28px;padding:34px 26px;box-shadow:0 18px 50px rgba(120,80,20,.25)}
+.mt-ic{font-size:56px;line-height:1;margin-bottom:12px;display:inline-block;animation:mtwob 2.2s ease-in-out infinite}
+@keyframes mtwob{0%,100%{transform:rotate(-12deg)}50%{transform:rotate(12deg)}}
+.mt-box h2{margin:0 0 10px;font-size:22px;color:#2a1c0e}
+.mt-box p{margin:0 0 14px;color:#6b5a40;line-height:1.7;white-space:pre-line}
+.mt-time{display:inline-block;background:#FDF3E1;color:#B3700F;font-weight:700;border-radius:999px;padding:8px 16px;margin-bottom:14px}
+.mt-call{display:block;background:linear-gradient(180deg,#F5B54F,#EE9A2E);color:#fff;font-weight:800;text-decoration:none;border-radius:999px;padding:14px;box-shadow:0 4px 0 #B8741A}
+html.is-maint,html.is-maint body{overflow:hidden!important;height:100%}
+@media(prefers-color-scheme:dark){#maint-overlay{background:linear-gradient(160deg,#2c2924,#1f1d1a)}.mt-box{background:#2f2d29}.mt-box h2{color:#f1e6d3}.mt-box p{color:#bfb39d}.mt-time{background:#4a3a1e;color:#F5B54F}}
+</style>
 </head>
 <body>
   <div class="announce" id="announce"><span id="announce-text"></span></div>
@@ -4041,6 +4059,22 @@ function applySettings() {
   ["timer", "flash-sub"].forEach((id) => { const el = document.getElementById(id); if (el) el.style.display = noTimer ? "none" : ""; });
   setText("#ft-year", String(khNow().getUTCFullYear()));
   setText("#eyebrow", S.eyebrow); setText("#tagline", S.tagline);
+  { let m = document.getElementById("maint-overlay"); const root = document.documentElement.classList;
+    if (S.maintOn !== true) { if (m) m.remove(); root.remove("is-maint"); }
+    else {
+      if (!m) { m = document.createElement("div"); m.id = "maint-overlay"; document.body.appendChild(m); }
+      const q = (x) => String(x || "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+      if (adminOn) { m.className = "preview"; m.textContent = "\u{1F6E0} កំពុងបើកការថែរក្សា — មានតែអ្នកជាម្ចាស់ហាងឃើញគេហទំព័រនេះ"; root.remove("is-maint"); }
+      else {
+        m.className = "";
+        m.innerHTML = '<div class="mt-box"><div class="mt-ic">\u{1F6E0}</div><h2>' + q(S.maintTitle || "កំពុងថែរក្សាគេហទំព័រ") + '</h2><p>' + q(S.maintMsg || "យើងកំពុងធ្វើបច្ចុប្បន្នភាព សូមអរគុណសម្រាប់ការអត់ធ្មត់។") + '</p>'
+          + (S.maintTime ? '<div class="mt-time">\u23F0 ' + q(S.maintTime) + '</div>' : "")
+          + (S.phone ? '<a class="mt-call" href="tel:' + q(S.phone) + '">ទូរស័ព្ទទៅហាង ' + q(S.phone) + '</a>' : "") + '</div>';
+        root.add("is-maint");
+      }
+    } }
+  { const h = document.documentElement.classList;
+    h.toggle("no-anim", S.animOn === false); h.toggle("no-reveal", S.animCards === false); h.toggle("no-fx", S.animFx === false); }
   setText("#flash-title", S.flashTitle);
   setText("#flash-sub", `ប្តូរទំនិញថ្មី រៀងរាល់ ${S.saleHours} ម៉ោង · ម៉ោងកម្ពុជា`);
   setText("#ft-thanks", S.thanks);
