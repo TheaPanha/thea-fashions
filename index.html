@@ -2199,7 +2199,7 @@ html body .toast{background:rgba(34,34,34,.92)!important;color:#fff!important}
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="Thea Fashion">
+<meta name="apple-mobile-web-app-title" content="PK Shop">
 <style id="rv-pwa-css">
 #recent-section{margin:18px 14px 4px;background:#fff;border-radius:22px;box-shadow:0 2px 10px rgba(0,0,0,.07);padding:14px 0 14px;overflow:hidden}
 #recent-section .rv-head{display:flex;align-items:center;justify-content:space-between;padding:0 16px 10px}
@@ -2221,6 +2221,24 @@ html body .toast{background:rgba(34,34,34,.92)!important;color:#fff!important}
 #pwa-banner .pw-go{background:linear-gradient(180deg,#FF6A4D,#EE4D2D);color:#fff;border:0;border-radius:999px;padding:10px 16px;font-weight:800;font:inherit;font-weight:800;box-shadow:0 3px 0 #B02A10}
 #pwa-banner .pw-x{background:none;border:0;color:#aaa;font-size:20px;padding:4px 6px;line-height:1}
 @media(min-width:641px){#pwa-banner{max-width:420px;left:auto;bottom:20px}}
+</style>
+<style id="share-css">.dt-share{right:114px}</style>
+<style id="os-css">
+.os-card{background:#fff;border-radius:22px;box-shadow:0 2px 12px rgba(0,0,0,.08);margin:10px 0 14px;overflow:hidden}
+.os-head{display:flex;align-items:center;justify-content:space-between;padding:16px 16px 12px;border-bottom:1px solid #F2F2F2}
+.os-head b{font-size:16px;font-weight:800;color:#222}
+.os-all{background:none;border:0;color:#EE4D2D;font:inherit;font-weight:800;font-size:13px;padding:4px 0;display:flex;align-items:center;gap:6px}
+.os-all i{font-size:11px}
+.os-row{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;padding:14px 8px 14px}
+.os-it{background:none;border:0;padding:0;font:inherit;display:flex;flex-direction:column;align-items:center;gap:8px;color:#333}
+.os-it small{font-size:11px;font-weight:700;line-height:1.3;text-align:center}
+.os-ic{position:relative;width:54px;height:54px;border-radius:17px;display:grid;place-items:center;font-size:22px;transition:transform .15s,box-shadow .2s}
+.os-ic i{display:block}
+.os-ic em{position:absolute;top:-6px;right:-6px;min-width:19px;height:19px;padding:0 5px;border-radius:999px;background:#EE4D2D;color:#fff;font-style:normal;font-size:11px;font-weight:800;display:grid;place-items:center;box-shadow:0 0 0 2px #fff}
+.c1{background:#FDF3E1;color:#EDA13A}.c2{background:#EEF0FB;color:#5F6BC0}.c3{background:#E8F4F2;color:#3E9C93}.c4{background:#EAF5EA;color:#4E9F57}.c5{background:#FCECEC;color:#D95B5B}
+.os-it:active .os-ic{transform:scale(.92)}
+.os-it.on .os-ic{box-shadow:0 0 0 2.5px currentColor,0 6px 14px rgba(0,0,0,.12);transform:translateY(-2px)}
+.os-it.on small{color:#EE4D2D}
 </style>
 </head>
 <body>
@@ -2328,6 +2346,7 @@ html body .toast{background:rgba(34,34,34,.92)!important;color:#fff!important}
           <span class="disc dt-disc" id="dt-disc" hidden></span>
           <button class="dt-round dt-x" id="dt-close" type="button" aria-label="បិទ"><i class="fa-solid fa-xmark"></i></button>
           <button class="dt-round dt-fav" id="dt-fav" type="button" aria-label="ចូលចិត្ត"><i class="fa-regular fa-heart"></i></button>
+          <button class="dt-round dt-share" id="dt-share" type="button" aria-label="ចែករំលែក"><i class="fa-solid fa-share-nodes"></i></button>
           <span class="dt-zoom"><i class="fa-solid fa-magnifying-glass-plus"></i> ចុចមើលរូបធំ</span>
         </div>
         <div class="dt-thumbs" id="dt-thumbs"></div>
@@ -2460,6 +2479,16 @@ html body .toast{background:rgba(34,34,34,.92)!important;color:#fff!important}
       <div class="sheet-handle"></div>
       <h3 id="ord-title" style="margin:6px 0 2px">ការកម្មង់របស់ខ្ញុំ</h3>
       <p class="of-hint" id="ord-sub">ស្ថានភាព និងលេខតាមដានការដឹកជញ្ជូន</p>
+      <div class="os-card" id="os-card">
+        <div class="os-head"><b>ការបញ្ជាទិញរបស់ខ្ញុំ</b><button type="button" class="os-all" id="os-all">មើលទាំងអស់ <i class="fa-solid fa-chevron-right"></i></button></div>
+        <div class="os-row">
+          <button type="button" class="os-it" data-st="new"><span class="os-ic c1"><i class="fa-solid fa-clipboard-list"></i><em></em></span><small>រង់ចាំ</small></button>
+          <button type="button" class="os-it" data-st="contacted"><span class="os-ic c2"><i class="fa-solid fa-box-archive"></i><em></em></span><small>កំពុងដំណើរការ</small></button>
+          <button type="button" class="os-it" data-st="shipping"><span class="os-ic c3"><i class="fa-solid fa-truck"></i><em></em></span><small>កំពុងដឹក</small></button>
+          <button type="button" class="os-it" data-st="done"><span class="os-ic c4"><i class="fa-solid fa-circle-check"></i><em></em></span><small>បានទទួល</small></button>
+          <button type="button" class="os-it" data-st="cancel"><span class="os-ic c5"><i class="fa-solid fa-circle-xmark"></i><em></em></span><small>បានលុបចោល</small></button>
+        </div>
+      </div>
       <div id="my-list"></div>
       <button class="sheet-cancel" id="ord-close" type="button">បិទ</button>
     </div>
@@ -3488,19 +3517,29 @@ async function tgStatus() {
 })();
 $c("au-close").onclick = () => { $c("authsheet").classList.remove("open"); afterAuth = null; };
 $c("authsheet").addEventListener("click", (e) => { if (e.target.id === "authsheet") $c("au-close").onclick(); });
+let mineF = "", MINE_ALL = [];
+function osRender(all) {
+  const cnt = {}; (all || []).forEach((o) => { cnt[o.status] = (cnt[o.status] || 0) + 1; });
+  document.querySelectorAll("#os-card .os-it").forEach((b) => {
+    const n = cnt[b.dataset.st] || 0, em = b.querySelector("em");
+    em.textContent = n > 99 ? "99+" : n; em.style.display = n ? "" : "none";
+    b.classList.toggle("on", mineF === b.dataset.st);
+  });
+}
 async function loadMine() {
   const box = $c("my-list");
   try {
     const t = await cToken();
     const r = await fetch(`${SB_URL}/rest/v1/orders?select=*&user_id=eq.${CU.sess.uid}&order=created_at.desc&limit=30`, { headers: { apikey: SB_KEY, Authorization: "Bearer " + t }, cache: "no-store" });
     if (!r.ok) throw new Error(r.status);
-    const rows = await r.json();
+    const allRows = await r.json(); MINE_ALL = allRows; osRender(allRows);
+    const rows = mineF ? allRows.filter((o) => o.status === mineF) : allRows;
     box.innerHTML = rows.length ? rows.map((o) => {
       const k = STEPS.findIndex((s) => s[0] === o.status), d = new Date(o.created_at).toLocaleDateString("en-GB", { timeZone: "Asia/Phnom_Penh", day: "2-digit", month: "short" });
       const prog = o.status === "cancel" ? `<div style="color:#B8213F;font-weight:700">បានបោះបង់</div>` : `<div class="mo-prog">${STEPS.map((s, n) => `<span class="${n <= k ? "on" : ""}"><i></i>${s[1]}</span>`).join("")}</div>`;
       return `<div class="mo"><b>${esc(o.product)}${o.size ? " · " + esc(o.size) : ""}</b><div class="mo-s">${formatRiel(o.price || 0)} · ${d}${o.order_code ? " · " + esc(o.order_code) : ""}</div>${prog}
         ${o.tracking_note ? `${esc(o.tracking_note)}<br>` : ""}${o.courier_no ? `${esc(o.courier || "")} <b>${esc(o.courier_no)}</b> <button type="button" class="of-btn" data-copy="${esc(o.courier_no)}" style="flex:none;padding:3px 9px">ចម្លង</button>` : ""}</div>`;
-    }).join("") : `<div class="of-hint">មិនទាន់មានការកម្មង់</div>`;
+    }).join("") : `<div class="of-hint">${mineF ? "គ្មានការកម្មង់ក្នុងស្ថានភាពនេះ" : "មិនទាន់មានការកម្មង់"}</div>`;
   } catch (e) { box.innerHTML = `<div class="of-hint">ទាញទិន្នន័យមិនបាន សូមចូលម្តងទៀត</div>`; }
 }
 function closeMine() { $c("mysheet").classList.remove("open"); clearInterval(myT); }
@@ -3511,11 +3550,18 @@ function openMine() {
 let ordT;
 function closeOrd() { $c("ordsheet").classList.remove("open"); clearInterval(ordT); }
 function openOrd() {
+  mineF = ""; osRender(MINE_ALL);
   if (!CU.sess) { afterAuth = null; openAuth("login", "ចូលគណនីដើម្បីមើលការកម្មង់របស់អ្នក"); return; }
   $c("my-list").innerHTML = `<div class="of-hint">កំពុងទាញទិន្នន័យ…</div>`;
   $c("ordsheet").classList.add("open"); loadMine(); clearInterval(ordT); ordT = setInterval(loadMine, 30000);
 }
 $c("ord-close").onclick = closeOrd;
+$c("os-card").addEventListener("click", (ev) => {
+  const it = ev.target.closest(".os-it"), all = ev.target.closest("#os-all");
+  if (!it && !all) return;
+  mineF = it ? (mineF === it.dataset.st ? "" : it.dataset.st) : "";
+  osRender(MINE_ALL); loadMine();
+});
 $c("ordsheet").addEventListener("click", (e) => { if (e.target.id === "ordsheet") closeOrd(); const c = e.target.closest("[data-copy]"); if (c) copyText(c.dataset.copy, c); });
 $c("tb-acc").addEventListener("click", (e) => {
   e.preventDefault();
@@ -4558,6 +4604,28 @@ window.addEventListener("storage", (e) => { if (e.key === "adminImages" && admin
   window.addEventListener("beforeinstallprompt",function(e){e.preventDefault();deferred=e;setTimeout(show,5000)});
   window.addEventListener("appinstalled",function(){hide(true)});
   if(ios)setTimeout(show,8000);
+})();
+</script>
+<script>
+/* ចែករំលែកទំនិញ + បើកទំនិញពីតំណ (#p3) */
+(function(){
+  function url(i){return location.origin+location.pathname+"#p"+(i+1)}
+  function fmt(n){return Number(n).toLocaleString("en-US")+" ៛"}
+  document.addEventListener("click",function(e){
+    var b=e.target.closest("#dt-share"); if(!b)return;
+    var i=(typeof dtI==="number")?dtI:-1, it=PRODUCTS[i]; if(!it)return;
+    var pr=0; try{pr=finalPrice(itemAt(i))}catch(x){pr=it.price}
+    var data={title:it.name,text:it.name+" — "+fmt(pr),url:url(i)};
+    if(navigator.share){navigator.share(data).catch(function(){});return}
+    var done=function(){if(typeof toast==="function")toast("បានចម្លងតំណទំនិញហើយ")};
+    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(data.url).then(done,function(){prompt("ចម្លងតំណនេះ",data.url)})}
+    else prompt("ចម្លងតំណនេះ",data.url);
+  });
+  var m=/^#p(\d+)$/.exec(location.hash||"");
+  if(m){var idx=+m[1]-1,tries=0;
+    (function go(){ if(typeof PRODUCTS!=="undefined"&&PRODUCTS[idx]&&typeof openDetail==="function"){openDetail(idx);return}
+      if(++tries<20)setTimeout(go,250); })();
+  }
 })();
 </script>
 </body>
