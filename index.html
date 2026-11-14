@@ -3265,7 +3265,15 @@ async function showQr(code, P) {
     msg.textContent = "មិនអាចបង្កើត QR បានទេ (" + String((e && e.message) || "error").slice(0, 40) + ")។ ការកម្មង់របស់អ្នកត្រូវបានទទួលហើយ ហាងនឹងទាក់ទងអ្នកដើម្បីបង់ប្រាក់។";
   }
 }
-async function placeOrder(P, code) {
+let lastOrderAt = 0;
+async function placeOrder(P, code) {      // ទប់ស្កាត់ចុចជាន់/ផ្ញើសារស្ទួន: ត្រូវរង់ចាំ ៨ វិនាទីក្រោយការកម្មង់ជោគជ័យ
+  if (Date.now() - lastOrderAt < 8000) return { ok: false, msg: "សូមរង់ចាំបន្តិច មុនបញ្ជូនការកម្មង់ម្តងទៀត" };
+  lastOrderAt = Date.now();
+  let r; try { r = await _placeOrder(P, code); } catch (e) { lastOrderAt = 0; throw e; }
+  if (!r || !r.ok) lastOrderAt = 0;
+  return r;
+}
+async function _placeOrder(P, code) {
   P = { ...P, items: P.items.map((it) => { const p = PRODUCTS[it.n - 1] || {}; let ph = ""; try { const u = photoOf(it.n); if (u && !/^data:/i.test(u)) ph = new URL(u, location.href).href; } catch (e) {} return { ...it, shop_id: p.shop || 1, n: p.ln || it.n, photo: ph }; }) };   // ការកម្មង់ទៅតាមម្ចាស់ទំនិញ
   const f = P.items[0];
   const body = { order_code: code, product_no: f.n, product: P.items.length > 1 ? `${f.name} +${P.items.length - 1}` : f.name, size: P.items.length === 1 ? (f.size || null) : null, phone: P.contact.phone, location: P.contact.isLink ? null : P.contact.loc, map_link: P.contact.link, pay_method: P.pay === "qr" ? "qr" : "cod", receipt_url: null, items: P.items, coupon: P.coupon };

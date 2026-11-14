@@ -929,7 +929,7 @@ async function renderAccess() {
     };
   } catch (e) { box.innerHTML = '<div class="ad-empty">ផ្ទុកមិនបាន (តើបានដំណើរការ admin-access.sql ហើយឬនៅ?)</div>'; }
 }
-async function tryAdminLogin() {
+async function _tryAdminLogin() {
   try {
     if (sbOn()) {
       let em;
@@ -949,12 +949,23 @@ async function tryAdminLogin() {
   refreshSite();
   openAdminPanel();
 }
+async function tryAdminLogin() {       // ទប់ស្កាត់ការទាយពាក្យសម្ងាត់៖ ខុស ៥ ដង → ចាក់សោ ៦០ វិនាទី
+  let lock = 0; try { lock = +localStorage.getItem("adminLock") || 0; } catch (e) {}
+  if (Date.now() < lock) { adminErr.textContent = "ព្យាយាមច្រើនពេក សូមរង់ចាំ " + Math.ceil((lock - Date.now()) / 1000) + " វិនាទី"; return; }
+  await _tryAdminLogin();
+  try {
+    if (adminOn) { localStorage.removeItem("adminFails"); localStorage.removeItem("adminLock"); return; }
+    const n = (+localStorage.getItem("adminFails") || 0) + 1;
+    if (n >= 5) { localStorage.setItem("adminLock", String(Date.now() + 60000)); localStorage.setItem("adminFails", "0"); adminErr.textContent = "ខុស ៥ ដង · ចាក់សោ ៦០ វិនាទី"; }
+    else localStorage.setItem("adminFails", String(n));
+  } catch (e) {}
+}
 document.getElementById("admin-go").addEventListener("click", tryAdminLogin);
 adminPass.addEventListener("keydown", (e) => { if (e.key === "Enter") tryAdminLogin(); });
 
 function adGallery(n) {
   const g = Array.isArray(adminImages["g" + n]) ? adminImages["g" + n] : [];
-  return `<div class="ad-gal"><div class="ad-gal-h">រូបបន្ថែម${g.length ? ` · ${g.length} សន្លឹក` : ""}</div><div class="ad-gal-row">${g.map((u, k) => `<div class="ad-gt"><img src="${u}" alt="" decoding="async" onerror="this.style.visibility='hidden'"><button type="button" class="ad-gx" data-gn="${n}" data-gk="${k}" aria-label="លុបរូប">លុប</button></div>`).join("")}<label class="ad-gadd" title="ថែមរូប"><span>＋</span><small>ថែមរូប</small><input type="file" accept="image/*" multiple data-gimg="${n}" hidden></label></div></div>`;
+  return `<div class="ad-gal"><div class="ad-gal-h">រូបបន្ថែម${g.length ? ` · ${g.length} សន្លឹក` : ""}</div><div class="ad-gal-row">${g.map((u, k) => `<div class="ad-gt"><img src="${e2(u)}" alt="" decoding="async" onerror="this.style.visibility='hidden'"><button type="button" class="ad-gx" data-gn="${n}" data-gk="${k}" aria-label="លុបរូប">លុប</button></div>`).join("")}<label class="ad-gadd" title="ថែមរូប"><span>＋</span><small>ថែមរូប</small><input type="file" accept="image/*" multiple data-gimg="${n}" hidden></label></div></div>`;
 }
 const AD_PALETTE = { "ខ្មៅ": "#1A1A1A", "ស": "#FFFFFF", "ក្រហម": "#D0021B", "ខៀវ": "#2F5BD0", "បៃតង": "#3F7D5C", "លឿង": "#F2C94C", "ផ្កាឈូក": "#F29CB5", "ស្វាយ": "#7A4FB5", "ប្រផេះ": "#9A9A9A", "ត្នោត": "#8B5A3C", "ទឹកក្រូច": "#F2994A", "ក្រែម": "#F3E7D3" };
 function adClrParse(t) {
@@ -1155,7 +1166,7 @@ function flashSaved() {
   function payBox(o) {
     if (o.pay_method !== "qr") return "";
     const [t, c] = payState(o), short = o.paid_amount != null && o.paid_amount < (o.price || 0);
-    return `<div class="od-box"><div class="od-row"><input data-payer value="${e2(o.payer_name)}" placeholder="ឈ្មោះអ្នកបង់ (លើបង្កាន់ដៃ)"><input data-paid type="text" inputmode="decimal" value="${o.paid_amount == null ? "" : o.paid_amount}" placeholder="ទឹកប្រាក់ ៛"><button class="od-sm" data-savepay="1" type="button">រក្សា</button></div>
+    return `<div class="od-box"><div class="od-row"><input data-payer value="${e2(o.payer_name)}" placeholder="ឈ្មោះអ្នកបង់ (លើបង្កាន់ដៃ)"><input data-paid type="text" inputmode="decimal" value="${o.paid_amount == null ? "" : (Number(o.paid_amount) || 0)}" placeholder="ទឹកប្រាក់ ៛"><button class="od-sm" data-savepay="1" type="button">រក្សា</button></div>
       <div class="od-stat2" style="color:${c}">${t}</div>${short ? `<button class="od-sm" data-sms="1" type="button" style="margin-top:8px;border-color:#B8213F;color:#B8213F">ប្រាប់ភ្ញៀវថាបង់មិនទាន់គ្រប់</button>` : ""}</div>`;
   }
   function draw() {
@@ -1169,7 +1180,7 @@ function flashSaved() {
     $("od-list").innerHTML = rows.length ? rows.map((o) => `<div class="od-card ${e2(o.status)}" data-id="${o.id}">
       <div class="od-top"><div class="od-name">${e2(o.product)}${o.size ? " · " + e2(o.size) : ""}</div><div class="od-time">${when(o.created_at)}</div></div>
       <div class="od-meta"><span class="od-price">${money(o.price)}</span> · #${e2(o.product_no)}${o.order_code ? " · <b>" + e2(o.order_code) + "</b>" : ""}${o.received_at ? ' <b style="color:#3F7D5C">· អតិថិជនបានទទួលទំនិញហើយ</b>' : ""}${o.paid_at ? ' <b style="color:#3F7D5C">· បានបង់ប្រាក់រួច (KHQR)</b>' : (o.pay_method === "qr" ? ' <b style="color:#B8213F">· រង់ចាំការបង់ប្រាក់</b>' : "")}${o.pay_method ? " · " + (o.pay_method === "qr" ? "បង់ឥឡូវ" : "បង់ពេលទទួល") : ""}<br>
-        ${Array.isArray(o.items) && o.items.length ? o.items.map((it) => "• " + e2(it.name) + (it.size ? " · " + e2(it.size) : "") + " ×" + it.qty + " — " + money(it.price * it.qty)).join("<br>") + "<br>" : ""}${o.coupon ? "" + e2(o.coupon) + " −" + money(o.discount) + "<br>" : ""}${o.customer_name ? "" + e2(o.customer_name) + " (គណនី)<br>" : ""}<a href="tel:${e2(String(o.phone).replace(/[^\d+]/g, ""))}">${e2(o.phone)}</a><br>${o.location ? "" + e2(o.location) + "<br>" : ""}${/^https?:\/\//.test(o.map_link || "") ? `<a href="${e2(o.map_link)}" target="_blank" rel="noopener">បើក Google Map</a>` : ""}</div>
+        ${Array.isArray(o.items) && o.items.length ? o.items.map((it) => "• " + e2(it.name) + (it.size ? " · " + e2(it.size) : "") + " ×" + (Number(it.qty) || 0) + " — " + money((Number(it.price) || 0) * (Number(it.qty) || 0))).join("<br>") + "<br>" : ""}${o.coupon ? "" + e2(o.coupon) + " −" + money(o.discount) + "<br>" : ""}${o.customer_name ? "" + e2(o.customer_name) + " (គណនី)<br>" : ""}<a href="tel:${e2(String(o.phone).replace(/[^\d+]/g, ""))}">${e2(o.phone)}</a><br>${o.location ? "" + e2(o.location) + "<br>" : ""}${/^https?:\/\//.test(o.map_link || "") ? `<a href="${e2(o.map_link)}" target="_blank" rel="noopener">បើក Google Map</a>` : ""}</div>
       ${payBox(o)}
       <div class="od-box"><div class="od-row"><input data-courier value="${e2(o.courier)}" placeholder="ក្រុមហ៊ុនដឹក"><input data-trackno value="${e2(o.courier_no)}" placeholder="លេខតាមដាន"></div>
         <div class="od-row" style="margin-top:6px"><input data-note value="${e2(o.tracking_note)}" placeholder="ដឹកដល់ណាហើយ?"><button class="od-sm" data-savetrack="1" type="button">រក្សា</button></div></div>
@@ -1792,6 +1803,20 @@ function openAdminPanel() {
     }
   }
   if (adminOn) { await syncFromRemote(); loadAdminData(); openAdminPanel(); } else openAdminLogin();
+})();
+
+// ចាកចេញស្វ័យប្រវត្តិពេលមិនប្រើ ២០ នាទី (ការពារពេលភ្លេចបិទទូរស័ព្ទ)
+(function () {
+  const LIMIT = 20 * 60 * 1000; let last = Date.now();
+  ["pointerdown", "keydown", "touchstart", "scroll"].forEach((ev) => window.addEventListener(ev, () => { last = Date.now(); }, { passive: true }));
+  function check() {
+    if (!adminOn || Date.now() - last < LIMIT) return;
+    const b = document.getElementById("ad-logout"); if (b) b.click();
+    try { sessionStorage.setItem("idleOut", "1"); } catch (e) {}
+  }
+  setInterval(check, 30000);
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) check(); });
+  try { if (sessionStorage.getItem("idleOut")) { sessionStorage.removeItem("idleOut"); setTimeout(() => { adminErr.textContent = "ចាកចេញស្វ័យប្រវត្តិ ព្រោះមិនបានប្រើ ២០ នាទី"; }, 400); } } catch (e) {}
 })();
 // ការពារ zoom លើទូរស័ព្ទ
 ["gesturestart", "gesturechange", "gestureend"].forEach((ev) => document.addEventListener(ev, (e) => e.preventDefault()));
