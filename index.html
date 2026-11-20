@@ -2240,6 +2240,23 @@ html body .toast{background:rgba(34,34,34,.92)!important;color:#fff!important}
 .os-it.on .os-ic{box-shadow:0 0 0 2.5px currentColor,0 6px 14px rgba(0,0,0,.12);transform:translateY(-2px)}
 .os-it.on small{color:#EE4D2D}
 </style>
+<style id="fab-css">
+#fab{position:fixed;right:14px;bottom:calc(160px + env(safe-area-inset-bottom,0px));z-index:44;display:flex;flex-direction:column;align-items:flex-end;gap:10px}
+#fab .fab-main{width:52px;height:52px;border-radius:50%;border:0;background:linear-gradient(180deg,#FF6A4D,#EE4D2D);color:#fff;font-size:22px;display:grid;place-items:center;box-shadow:0 8px 20px rgba(238,77,45,.45);transition:transform .25s}
+#fab.open .fab-main{transform:rotate(90deg)}
+#fab .fab-list{display:flex;flex-direction:column;align-items:flex-end;gap:10px;pointer-events:none}
+#fab .fab-item{display:flex;align-items:center;gap:10px;text-decoration:none;opacity:0;transform:translateY(12px) scale(.9);transition:opacity .2s,transform .25s}
+#fab.open .fab-list{pointer-events:auto}
+#fab.open .fab-item{opacity:1;transform:none}
+#fab.open .fab-item:nth-child(2){transition-delay:.04s}#fab.open .fab-item:nth-child(3){transition-delay:.08s}
+#fab .fab-item b{background:#fff;color:#222;font-size:13px;font-weight:700;padding:7px 12px;border-radius:999px;box-shadow:0 4px 14px rgba(0,0,0,.18)}
+#fab .fab-item i{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;color:#fff;font-size:19px;box-shadow:0 6px 16px rgba(0,0,0,.25)}
+#fab .f-call i{background:#3E9C93}#fab .f-tg i{background:#229ED9}#fab .f-msg i{background:#0A7CFF}
+#fab-dim{position:fixed;inset:0;z-index:43;background:rgba(0,0,0,.25);opacity:0;pointer-events:none;transition:opacity .25s}
+#fab-dim.on{opacity:1;pointer-events:auto}
+html.is-maint #fab,html.is-maint #fab-dim{display:none}
+@media(min-width:641px){#fab{bottom:90px}}
+</style>
 </head>
 <body>
   <div class="announce" id="announce"><span id="announce-text"></span></div>
@@ -4634,6 +4651,36 @@ window.addEventListener("storage", (e) => { if (e.key === "adminImages" && admin
     (function go(){ if(typeof PRODUCTS!=="undefined"&&PRODUCTS[idx]&&typeof openDetail==="function"){openDetail(idx);return}
       if(++tries<20)setTimeout(go,250); })();
   }
+})();
+</script>
+<script>
+/* ប៊ូតុងទាក់ទងលឿន: អានតំណពីរូបតំណាង Telegram / ទូរស័ព្ទ / Messenger ដែលមានស្រាប់លើរបារលើ */
+(function(){
+  var items=[["tb-call","f-call","fa-solid fa-phone","ទូរស័ព្ទ"],["tb-tg","f-tg","fa-brands fa-telegram","Telegram"],["tb-msg","f-msg","fa-brands fa-facebook-messenger","Messenger"]];
+  function build(){
+    if(document.getElementById("fab"))return;
+    var list=items.map(function(x){return '<a class="fab-item '+x[1]+'" data-src="'+x[0]+'" href="#" target="_blank" rel="noopener"><b>'+x[3]+'</b><i class="'+x[2]+'"></i></a>'}).join("");
+    var d=document.createElement("div");d.id="fab";
+    d.innerHTML='<div class="fab-list">'+list+'</div><button type="button" class="fab-main" aria-label="ទាក់ទងហាង"><i class="fa-solid fa-headset"></i></button>';
+    document.body.appendChild(d);
+    var dim=document.createElement("div");dim.id="fab-dim";document.body.appendChild(dim);
+    function close(){d.classList.remove("open");dim.classList.remove("on")}
+    function open(){
+      var any=false;
+      d.querySelectorAll(".fab-item").forEach(function(a){
+        var src=document.getElementById(a.dataset.src),h=src&&src.getAttribute("href");
+        var ok=h&&h!=="#"&&!/^tel:$/.test(h)&&!/t\.me\/$/.test(h);
+        a.style.display=ok?"":"none"; if(ok){a.href=h;any=true;if(/^tel:/.test(h))a.removeAttribute("target")}
+      });
+      if(!any){ if(typeof toast==="function")toast("ហាងមិនទាន់កំណត់ព័ត៌មានទាក់ទង"); return }
+      d.classList.add("open");dim.classList.add("on");
+    }
+    d.querySelector(".fab-main").addEventListener("click",function(){d.classList.contains("open")?close():open()});
+    dim.addEventListener("click",close);
+    d.addEventListener("click",function(e){if(e.target.closest(".fab-item"))setTimeout(close,150)});
+    document.addEventListener("keydown",function(e){if(e.key==="Escape")close()});
+  }
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",build);else build();
 })();
 </script>
 </body>
