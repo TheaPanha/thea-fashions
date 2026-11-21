@@ -2257,6 +2257,23 @@ html body .toast{background:rgba(34,34,34,.92)!important;color:#fff!important}
 html.is-maint #fab,html.is-maint #fab-dim{display:none}
 @media(min-width:641px){#fab{bottom:90px}}
 </style>
+<style id="lang-css">
+#lang-btn{position:absolute;right:14px;top:14px;z-index:3;height:34px;min-width:52px;padding:0 12px;border-radius:999px;border:1.5px solid rgba(255,255,255,.85);background:rgba(255,255,255,.18);color:#fff;font:inherit;font-size:13px;font-weight:800;letter-spacing:.02em;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+#lang-btn:active{transform:scale(.94)}
+html[lang="en"] body{letter-spacing:0}
+</style>
+<style id="alert-css">
+.dt-alert{display:block;margin:10px 16px 0;padding:12px 16px;border-radius:999px;border:1.5px solid #EE4D2D;background:#FEEEEA;color:#EE4D2D;font:inherit;font-weight:800;font-size:14px}
+.dt-alert.on{background:#E8F5EA;border-color:#4E9F57;color:#2E7D32}
+.dt-alert[hidden]{display:none}
+#restock-card{position:fixed;left:14px;right:14px;bottom:calc(98px + env(safe-area-inset-bottom,0px));z-index:46;background:#fff;border-radius:20px;box-shadow:0 12px 34px rgba(0,0,0,.22);padding:14px 14px 12px;animation:tabin .5s cubic-bezier(.2,.9,.25,1) backwards}
+#restock-card b{display:block;font-size:14px;color:#222;margin-bottom:8px}
+#restock-card .rc-x{position:absolute;right:10px;top:8px;background:none;border:0;font-size:20px;color:#aaa;line-height:1}
+#restock-card .rc-row{display:flex;gap:8px;flex-wrap:wrap}
+#restock-card .rc-chip{border:0;background:#FEEEEA;color:#EE4D2D;font:inherit;font-weight:700;font-size:13px;padding:8px 14px;border-radius:999px}
+@media(min-width:641px){#restock-card{max-width:420px;left:auto;bottom:20px}}
+</style>
+<style id="stock-colors">html body .dt-stock.out{background:#FDECEA!important;color:#C62828!important}html body .dt-stock.low{background:#FFF4E0!important;color:#B26A00!important}</style>
 </head>
 <body>
   <div class="announce" id="announce"><span id="announce-text"></span></div>
@@ -4025,7 +4042,7 @@ function openDetail(i) {
   dt$("dt-guide-rows").innerHTML = SIZE_GUIDE.filter((g) => sizes.includes(g[0])).map((g) => `<tr><td>${g[0]}</td><td>${g[1]}</td></tr>`).join("");
   // ពិពណ៌នា
   const custom = (p.desc || "").trim();
-  dt$("dt-desc").innerHTML = esc(custom || `${p.name} ទំហំ ${stripColors(p.place)}។ ${info.tip}`).replace(/\n/g, "<br>");
+  dt$("dt-desc").innerHTML = esc(custom || `${p.name} ${/^ទំហំ/.test(stripColors(p.place)) ? "" : "ទំហំ "}${stripColors(p.place)}។ ${info.tip}`).replace(/\n/g, "<br>");
   // ព័ត៌មានលម្អិត
   const mat = dtMaterial(p.name), who = dtAudience(p.name);
   const rows = [["ប្រភេទ", CAT_LABEL[cat]], ["ទំហំ", stripColors(p.place)]];
@@ -4626,9 +4643,9 @@ window.addEventListener("storage", (e) => { if (e.key === "adminImages" && admin
     b.querySelector(".pw-x").addEventListener("click",function(){hide(true)});
     var go=b.querySelector(".pw-go"); if(go)go.addEventListener("click",function(){deferred.prompt();deferred.userChoice.finally(function(){deferred=null;hide(true)})});
   }
-  window.addEventListener("beforeinstallprompt",function(e){e.preventDefault();deferred=e;setTimeout(show,5000)});
+  window.addEventListener("beforeinstallprompt",function(e){e.preventDefault();});
   window.addEventListener("appinstalled",function(){hide(true)});
-  if(ios)setTimeout(show,8000);
+  
 })();
 </script>
 <script>
@@ -4681,6 +4698,145 @@ window.addEventListener("storage", (e) => { if (e.key === "adminImages" && admin
     document.addEventListener("keydown",function(e){if(e.key==="Escape")close()});
   }
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",build);else build();
+})();
+</script>
+<script>
+/* ភាសា ខ្មែរ / English: បកប្រែអត្ថបទរបស់ទំព័រ (ឈ្មោះទំនិញ និងឈ្មោះអាសយដ្ឋានមិនត្រូវបានបកប្រែ) */
+(function(){
+  var DICT={"ស": "White", "ខោ": "Pants", "ខៀវ": "Blue", "ឃុំ": "Commune", "ចុច": "Tap", "ឈុត": "Sets", "ដល់": "To", "តំណ": "link", "ទាប": "Low", "ទិញ": "Buy", "បិទ": "Close", "ពណ៌": "Color", "មុន": "Previous", "លុប": "Delete", "លឿង": "Yellow", "ហាង": "Shop", "អាវ": "Tops", "ខណ្ឌ": "District", "ខ្មៅ": "Black", "គណនី": "Account", "ទំហំ": "Size", "បៃតង": "Green", "ប្រើ": "Use", "ភូមិ": "Village", "ម៉ោង": "hours", "រ៉ូប": "Dresses", "ក្នុង": "in", "ក្មេង": "Kids", "ក្រហម": "Red", "ក្រុង": "City", "ក្រែម": "Cream", "ខេត្ត": "Province", "ខ្ញុំ": "Me", "ខ្ពស់": "High", "ចម្លង": "Copy", "ឆ្នាំ": "years", "ឈ្មោះ": "Name", "ដំឡើង": "Install", "ត្នោត": "Brown", "ទំនិញ": "Items", "នៅសល់": "left", "បានទេ": "", "ផ្កាយ": "stars", "ភ្លៀង": "Rain", "មឺនុយ": "Menu", "រូបទី": "Photo", "សន្សំ": "Saving", "សូត្រ": "Silk", "សំពត់": "Skirts", "ស្កេន": "Scan", "ស្បែក": "Leather", "ស្រុក": "District", "ស្វាយ": "Purple", "ឡើងលើ": "Back to top", "កប្បាស": "Cotton", "កម្មង់": "Order", "ខូវប៊យ": "Denim", "ចូលតាម": "Sign in with", "តម្រៀប": "Sort", "តាមដាន": "Follow", "ទីតាំង": "Location", "បង់តាម": "Pay via", "បញ្ចុះ": "Discount", "បោះបង់": "Cancel", "ប្រផេះ": "Gray", "ប្រភេទ": "Category", "ផ្ទាំង": "Panel", "ភ្ជាប់": "Connect", "មានលក់": "Available", "មើលហាង": "View shop", "រង់ចាំ": "Pending", "រូបមុន": "Previous photo", "រួចចុច": "then tap", "សម្អាត": "Clear", "សួស្តី": "Hello", "ស្ត្រី": "Women", "ឡើងវិញ": "again", "ក្រណាត់": "Fabric", "ចូលគណនី": "Sign in", "តម្លៃពី": "Price from", "ថែរក្សា": "Maintenance", "ទាំងអស់": "All", "ទិញឥឡូវ": "Buy now", "បន្ទាប់": "Next", "បានទទួល": "Received", "ផ្កាឈូក": "Pink", "ផ្ញើតាម": "Send via", "ពិនិត្យ": "Check", "ភ្នំពេញ": "Phnom Penh", "មើលរ៉ូប": "View dresses", "រាជធានី": "Capital", "រួចរាល់": "Done", "សង្កាត់": "Sangkat", "សម្រាប់": "For", "ស្វែងរក": "Search", "អតិថិជន": "Customer", "ឬបង់តាម": "Or pay via", "កំពុងដឹក": "Shipping", "ក្រោយចុច": "after pressing", "គូស្នេហ៍": "Couples", "ចម្លងហើយ": "Copied", "ចូលចិត្ត": "Favorites", "ចែករំលែក": "Share", "ត្រូវបង់": "To pay", "ត្រូវបើក": "must be enabled", "ទឹកក្រូច": "Orange", "ទូរស័ព្ទ": "Phone", "ទំព័រដើម": "Home", "ប៉ុណ្ណោះ": "only", "មានស្តុក": "In stock", "មិនបង្ខំ": "Optional", "មើលខោអាវ": "Shop clothing", "របស់អ្នក": "your", "រួចជ្រើស": "then select", "វាយតម្លៃ": "Review", "សូមអរគុណ": "Thank you", "សួរអំពី៖": "Ask about:", "អស់ស្តុក": "Out of stock", "ការបង់តាម": "Payment via", "ចេញពីគណនី": "Sign out", "ដឹកដល់ហើយ": "Delivered", "តម្លៃ ទាប": "Price Low", "តម្លៃសរុប": "Total", "តាមដានរួច": "Followed", "ថ្ងៃកំណើត": "Birthday", "ថ្មីបំផុត": "Newest", "ទាក់ទងហាង": "Contact shop", "បន្ថែមរូប": "Add photo", "បានចាកចេញ": "Signed out", "បានបោះបង់": "Cancelled", "បានភ្ជាប់": "Connected", "បានលុបចោល": "Cancelled", "ម្ចាស់ហាង": "Shop owner", "អស់ស្តុក៖": "Out of stock:", "អាសយដ្ឋាន": "Address", "កន្ត្រកទទេ": "Your cart is empty", "កំពុងផ្ទុក": "Loading", "កំពុងរៀបចំ": "Preparing", "ក្រណាត់ទន់": "Soft fabric", "ក្រណាត់រឹង": "Firm fabric", "ចូលគណនីតាម": "Sign in with", "មើលទាំងអស់": "View all", "រូបបន្ទាប់": "Next photo", "ហាងទាំងអស់": "All shops", "ហៅទូរស័ព្ទ": "Call", "អ្នកតាមដាន": "followers", "កំពុងតាមដាន": "Following", "កំពុងបង្កើត": "Creating", "គ្រឿងបន្ថែម": "Accessories", "ចម្លងតំណនេះ": "Copy this link", "ចុចមើលរូបធំ": "Tap to enlarge", "ជ្រើសរើសឃុំ": "Select commune", "ជ្រើសរើសពណ៌": "Select color", "ដាក់កន្ត្រក": "Add to cart", "តម្លៃ ខ្ពស់": "Price High", "ទម្ងន់ខ្លួន": "Body weight", "បញ្ចុះតម្លៃ": "Sale", "បានរក្សាទុក": "Saved", "ប្តូររូបភាព": "Change photo", "ប្រភេទទំនិញ": "Categories", "ផ្សព្វផ្សាយ": "Promotions", "លេខទូរស័ព្ទ": "Phone number", "កន្ត្រកទំនិញ": "Cart", "ការបម្រើសេវា": "Our services", "ក្រណាត់ត្បាញ": "Woven fabric", "ជ្រើសរើសខណ្ឌ": "Select district", "ជ្រើសរើសទំហំ": "Select size", "ជ្រើសរើសភូមិ": "Select village", "ឈប់តាមដានហើយ": "Unfollowed", "បង់ប្រាក់តាម": "Pay via", "បន្តទៅកម្មង់": "Continue to order", "ផ្ញើវាយតម្លៃ": "Submit review", "មិនត្រូវគ្នា": "Doesn't match", "មិនបានសម្រេច": "failed", "មិនអាចបង្កើត": "Unable to create", "លេខការកម្មង់": "Order number", "សួរម្ចាស់ហាង": "Ask the shop", "សំពត់ · រ៉ូប": "Skirts · Dresses", "ស្វែងរកខោអាវ": "Search clothes", "អំពីទំនិញនេះ": "About this item", "កំពុងដំណើរការ": "Processing", "កំពុងផ្ទុករូប": "Loading photo", "ក្រណាត់ខូវប៊យ": "Denim fabric", "ខោអាវទាន់សម័យ": "Trendy fashion", "ខោអាវផ្សេងទៀត": "More fashion", "គណនីរបស់ខ្ញុំ": "My account", "ចូលគណនីមិនបាន": "Unable to sign in", "ជ្រើសរើសខេត្ត": "Select province", "ជ្រើសរើសស្រុក": "Select district", "ទូរស័ព្ទទៅហាង": "Call the shop", "ព័ត៌មានលម្អិត": "Details", "មិនទាន់ភ្ជាប់": "Not connected", "មិនបាច់បង់មុន": "No prepayment needed", "មិនអាចតភ្ជាប់": "Unable to connect", "វាយតម្លៃទំនិញ": "Rate this item", "វិធីបង់ប្រាក់": "Payment method", "សម្អាតកន្ត្រក": "Clear cart", "សរសេរវាយតម្លៃ": "Write a review", "ស្តុកមិនគ្រប់": "Not enough stock", "ការពារទឹកភ្លៀង": "Rain-resistant", "កំពុងដឹកជញ្ជូន": "Shipping", "ខ្ញុំបានបង់ហើយ": "I have paid", "ចូលគណនីរួចរាល់": "Signed in", "តម្រៀប៖ ធម្មតា": "Sort: Default", "តារាងទំហំណែនាំ": "Size guide", "ផ្ទុករូបមិនបាន": "Unable to upload photo", "រក្សាទុកមិនបាន": "Unable to save", "សូមជ្រើសរើសឃុំ": "Please select a commune", "ការឆ្លើយតបពីហាង": "Shop reply", "គណនីត្រូវបានលុប": "Account deleted", "ជ្រើសរើសសង្កាត់": "Select sangkat", "ទីតាំងដឹកជញ្ជូន": "Delivery address", "ទំនិញស្រដៀងគ្នា": "Similar items", "បង់ពេលទទួលទំនិញ": "Pay on delivery", "រក្សាទុកព័ត៌មាន": "Save", "សូមជ្រើសរើសខណ្ឌ": "Please select a district", "សូមជ្រើសរើសភូមិ": "Please select a village", "សួរហាងបានភ្លាមៗ": "Ask the shop anytime", "កំពុងទាញទិន្នន័យ": "Loading data", "ចុចរូបដើម្បីដាក់": "Tap the photo to add", "ដាក់ក្នុងកន្ត្រក": "Add to cart", "ទំនិញដែលចូលចិត្ត": "Favorite items", "ទំនិញបញ្ចុះតម្លៃ": "Sale items", "បង់ប្រាក់ពេលទទួល": "Cash on delivery", "បញ្ចុះច្រើនបំផុត": "Biggest discount", "បញ្ចុះតម្លៃពិសេស": "Special offer", "បញ្ជាក់ការកម្មង់": "Confirm order", "បានទទួលការកម្មង់": "Order received", "លុបគណនីរបស់ខ្ញុំ": "Delete my account", "វាយសំណួររបស់អ្នក": "Type your question", "សម្រាប់គ្រប់ឱកាស": "For every occasion", "សូមជ្រើសរើសខេត្ត": "Please select a province", "សូមជ្រើសរើសស្រុក": "Please select a district", "កំពុងតាមដានហាងនេះ": "You follow this shop", "ទំនិញថ្មី រៀងរាល់": "New items every", "លេខកូដបញ្ចុះតម្លៃ": "Discount code", "វាយតម្លៃពីអតិថិជន": "Customer reviews", "សូមជ្រើសរើសពណ៌សិន": "Please select a color first", "សូមព្យាយាមម្តងទៀត": "Please try again", "ការកម្មង់របស់ខ្ញុំ": "My orders", "កំពុងបើកការថែរក្សា": "Maintenance mode is on", "ចំនួនទឹកប្រាក់សរុប": "Total amount", "តាមដានការដឹកជញ្ជូន": "Track delivery", "មិនទាន់មានវាយតម្លៃ": "No reviews yet", "ម៉ោង · ម៉ោងកម្ពុជា": "hours · Cambodia time", "សូមជ្រើសរើសទំហំសិន": "Please select a size first", "សូមជ្រើសរើសសង្កាត់": "Please select a sangkat", "កម្មវិធីនៅក្នុងរបៀប": "The app is in", "ទំនិញដែលបានមើលថ្មីៗ": "Recently viewed", "បានចម្លងតំណទំនិញហើយ": "Item link copied", "បានដាក់ក្នុងកន្ត្រក": "Added to cart", "បានទទួលការកម្មង់ហើយ": "Order received", "ពិនិត្យលេខកូដមិនបាន": "Unable to check the code", "មិនទាន់មានការកម្មង់": "No orders yet", "មិនអាចប្រើលេខកូដបាន": "This code can't be used", "មើលទំនិញបញ្ចុះតម្លៃ": "View sale items", "លេខកូដមិនត្រឹមត្រូវ": "Invalid code", "សូមបំពេញលេខទូរស័ព្ទ": "Please enter your phone number", "ហាងបានបិទការជជែកនេះ": "The shop has closed this chat", "ការបញ្ជាទិញរបស់ខ្ញុំ": "My orders", "កំពុងថែរក្សាគេហទំព័រ": "Site under maintenance", "កំពុងបញ្ជូនការកម្មង់": "Sending your order", "ខោអាវទាន់សម័យ ស្អាតៗ": "Beautiful, trendy fashion", "ត្រឡប់ទៅទំនិញទាំងអស់": "Back to all items", "ចូលគណនីដើម្បីវាយតម្លៃ": "Sign in to review", "បញ្ជូនការកម្មង់មិនបាន": "Unable to send the order", "អ្នកបានវាយតម្លៃរួចហើយ": "You've already reviewed this", "ការទិញ និងការដឹកជញ្ជូន": "Buying & delivery", "ចូលគណនីដើម្បីតាមដានហាង": "Sign in to follow shops", "ប្តូរទំនិញថ្មី រៀងរាល់": "New items every", "មើលស្ថានភាពបានគ្រប់ពេល": "Check status anytime", "សូមកែចំនួនក្នុងកន្ត្រក": "Please adjust the quantity in your cart", "សូមបើកគេហទំព័រនេះក្នុង": "Please open this site in", "បញ្ចុះតម្លៃពិសេសថ្ងៃនេះ": "Today's special offers", "អរគុណសម្រាប់ការវាយតម្លៃ": "Thanks for your review", "ដើម្បីទទួលដំណឹងការកម្មង់": "to get order updates", "ហើយហាងនឹងផ្ទៀងផ្ទាត់ដោយដៃ។": "and the shop will verify manually.", "ផ្ទះលេខ ផ្លូវ ឬចំណុចសម្គាល់": "House no., street or landmark", "រកមិនឃើញទំនិញដែលអ្នកស្វែងរក": "No items found", "លុបមិនបាន សូមព្យាយាមម្តងទៀត": "Couldn't delete. Please try again", "សូមអរគុណដែលគាំទ្រហាងរបស់យើង": "Thank you for supporting our shop", "ត្រូវមានគណនីដើម្បីបន្តការទិញ": "An account is required to continue", "ផុតកំណត់។ បើបានបង់រួច សូមចុច": "expired. If you've paid, tap", "ផ្ញើមិនបាន សូមព្យាយាមម្តងទៀត": "Couldn't send. Please try again", "សរសេរមតិរបស់អ្នកអំពីទំនិញនេះ": "Write your thoughts about this item", "ហាងមិនទាន់កំណត់ព័ត៌មានទាក់ទង": "This shop hasn't set up contact info", "បានចម្លងសារ សូមបិទភ្ជាប់ក្នុង": "Message copied. Paste it in", "មិនទាន់បើកសម្រាប់កន្ត្រកនេះទេ": "isn't available for this cart yet", "មិនទាន់មានទំនិញក្នុងប្រភេទនេះ": "No items in this category yet", "សូមបំពេញផ្ទះលេខ ឬចំណុចសម្គាល់": "Please enter a house no. or landmark", "ហើយ អ្នកនឹងទទួលដំណឹងការកម្មង់": "and you'll get order updates", "អ្នកបានវាយតម្លៃទំនិញនេះរួចហើយ": "You've already reviewed this item", "គ្មានការកម្មង់ក្នុងស្ថានភាពនេះ": "No orders in this status", "តាមដានមិនបាន សូមព្យាយាមម្តងទៀត": "Couldn't follow. Please try again", "ការចូលតាមវិធីនេះមិនទាន់បើកក្នុង": "Signing in this way isn't enabled in", "ទាញទិន្នន័យមិនបាន សូមចូលម្តងទៀត": "Couldn't load data. Please sign in again", "បានចម្លងសំណួរ សូមបិទភ្ជាប់ក្នុង": "Question copied. Paste it in", "ពិនិត្យមិនបាន សូមព្យាយាមម្តងទៀត": "Couldn't check. Please try again", "ចុចម្តងទៀតដើម្បីលុបជាអចិន្ត្រៃយ៍": "Tap again to delete permanently", "បានផ្ញើសារទៅហាង ចម្លើយនឹងមកក្នុង": "Message sent to the shop. The reply will arrive in", "កន្ត្រកមានទំនិញពីហាងច្រើន អ្នកបង់": "Your cart has items from several shops. You pay", "ចូលគណនីដើម្បីមើលការកម្មង់របស់អ្នក": "Sign in to see your orders", "បង់ប្រាក់ជូនអ្នកដឹកពេលទទួលអីវ៉ាន់": "Pay the courier on delivery", "ស្ថានភាព និងលេខតាមដានការដឹកជញ្ជូន": "Status and delivery tracking number", "ហើយហាងនឹងផ្ទៀងផ្ទាត់ ឬទាក់ទងអ្នក។": "and the shop will verify or contact you.", "ដើម្បីតាមដានការកម្មង់ និងទទួលដំណឹង": "to track orders and get updates", "មានតែអ្នកជាម្ចាស់ហាងឃើញគេហទំព័រនេះ": "Only you, the shop owner, can see this site", "ហាងនេះមិនទាន់ដាក់ព័ត៌មានទំនាក់ទំនងទេ": "This shop hasn't added contact info yet", "បន្ទាប់ពីកម្មង់ អាចតាមដានស្ថានភាពក្នុង": "After ordering, you can track the status in", "លើកដំបូងសូមបោកដាច់ដោយឡែក ដោយទឹកត្រជាក់": "Wash separately the first time, in cold water", "បន្ថែមទៅអេក្រង់ដើម ប្រើបានលឿនដូចកម្មវិធី": "Add to your home screen for app-like speed", "រក្សាទុកក្នុងកន្លែងស្ងួត ជៀសវាងប៉ះទឹកយូរ": "Store in a dry place and avoid long contact with water", "បញ្ជូនការកម្មង់មិនបាន សូមពិនិត្យអ៊ីនធឺណិត": "Couldn't send the order. Please check your internet", "សូមរង់ចាំបន្តិច មុនបញ្ជូនការកម្មង់ម្តងទៀត": "Please wait a moment before ordering again", "មានសំណួរអំពីទំហំ ឬពណ៌ សូមសួរហាងបានគ្រប់ពេល": "Questions about size or color? Ask the shop anytime", "តែមួយ ហើយប្រព័ន្ធនឹងចែកទឹកប្រាក់ទៅហាងនីមួយៗ": "only one, and the system will split the payment between the shops", "អ្នកបានបដិសេធការចូល ឬគណនីមិនមានសិទ្ធិសាកល្បង": "You declined the sign-in, or the account isn't allowed to test", "មិនទាន់មានទំនិញដែលចូលចិត្ត ចុចរូបបេះដូងលើទំនិញ": "No favorites yet. Tap the heart on an item", "ឈុតស្រេច ស្លៀកតែមួយក៏ស្អាត មិនបាច់ខំគិតផ្គូផ្គង។": "Ready-made sets: wear one piece and look great, no mixing needed.", "គណនីនេះមិនមានអ៊ីមែល ឬមិនបានអនុញ្ញាតចែករំលែកអ៊ីមែល": "This account has no email, or email sharing wasn't allowed", "ផ្ទុករូបមិនបាន សូមព្យាយាមម្តងទៀត ឬផ្ញើដោយគ្មានរូប": "Couldn't upload the photo. Try again or send without a photo", "ចូលគណនីដើម្បីមើលការកម្មង់ និងលេខតាមដានការដឹកជញ្ជូន": "Sign in to see your orders and delivery tracking numbers", "បោកដោយដៃ ឬម៉ាស៊ីនក្នុងមុខងារស្រាល ហើយហាលក្នុងម្លប់": "Hand wash or use a gentle machine cycle, and dry in the shade", "មានតែអ្នកដែលបានទិញ និងទទួលទំនិញរួចទេ ទើបវាយតម្លៃបាន": "Only customers who bought and received the item can review it", "គ្រឿងបន្ថែមតូចៗ ដែលធ្វើឲ្យការស្លៀកពាក់ពេញលក្ខណៈជាងមុន។": "Small accessories that complete any outfit.", "យើងកំពុងធ្វើបច្ចុប្បន្នភាព សូមអរគុណសម្រាប់ការអត់ធ្មត់។": "We're updating the site. Thank you for your patience.", "ជាការប៉ាន់ស្មានប៉ុណ្ណោះ បើមិនប្រាកដ សូមសួរហាងមុនកម្មង់។": "This is only an estimate. If unsure, please ask the shop before ordering.", "ជាមួយកម្មវិធីធនាគារ ហើយរង់ចាំការបញ្ជាក់ដោយស្វ័យប្រវត្តិ": "with your banking app, then wait for automatic confirmation", "ស្អាតទាន់សម័យ សមសម្រាប់ទៅធ្វើការ ដើរលេង ឬចូលរួមកម្មវិធី។": "Stylish and trendy, great for work, outings or events.", "បោកដោយទឹកត្រជាក់ ហើយហាលក្នុងម្លប់ ដើម្បីរក្សាពណ៌ឲ្យបានយូរ": "Wash in cold water and dry in the shade to keep the color longer", "បោកដោយប្រែខាងក្នុងចេញ និងទឹកត្រជាក់ ដើម្បីកុំឲ្យស្រអាប់ពណ៌": "Wash inside out in cold water to prevent fading", "ស្លៀកស្រួល រក្សាទ្រង់ទ្រាយល្អ ផ្គូផ្គងបានជាមួយអាវច្រើនបែប។": "Comfortable, keeps its shape well and pairs with many tops.", "ខោអាវស្អាតៗ ទាន់សម័យ គ្រប់ទំហំ សម្រាប់ជាប់ចិត្តអ្នកគ្រប់ថ្ងៃ": "Beautiful, trendy clothes in every size for your everyday style", "ស្លៀកស្រួល ងាយផ្គូផ្គងជាមួយខោ ឬសំពត់ សមសម្រាប់ស្លៀកប្រចាំថ្ងៃ។": "Comfortable and easy to pair with pants or skirts, great for everyday wear.", "តែមួយនេះ ហើយរង់ចាំការបញ្ជាក់ ប្រព័ន្ធនឹងចែកទឹកប្រាក់ទៅហាងនីមួយៗ": "only this one, then wait for confirmation. The system will split the payment between the shops", "ប្រព័ន្ធមិនអាចផ្ទៀងផ្ទាត់ដោយស្វ័យប្រវត្តិទេ។ បន្ទាប់ពីបង់ សូមចុច": "The system couldn't verify automatically. After paying, tap", "យើងនឹងទំនាក់ទំនងអ្នកតាមលេខទូរស័ព្ទ ដើម្បីបញ្ជាក់ និងដឹកជញ្ជូនទំនិញ។": "We'll contact you by phone to confirm and deliver your order.", "។ ការកម្មង់របស់អ្នកត្រូវបានទទួលហើយ ហាងនឹងទាក់ទងអ្នកដើម្បីបង់ប្រាក់។": ". Your order has been received. The shop will contact you for payment.", "ដោយស្កេនជាមួយកម្មវិធីធនាគារ ហើយប្រព័ន្ធនឹងបញ្ជាក់ការទូទាត់ដោយស្វ័យប្រវត្តិ": "by scanning with your banking app, and the system will confirm the payment automatically", "មិនទាន់មានវាយតម្លៃ។ មានតែអ្នកដែលបានទិញ និងទទួលទំនិញរួចទេ ទើបអាចវាយតម្លៃបាន។": "No reviews yet. Only customers who bought and received the item can review it.", "ឈ្មោះ ក": "Name A", "អ": "Z", "។": ".", "ក្រ": "", "ជូនដំណឹងខ្ញុំពេលមានទំនិញ": "Notify me when it's back", "នឹងជូនដំណឹងអ្នកពេលទំនិញមក (ចុចដើម្បីបោះបង់)": "We'll notify you when it's back (tap to cancel)", "បានបោះបង់ការជូនដំណឹង": "Alert cancelled", "បានចុះឈ្មោះ យើងនឹងជូនដំណឹងពេលទំនិញមកវិញ": "Subscribed. We'll let you know when it's back", "មុខងារនេះមិនទាន់បើក": "This feature isn't enabled yet", "បរាជ័យ សូមព្យាយាមម្តងទៀត": "Failed. Please try again", "ចូលគណនីដើម្បីទទួលដំណឹងពេលទំនិញមកវិញ": "Sign in to get notified when it's back", "ទំនិញដែលអ្នករង់ចាំ មកវិញហើយ!": "Items you were waiting for are back!"};
+  var RUN=/[\u1780-\u17FF][\u1780-\u17FF\u200b ·៖។]*[\u1780-\u17FF៖។]|[\u1780-\u17FF]/g, KH=/[\u1780-\u17FF]/;
+  var ATTRS=["placeholder","aria-label","title","alt"];
+  var lang="km", orig=new WeakMap(), done=new WeakMap(), obs=null;
+  function run(r){
+    var k=r.replace(/\u200b/g,"");
+    if(Object.prototype.hasOwnProperty.call(DICT,k))return DICT[k];
+    var t=k.split(" "),out=[],i=0;
+    while(i<t.length){
+      var hit=false;
+      for(var j=t.length;j>i;j--){var ph=t.slice(i,j).join(" ");
+        if(Object.prototype.hasOwnProperty.call(DICT,ph)){out.push(DICT[ph]);i=j;hit=true;break}}
+      if(!hit){out.push(t[i]);i++}
+    }
+    return out.join(" ");
+  }
+  function tr(str){return KH.test(str)?str.replace(RUN,run).replace(/ {2,}/g," "):str}
+  window.trLang=tr;
+  function skip(n){var p=n.parentNode;return !p||/^(SCRIPT|STYLE|TEXTAREA|NOSCRIPT)$/.test(p.nodeName)||(p.closest&&p.closest("[data-no-tr]"))}
+  function node(n){
+    if(skip(n))return; var v=n.nodeValue;
+    if(done.has(n)&&done.get(n)===v)return;
+    if(!KH.test(v))return;
+    var o=v,t=tr(v); orig.set(n,o); done.set(n,t); if(t!==v)n.nodeValue=t;
+  }
+  function attrs(el){
+    ATTRS.forEach(function(a){var v=el.getAttribute&&el.getAttribute(a); if(!v||!KH.test(v))return;
+      var key="data-km-"+a; el.setAttribute(key,v); var t=tr(v); if(t!==v)el.setAttribute(a,t)});
+  }
+  function walk(root){
+    if(root.nodeType===3){node(root);return}
+    if(root.nodeType!==1)return;
+    if(root.closest&&root.closest("[data-no-tr]"))return;
+    var w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,null),n;
+    while((n=w.nextNode()))node(n);
+    attrs(root); root.querySelectorAll("[placeholder],[aria-label],[title],[alt]").forEach(attrs);
+  }
+  function restore(){
+    var w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT,null),n;
+    while((n=w.nextNode())){ if(orig.has(n)&&done.get(n)===n.nodeValue){n.nodeValue=orig.get(n)} orig.delete(n);done.delete(n); }
+    document.querySelectorAll("*").forEach(function(el){ATTRS.forEach(function(a){var k="data-km-"+a; if(el.hasAttribute&&el.hasAttribute(k)){el.setAttribute(a,el.getAttribute(k));el.removeAttribute(k)}})});
+  }
+  function start(){
+    walk(document.body);
+    if(obs)obs.disconnect();
+    obs=new MutationObserver(function(ms){
+      ms.forEach(function(m){
+        if(m.type==="characterData")node(m.target);
+        else if(m.type==="attributes"){var el=m.target;if(el.hasAttribute("data-km-"+m.attributeName)&&el.getAttribute(m.attributeName)===tr(el.getAttribute("data-km-"+m.attributeName)))return; attrs(el)}
+        else m.addedNodes.forEach(walk);
+      });
+    });
+    obs.observe(document.body,{childList:true,subtree:true,characterData:true,attributes:true,attributeFilter:ATTRS});
+  }
+  function set(l,persist){
+    lang=l; document.documentElement.setAttribute("lang",l==="en"?"en":"km");
+    if(persist){try{localStorage.setItem("lang",l)}catch(e){}}
+    var b=document.getElementById("lang-btn"); if(b)b.textContent=l==="en"?"ខ្មែរ":"EN";
+    if(l==="en")start(); else {if(obs){obs.disconnect();obs=null} restore()}
+  }
+  function mk(){
+    var tb=document.querySelector(".topbar"); if(!tb||document.getElementById("lang-btn"))return;
+    var b=document.createElement("button"); b.id="lang-btn"; b.type="button"; b.setAttribute("data-no-tr","");b.setAttribute("aria-label","Language"); b.textContent="EN";
+    b.addEventListener("click",function(){set(lang==="en"?"km":"en",true)});
+    tb.appendChild(b);
+  }
+  /* ប្រអប់សារ (alert/confirm/prompt) */
+  ["alert","confirm","prompt"].forEach(function(f){var o=window[f]; if(typeof o!=="function")return;
+    window[f]=function(m){var a=[].slice.apply(arguments); if(lang==="en"&&typeof a[0]==="string")a[0]=tr(a[0]); return o.apply(window,a)}});
+  function init(){
+    mk(); var saved="km"; try{saved=localStorage.getItem("lang")||"km"}catch(e){}
+    if(saved==="en"){set("en",false);setTimeout(function(){if(lang==="en")walk(document.body)},1200)}
+  }
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);else init();
+})();
+</script>
+<script>
+/* ជូនដំណឹងពេលទំនិញអស់ស្តុកមកវិញ (ត្រូវការ stock_alerts.sql ក្នុង Supabase) */
+(function(){
+  function shopOf(i){try{return (PRODUCTS[i]&&PRODUCTS[i].shop)||1}catch(e){return 1}}
+  function hdr(tok){return {apikey:SB_KEY,Authorization:"Bearer "+tok,"Content-Type":"application/json"}}
+  function say(m){if(typeof toast==="function")toast(m)}
+  async function rpc(name,body){var tok=await cToken();return fetch(SB_URL+"/rest/v1/rpc/"+name,{method:"POST",headers:hdr(tok),body:JSON.stringify(body)})}
+  async function isSub(i){
+    if(!CU.sess||!sbReady())return false;
+    try{var tok=await cToken();
+      var r=await fetch(SB_URL+"/rest/v1/stock_alerts?select=id&product_no=eq."+(i+1)+"&shop_id=eq."+shopOf(i)+"&notified_at=is.null",{headers:hdr(tok),cache:"no-store"});
+      if(!r.ok)return false; return (await r.json()).length>0}catch(e){return false}
+  }
+  function btn(){
+    var b=document.getElementById("dt-alert"); if(b)return b;
+    var st=document.getElementById("dt-stock"); if(!st)return null;
+    b=document.createElement("button"); b.type="button"; b.id="dt-alert"; b.className="dt-alert"; b.hidden=true;
+    st.insertAdjacentElement("afterend",b);
+    b.addEventListener("click",function(){toggle(+b.dataset.i)});
+    return b;
+  }
+  function label(b,on){b.classList.toggle("on",on);b.dataset.on=on?"1":"";b.textContent=on?"✓ នឹងជូនដំណឹងអ្នកពេលទំនិញមក (ចុចដើម្បីបោះបង់)":"🔔 ជូនដំណឹងខ្ញុំពេលមានទំនិញ"}
+  async function update(i){
+    var b=btn(); if(!b)return; b.dataset.i=i;
+    var out=false; try{out=(typeof stockOf==="function")&&stockOf(i)===0}catch(e){}
+    if(!out||!sbReady()){b.hidden=true;return}
+    b.hidden=false; label(b,false);
+    var on=await isSub(i); if(+b.dataset.i===i)label(b,on);
+  }
+  async function toggle(i){
+    var b=btn(); if(!b)return;
+    if(!CU.sess){afterAuth=function(){toggle(i)};openAuth("login","ចូលគណនីដើម្បីទទួលដំណឹងពេលទំនិញមកវិញ");return}
+    var on=b.dataset.on==="1";
+    try{
+      var r=await rpc(on?"unsubscribe_stock_alert":"subscribe_stock_alert",{p_product:i+1,p_shop:shopOf(i)});
+      if(!r.ok){say(r.status===404?"មុខងារនេះមិនទាន់បើក":"បរាជ័យ សូមព្យាយាមម្តងទៀត");return}
+      label(b,!on); say(on?"បានបោះបង់ការជូនដំណឹង":"បានចុះឈ្មោះ យើងនឹងជូនដំណឹងពេលទំនិញមកវិញ");
+    }catch(e){say("បរាជ័យ សូមព្យាយាមម្តងទៀត")}
+  }
+  if(typeof openDetail==="function"){var _o=openDetail;openDetail=function(i){var r=_o.apply(this,arguments);try{update(i)}catch(e){}return r}}
+  /* អតិថិជនត្រឡប់មកវិញ៖ បង្ហាញទំនិញដែលមកវិញហើយ */
+  async function check(){
+    if(!CU.sess||!sbReady()||typeof PRODUCTS==="undefined")return;
+    try{var r=await rpc("my_restock_alerts",{}); if(!r.ok)return; var rows=await r.json(); if(!rows.length)return;
+      var items=[]; rows.forEach(function(x){var i=x.product_no-1,p=PRODUCTS[i]; if(p&&(p.shop||1)===x.shop_id)items.push({i:i,name:p.name})});
+      if(!items.length)return;
+      var old=document.getElementById("restock-card"); if(old)old.remove();
+      var c=document.createElement("div"); c.id="restock-card";
+      c.innerHTML='<button type="button" class="rc-x" aria-label="បិទ">&times;</button><b>🔔 ទំនិញដែលអ្នករង់ចាំ មកវិញហើយ!</b><div class="rc-row">'+items.map(function(t){return '<button type="button" class="rc-chip" data-i="'+t.i+'">'+String(t.name).replace(/[&<>"]/g,function(ch){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[ch]})+'</button>'}).join("")+'</div>';
+      document.body.appendChild(c);
+      c.addEventListener("click",function(e){
+        if(e.target.closest(".rc-x")){c.remove();return}
+        var ch=e.target.closest(".rc-chip"); if(ch){c.remove();openDetail(+ch.dataset.i)}
+      });
+    }catch(e){}
+  }
+  window.checkRestockAlerts=check;
+  document.addEventListener("DOMContentLoaded",function(){setTimeout(check,2500)});
 })();
 </script>
 </body>
