@@ -1839,7 +1839,9 @@ async function notifyRestock(n, name) {
     const r = await fetch(`${SB_URL}/rest/v1/rpc/notify_restock`, { method: "POST", headers: { apikey: SB_KEY, Authorization: "Bearer " + t, "Content-Type": "application/json" }, body: JSON.stringify({ p_product: n, p_shop: SHOP_ID, p_name: name || "", p_link: base ? base + "#p" + n : "" }) });
     if (!r.ok) return;
     const c = await r.json();
-    if (Number(c) > 0) alert("បានជូនដំណឹងអតិថិជន " + c + " នាក់ ថាទំនិញនេះមកវិញហើយ");
+    const subs = typeof c === "object" && c ? Number(c.subs) || 0 : Number(c) || 0;
+    const tg = typeof c === "object" && c ? Number(c.telegram) || 0 : 0;
+    if (subs > 0) alert("បានជូនដំណឹងអតិថិជន " + subs + " នាក់ ថាទំនិញនេះមកវិញហើយ\n• ផ្ញើ Telegram៖ " + tg + " នាក់\n• នៅសល់នឹងឃើញកាតក្នុងគេហទំព័រ៖ " + (subs - tg) + " នាក់" + (tg === 0 ? "\n(Telegram 0៖ អតិថិជនមិនទាន់ភ្ជាប់ Telegram ឬមិនទាន់កំណត់ bot)" : ""));
   } catch (e) {}
 }
 // ការពារ zoom លើទូរស័ព្ទ
