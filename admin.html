@@ -1522,7 +1522,7 @@ function openAdminPanel() {
       if (el.value === "") delete adminData.stock[n];
       else adminData.stock[n] = Math.max(0, Math.round(Number(el.value) || 0));
       window.__sd.add(String(n));
-      restockWatch(n, prevStock, adminData.stock[n]);
+      restockWatch(n, prevStock, adminData.stock[n], p && p.name);
     }
     else if (f === "sale") {
       const v = Math.round(Number(el.value) || 0);
@@ -1823,18 +1823,20 @@ function openAdminPanel() {
 
 // ជូនដំណឹងអតិថិជនដែលរង់ចាំ ពេលម្ចាស់ប្តូរស្តុកពី 0 ទៅលើសសូន្យ (រង់ចាំ ១.៦ វិនាទី ក្រោយវាយចប់)
 window.__rs = window.__rs || {};
-function restockWatch(n, prev, now) {
+function restockWatch(n, prev, now, name) {
   const st = window.__rs[n] || (window.__rs[n] = { flag: false, t: 0 });
+  if (name) st.name = name;
   if (prev !== undefined && prev !== "" && Number(prev) === 0 && Number(now) > 0) st.flag = true;
   if (!(Number(now) > 0)) st.flag = false;
   clearTimeout(st.t);
-  if (st.flag) st.t = setTimeout(() => { st.flag = false; notifyRestock(n); }, 1600);
+  if (st.flag) st.t = setTimeout(() => { st.flag = false; notifyRestock(n, st.name); }, 1600);
 }
-async function notifyRestock(n) {
+async function notifyRestock(n, name) {
   if (!sbOn()) return;
   try {
     const t = await sbToken();
-    const r = await fetch(`${SB_URL}/rest/v1/rpc/notify_restock`, { method: "POST", headers: { apikey: SB_KEY, Authorization: "Bearer " + t, "Content-Type": "application/json" }, body: JSON.stringify({ p_product: n, p_shop: SHOP_ID }) });
+    const base = /^https:/.test(location.href) ? location.href.replace(/admin\.html.*$/, "").replace(/[?#].*$/, "") : "";
+    const r = await fetch(`${SB_URL}/rest/v1/rpc/notify_restock`, { method: "POST", headers: { apikey: SB_KEY, Authorization: "Bearer " + t, "Content-Type": "application/json" }, body: JSON.stringify({ p_product: n, p_shop: SHOP_ID, p_name: name || "", p_link: base ? base + "#p" + n : "" }) });
     if (!r.ok) return;
     const c = await r.json();
     if (Number(c) > 0) alert("បានជូនដំណឹងអតិថិជន " + c + " នាក់ ថាទំនិញនេះមកវិញហើយ");
