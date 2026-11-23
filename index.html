@@ -2633,6 +2633,7 @@ new MutationObserver(build).observe(nav,{childList:true});build();
 <nav class="sp-tabs" aria-label="មឺនុយ">
 <button type="button" class="on" id="sp-home"><span class="ic"><i class="fa-solid fa-house"></i></span>ទំព័រដើម</button>
 <button type="button" id="sp-fav"><span class="ic"><i class="fa-regular fa-heart"></i></span>ចូលចិត្ត</button>
+<button type="button" id="sp-cart"><span class="ic" style="position:relative"><i class="fa-solid fa-cart-shopping"></i><b class="cbadge" id="sp-cbadge" hidden></b></span>កន្ត្រក</button>
 <button type="button" id="sp-ord"><span class="ic"><i class="fa-solid fa-bag-shopping"></i></span>កម្មង់</button>
 <button type="button" id="sp-me"><span class="ic"><i class="fa-regular fa-user"></i></span>ខ្ញុំ</button>
 </nav>
@@ -2649,7 +2650,7 @@ g('sp-home').addEventListener('click',function(){act(function(){
  scrollTo({top:0,behavior:'smooth'});setOn('sp-home')})});
 g('sp-fav').addEventListener('click',function(){act(function(){
  g('tb-fav').click();setTimeout(base,50)})});
-[['sp-ord','tb-track'],['sp-me','tb-acc']].forEach(function(p){
+[['sp-cart','tb-cart'],['sp-ord','tb-track'],['sp-me','tb-acc']].forEach(function(p){
  g(p[0]).addEventListener('click',function(){act(function(){
   var t=g(p[1]);if(t)t.click();setOn(p[0]);setTimeout(base,900)})})});
 var tf=g('tb-fav');if(tf)tf.addEventListener('click',function(){setTimeout(base,80)});
@@ -3376,6 +3377,7 @@ function addToCart(n, size) {
 function renderCartUI() {
   const T = cartTotals(), b = $c("cart-badge");
   b.hidden = !T.qty; b.textContent = T.qty;
+  const sb = document.getElementById("sp-cbadge"); if (sb) { sb.hidden = !T.qty; sb.textContent = T.qty; }
   if (!$c("cartsheet").classList.contains("open")) return;
   $c("cart-list").innerHTML = T.L.length ? T.L.map((l, k) => `<div class="ci"><img src="${photoOf(l.n)}" alt="" onerror="this.style.visibility='hidden'">
     <div><b>${esc(l.name)}</b><div class="cs">${l.size ? esc(l.size) + " · " : ""}${formatRiel(l.price)}</div>
