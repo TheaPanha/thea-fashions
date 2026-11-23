@@ -718,11 +718,24 @@ function sbPush() {
     } catch (e) { alert("រក្សាទុកលើ server មិនបាន៖ " + e.message); }
   }, 500);
 }
+function adImgErr(err) {
+  const m = String((err && err.message) || "");
+  if (m.indexOf("upload") === 0) alert("ផ្ទុករូបឡើង server មិនបាន (" + m + ")។ សូមពិនិត្យអ៊ីនធឺណិត ហើយសាកល្បងម្តងទៀត");
+  else alert("បើករូបមិនបាន (" + m + ")។ សូមសាកល្បងរូប JPG/PNG");
+}
 async function sbUpload(path, dataUrl) {
   if (SHOP_ID !== 1) path = `s${SHOP_ID}/${path}`;      // រូបហាងផ្សេង ដាក់ក្នុងថតរបស់ខ្លួន
-  const blob = await (await fetch(dataUrl)).blob();
+  // បម្លែង dataURL → Blob ដោយមិនប្រើ fetch (Safari iPhone អាចបរាជ័យ "Load failed")
+  const bin = atob(dataUrl.split(",")[1] || ""), u8 = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i);
+  const blob = new Blob([u8], { type: "image/jpeg" });
   const t = await sbToken();
-  const r = await fetch(`${SB_URL}/storage/v1/object/photos/${path}`, { method: "POST", headers: { apikey: SB_KEY, Authorization: "Bearer " + t, "x-upsert": "true", "Content-Type": "image/jpeg" }, body: blob });
+  let r, lastErr;
+  for (let a = 0; a < 3 && !r; a++) {            // ព្យាយាមម្តងទៀត បើបណ្តាញមានបញ្ហា
+    try { r = await fetch(`${SB_URL}/storage/v1/object/photos/${path}`, { method: "POST", headers: { apikey: SB_KEY, Authorization: "Bearer " + t, "x-upsert": "true", "Content-Type": "image/jpeg" }, body: blob }); }
+    catch (e) { lastErr = e; await new Promise((ok) => setTimeout(ok, 700 * (a + 1))); }
+  }
+  if (!r) throw new Error("upload-net");
   if (!r.ok) throw new Error("upload " + r.status);
   return `${SB_URL}/storage/v1/object/public/photos/${path}?v=${Date.now()}`;
 }
@@ -1502,7 +1515,7 @@ function openAdminPanel() {
             let d = await processImage(file);
             if (sbOn()) d = await sbUpload("p" + n + "_" + Date.now() + "_" + arr.length + ".jpg", d);
             arr.push(d);
-          } catch (err) { alert("បើករូបមិនបាន (" + (err && err.message) + ")។ សូមសាកល្បងរូប JPG/PNG"); }
+          } catch (err) { adImgErr(err); }
         }
         adminImages[key] = arr;
         if (!saveImages()) { if (old) adminImages[key] = old; else delete adminImages[key]; return; }
@@ -1523,7 +1536,7 @@ function openAdminPanel() {
         const keep = list.scrollTop;
         list.innerHTML = adminRows(document.getElementById("ad-search").value);
         list.scrollTop = keep;
-      }).catch((err) => alert("បើករូបមិនបាន (" + (err && err.message) + ")។ សូមសាកល្បងរូប JPG/PNG"));
+      }).catch((err) => adImgErr(err));
       return;
     }
     if (f === "sizeFrom" || f === "sizeTo") {
@@ -1708,7 +1721,7 @@ function openAdminPanel() {
       const pick = document.getElementById("ad-photo-pick");
       pick.style.backgroundImage = `url("${data}")`; pick.classList.add("has");
       document.getElementById("ad-photo-label").textContent = "ប្តូររូប";
-    }).catch((err) => alert("បើករូបមិនបាន (" + (err && err.message) + ")។ សូមសាកល្បងរូប JPG/PNG"));
+    }).catch((err) => adImgErr(err));
   });
   document.getElementById("ad-add-save").addEventListener("click", async () => {
     const name = document.getElementById("ad-new-name").value.trim();
@@ -1817,7 +1830,7 @@ function openAdminPanel() {
         adminImages["b" + el.dataset.bimg] = data;
         if (!saveImages()) { delete adminImages["b" + el.dataset.bimg]; return; }
         flashSaved(); renderPromo();
-      }).catch((err) => alert("បើករូបមិនបាន (" + (err && err.message) + ")។ សូមសាកល្បងរូប JPG/PNG"));
+      }).catch((err) => adImgErr(err));
     }
   });
   adminSheet.classList.add("open");
