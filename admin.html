@@ -1280,8 +1280,23 @@ function flashSaved() {
   window.odInit = function () {
     const root = $("od-root"); if (!root) return;
     if (!sbOn()) { root.innerHTML = `<div class="od-empty">មិនទាន់ភ្ជាប់ Supabase</div>`; return; }
-    root.innerHTML = `<div class="od-stats" id="od-stats"></div><div id="od-rev"></div><div class="od-chips" id="od-chips"></div><div id="od-list"><div class="od-empty">កំពុងទាញ...</div></div>`;
+    root.innerHTML = `<div class="od-stats" id="od-stats"></div><div id="od-rev"></div><button type="button" class="ad-linkbtn" id="od-csv" style="margin:2px 0 10px">⬇ នាំចេញការកម្មង់ (Excel/CSV)</button><div class="od-chips" id="od-chips"></div><div id="od-list"><div class="od-empty">កំពុងទាញ...</div></div>`;
     ready = true; odLoad(); clearInterval(timer); timer = setInterval(() => { if (!document.hidden) odLoad(); }, 30000);
+    $("od-csv").onclick = () => {
+      if (!orders.length) { alert("មិនទាន់មានការកម្មង់ដើម្បីនាំចេញ"); return; }
+      const cell = (v) => { v = v == null ? "" : String(v); return /[",\n\r]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; };
+      const head = ["លេខកូដ", "កាលបរិច្ឆេទ", "អតិថិជន", "ទូរស័ព្ទ", "ទីតាំង", "ទំនិញ", "តម្លៃសរុប (៛)", "បញ្ចុះ (៛)", "កូដបញ្ចុះ", "វិធីបង់", "ស្ថានភាព", "បានបង់ (៛)", "ក្រុមហ៊ុនដឹក", "លេខតាមដាន"];
+      const rows = orders.map((o) => {
+        const its = Array.isArray(o.items) && o.items.length ? o.items.map((i) => `${i.name || ""} x${i.qty || 1}${i.size ? " (" + i.size + ")" : ""}`).join("; ") : `${o.product || ""}${o.size ? " (" + o.size + ")" : ""}`;
+        const d = o.created_at ? new Date(o.created_at).toLocaleString("sv-SE", { timeZone: "Asia/Phnom_Penh" }) : "";
+        return [o.order_code, d, o.customer_name, o.phone, o.location, its, o.price, o.discount, o.coupon, o.pay_method, o.status, o.paid_amount, o.courier, o.courier_no].map(cell).join(",");
+      });
+      const csv = "\uFEFF" + [head.map(cell).join(",")].concat(rows).join("\r\n");
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
+      a.download = "orders-" + new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Phnom_Penh" }) + ".csv";
+      document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+    };
     $("od-rev").onclick = (e) => { const b = e.target.closest("[data-rg]"); if (b) { rng = b.dataset.rg; draw(); } };
     $("od-chips").onclick = (e) => { const b = e.target.closest("[data-f]"); if (b) { flt = b.dataset.f; draw(); } };
     $("rcv-x").onclick = () => { $("rcv").style.display = "none"; $("rcv-img").removeAttribute("src"); };
