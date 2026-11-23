@@ -1216,7 +1216,7 @@ function flashSaved() {
       ${payBox(o)}
       <div class="od-box"><div class="od-row"><input data-courier value="${e2(o.courier)}" placeholder="ក្រុមហ៊ុនដឹក"><input data-trackno value="${e2(o.courier_no)}" placeholder="លេខតាមដាន"></div>
         <div class="od-row" style="margin-top:6px"><input data-note value="${e2(o.tracking_note)}" placeholder="ដឹកដល់ណាហើយ?"><button class="od-sm" data-savetrack="1" type="button">រក្សា</button></div></div>
-      <div class="od-acts">${o.receipt_url ? `<button class="od-sm" data-rc="${e2(o.receipt_url)}" type="button" style="border-color:#3F7D5C;color:#3F7D5C">មើលបង្កាន់ដៃ</button>` : ""}${Object.entries(ST).filter(([k]) => k !== o.status).map(([k, v]) => `<button class="od-sm" data-s="${k}" type="button">${v}</button>`).join("")}<button class="od-sm" data-del="1" type="button" style="color:#B8213F">លុប</button></div>
+      <div class="od-acts"><button class="od-sm" data-inv="1" type="button">វិក្កយបត្រ</button>${o.receipt_url ? `<button class="od-sm" data-rc="${e2(o.receipt_url)}" type="button" style="border-color:#3F7D5C;color:#3F7D5C">មើលបង្កាន់ដៃ</button>` : ""}${Object.entries(ST).filter(([k]) => k !== o.status).map(([k, v]) => `<button class="od-sm" data-s="${k}" type="button">${v}</button>`).join("")}<button class="od-sm" data-del="1" type="button" style="color:#B8213F">លុប</button></div>
     </div>`).join("") : `<div class="od-empty">មិនទាន់មានការបញ្ជាទិញ</div>`;
   }
   // ----- លេខកូដបញ្ចុះតម្លៃ -----
@@ -1277,6 +1277,25 @@ function flashSaved() {
     try { orders = await api(`orders?select=*&shop_id=eq.${SHOP_ID}&order=created_at.desc&limit=300`, { headers: { Prefer: "" } }); draw(); }
     catch (e) { $("od-list").innerHTML = `<div class="od-empty">ទាញទិន្នន័យមិនបាន (${e2(e.message)})</div>`; }
   };
+  // វិក្កយបត្រ: បើកទំព័រថ្មី ហើយបោះពុម្ព / រក្សាទុកជា PDF តាម Print
+  function odInvoice(o) {
+    const w = window.open("", "_blank");
+    if (!w) { alert("សូមអនុញ្ញាតឲ្យបើកទំព័រថ្មី (pop-up)"); return; }
+    const its = Array.isArray(o.items) && o.items.length ? o.items : [{ name: o.product, size: o.size, qty: 1, price: o.price }];
+    const sub = its.reduce((t, i) => t + (Number(i.price) || 0) * (Number(i.qty) || 0), 0), disc = Number(o.discount) || 0;
+    const pay = o.pay_method === "qr" ? "KHQR" : "បង់ពេលទទួលទំនិញ";
+    const rows = its.map((i, k) => `<tr><td>${k + 1}</td><td>${e2(i.name)}${i.size ? `<br><small>${e2(i.size)}</small>` : ""}</td><td class="r">${Number(i.qty) || 0}</td><td class="r">${money(i.price)}</td><td class="r">${money((Number(i.price) || 0) * (Number(i.qty) || 0))}</td></tr>`).join("");
+    w.document.write(`<!doctype html><html lang="km"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>វិក្កយបត្រ ${e2(o.order_code || o.id)}</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Khmer:wght@400;700&display=swap" rel="stylesheet">
+<style>body{font-family:"Noto Sans Khmer",system-ui,sans-serif;color:#222;margin:0;padding:24px;max-width:720px;margin:auto}h1{margin:0;font-size:22px}.top{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid #222;padding-bottom:12px;margin-bottom:14px}.m{font-size:13px;line-height:1.8}table{width:100%;border-collapse:collapse;margin-top:14px;font-size:14px}th,td{padding:8px 6px;border-bottom:1px solid #ddd;text-align:left;vertical-align:top}th{background:#f5f1ea}.r{text-align:right}small{color:#777}.t{margin-top:12px;margin-left:auto;width:260px;font-size:14px}.t div{display:flex;justify-content:space-between;padding:4px 0}.t .g{font-weight:700;font-size:17px;border-top:2px solid #222;margin-top:4px;padding-top:8px}.f{text-align:center;margin-top:30px;color:#777;font-size:13px}.b{margin:0 0 16px}.b button{padding:10px 18px;font:inherit;border:0;border-radius:10px;background:#222;color:#fff}@media print{.b{display:none}body{padding:0}}</style></head><body>
+<div class="b"><button onclick="window.print()">បោះពុម្ព / រក្សាទុក PDF</button></div>
+<div class="top"><div><h1>Thea Fashion</h1><div class="m">វិក្កយបត្រ</div></div><div class="m" style="text-align:right">លេខកូដ៖ <b>${e2(o.order_code || o.id)}</b><br>កាលបរិច្ឆេទ៖ ${e2(new Date(o.created_at).toLocaleString("en-GB", { timeZone: "Asia/Phnom_Penh", day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }))}</div></div>
+<div class="m">អតិថិជន៖ <b>${e2(o.customer_name || "-")}</b><br>ទូរស័ព្ទ៖ ${e2(o.phone || "-")}<br>ទីតាំង៖ ${e2(o.location || "-")}<br>វិធីបង់ប្រាក់៖ ${pay}</div>
+<table><thead><tr><th>#</th><th>ទំនិញ</th><th class="r">ចំនួន</th><th class="r">តម្លៃ</th><th class="r">សរុប</th></tr></thead><tbody>${rows}</tbody></table>
+<div class="t"><div><span>តម្លៃសរុប</span><span>${money(sub)}</span></div>${disc ? `<div><span>បញ្ចុះ${o.coupon ? " (" + e2(o.coupon) + ")" : ""}</span><span>−${money(disc)}</span></div>` : ""}<div class="g"><span>ត្រូវបង់</span><span>${money(o.price)}</span></div></div>
+<div class="f">សូមអរគុណដែលបានគាំទ្រ Thea Fashion</div></body></html>`);
+    w.document.close();
+  }
   window.odInit = function () {
     const root = $("od-root"); if (!root) return;
     if (!sbOn()) { root.innerHTML = `<div class="od-empty">មិនទាន់ភ្ជាប់ Supabase</div>`; return; }
@@ -1305,6 +1324,7 @@ function flashSaved() {
       if (!b || !card) return;
       const id = card.dataset.id, o = orders.find((x) => String(x.id) === id), g = (s) => card.querySelector(s).value.trim();
       try {
+        if (b.dataset.inv) { odInvoice(o); return; }
         if (b.dataset.rc) {
           const v = $("rcv"), im = $("rcv-img"), msg = $("rcv-msg"), op = $("rcv-open");
           v.style.display = "flex"; im.style.display = "none"; op.style.display = "none"; msg.textContent = "កំពុងផ្ទុករូប...";
