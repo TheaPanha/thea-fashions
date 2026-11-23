@@ -539,7 +539,7 @@ body{background:#F3F0EB!important}
       <input id="admin-pass" class="ad-input" type="password" placeholder="ពាក្យសម្ងាត់" autocomplete="current-password" />
       <div class="ad-err" id="admin-err"></div>
       <button class="sheet-confirm" id="admin-go" type="button">ចូល</button>
-      <button class="ad-linkbtn" id="rq-open" type="button">ស្នើសុំសិទ្ធិប្រើ Admin</button>
+      <button class="ad-linkbtn" id="rq-open" type="button" style="display:none">ស្នើសុំសិទ្ធិប្រើ Admin</button>
       <div class="ad-rq" id="rq-box" style="display:none">
         <div class="ad-rq-h">ស្នើសុំសិទ្ធិ</div>
         <p class="ad-hint" style="margin:0 0 10px">ម្ចាស់ហាងនឹងពិនិត្យ និងអនុម័តសំណើរបស់អ្នក។ ក្រោយអនុម័ត អ្នកអាចចូលដោយអ៊ីមែល និងពាក្យសម្ងាត់ខាងក្រោម។</p>
@@ -952,7 +952,7 @@ async function _tryAdminLogin() {
       try { em = (document.getElementById("admin-email").value || OWNER_EMAIL).trim(); await sbAuth({ email: em, password: adminPass.value }, "password"); }
       catch (e) { adminErr.textContent = "ពាក្យសម្ងាត់មិនត្រឹមត្រូវ ឬភ្ជាប់ Supabase មិនបាន"; return; }
       const sid = await acApproved(em);
-      if (!sid) { sbSess = null; acClearLocal(); adminErr.textContent = "គណនីនេះមិនទាន់ទទួលបានសិទ្ធិពីម្ចាស់ហាងទេ។ សូមរង់ចាំការអនុម័ត។"; return; }
+      if (!sid) { sbSess = null; acClearLocal(); adminErr.textContent = "គណនីនេះមិនមែនជា Admin ទេ។"; return; }
       if (sid !== SHOP_ID) { try { localStorage.removeItem("adminData"); localStorage.removeItem("adminImages"); } catch (e) {} }   // ប្តូរគណនី → លុបទិន្នន័យចាស់លើឧបករណ៍នេះ
       SHOP_ID = sid; if (SHOP_ID !== 1) applyBlankShop();
       try { localStorage.setItem("adminEmail", em); localStorage.setItem("adminShop", String(sid)); } catch (e) {}
@@ -1341,7 +1341,6 @@ function openAdminPanel() {
       ${SHOP_ID !== 1 ? `<button class="ad-tab" data-tab="profile" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg> ហាងខ្ញុំ</button>` : ""}
       ${SHOP_ID === 1 ? `<button class="ad-tab" data-tab="design" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18c1.2 0 2-.8 2-1.8 0-.6-.3-1-.6-1.4-.3-.4-.4-.8-.4-1.3 0-1 .8-1.8 1.8-1.8H17a4 4 0 0 0 4-4C21 6.5 17 3 12 3Z"/><circle cx="7.5" cy="11" r="1"/><circle cx="10" cy="7" r="1"/><circle cx="15" cy="7.5" r="1"/></svg>រចនា</button>` : ""}
       ${SHOP_ID === 1 ? `<button class="ad-tab" data-tab="shop" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5 5.5 4h13L20 9.5"/><path d="M4 9.5a2.7 2.7 0 0 0 5.3 0 2.7 2.7 0 0 0 5.4 0 2.7 2.7 0 0 0 5.3 0"/><path d="M5 12.5V20h14v-7.5M10 20v-4.5h4V20"/></svg>ហាង</button>` : ""}
-      ${sbOn() && acIsOwner() ? `<button class="ad-tab" data-tab="access" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="8" cy="15" r="4"/><path d="m11 12 9-9M16 7l3 3M14 9l2 2"/></svg> សិទ្ធិ</button>` : ""}
       <button class="ad-tab" data-tab="reviews" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9L12 3Z"/></svg> វាយតម្លៃ</button>
       ${SHOP_ID === 1 ? `<button class="ad-tab" data-tab="tools" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.7 6.3a4 4 0 0 0-5 5L3 18l3 3 6.7-6.7a4 4 0 0 0 5-5l-2.4 2.4-2.6-.6-.6-2.6 2.6-2.2Z"/></svg>ចលនា · ថែរក្សា</button>` : ""}
       <button class="ad-tab" data-tab="promo" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10v4h3l8 4V6L7 10H4Z"/><path d="M18.5 9.5a4 4 0 0 1 0 5"/></svg>ផ្សព្វផ្សាយ</button>
@@ -1448,7 +1447,6 @@ function openAdminPanel() {
 
     <div class="ad-panel" data-tab="reviews" style="display:none"><div id="rv-body"></div></div>
     <div class="ad-panel" data-tab="promo" style="display:none"><div id="cp-box"></div></div>
-    <div class="ad-panel" data-tab="access" style="display:none"><div id="ac-body"></div></div>
 
     ${SHOP_ID !== 1 ? `<div class="ad-panel" data-tab="profile" style="display:none">
       <div class="ad-label" style="margin-top:0">ប្រវត្តិហាងរបស់អ្នក (អតិថិជនឃើញពេលចុច "មើលហាង")</div>

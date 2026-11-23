@@ -2538,6 +2538,7 @@ html body .shopstrip, html body .dt-seller { display: none !important; }</style>
       <div class="sheet-handle"></div>
       <h3 style="margin:6px 0 4px">កន្ត្រកទំនិញ</h3>
       <div id="cart-list"></div>
+      <div id="cart-rec" style="display:none"><div class="dt-h" style="margin:14px 0 10px">ទំនិញដែលគួរទិញបន្ថែម</div><div class="dt-rel" id="cart-rec-list"></div></div>
       <div class="cp-row"><input class="of-input" id="cp-code" type="text" placeholder="លេខកូដបញ្ចុះតម្លៃ" autocapitalize="characters" autocomplete="off" /><button type="button" class="of-btn" id="cp-go" style="flex:none;padding:0 14px">ប្រើ</button></div>
       <div class="of-hint" id="cp-msg" style="margin-top:6px"></div>
       <div class="cart-sum" id="cart-sum"></div>
@@ -2800,6 +2801,7 @@ async function saveOrderRemote(o) {
   if (!sbReady()) return;
   try { await fetch(`${SB_URL}/rest/v1/orders`, { method: "POST", keepalive: true, headers: { apikey: SB_KEY, Authorization: "Bearer " + SB_KEY, "Content-Type": "application/json", Prefer: "return=minimal" }, body: JSON.stringify(o) }); } catch (e) {}
 }
+const ONLY_MAIN_SHOP = true;   // បង្ហាញតែហាងមេ (Thea Fashion) · ដាក់ false ដើម្បីបង្ហាញហាង admin ផ្សេងវិញ
 let SHOPS = {}, shopFilter = 0, RSUM = {}, FOLLOWS = {};   // RSUM: ពិន្ទុវាយតម្លៃ · FOLLOWS: ចំនួនអ្នកតាមដាន
 function applyShared(d, others) {                    // d = ទិន្នន័យហាងលេខ 1 · others = [{id, data}] ហាងរបស់ admin ផ្សេង (បង្ហាញរួមគ្នា)
   if (!d) return;
@@ -3386,10 +3388,21 @@ function renderCartUI() {
     : `<div class="of-hint" style="padding:16px 0">កន្ត្រកទទេ</div>`;
   $c("cart-sum").innerHTML = `<div><span>តម្លៃសរុប</span><span>${formatRiel(T.sub)}</span></div>${T.disc ? `<div style="color:#3F7D5C"><span>បញ្ចុះ (${esc(cartCoupon.code)})</span><span>−${formatRiel(T.disc)}</span></div>` : ""}<div class="tot"><span>ត្រូវបង់</span><span>${formatRiel(T.total)}</span></div>`;
   $c("cart-go").disabled = !T.L.length;
+  const rec = T.L.length ? cartRecs(T) : [];
+  $c("cart-rec").style.display = rec.length ? "" : "none";
+  $c("cart-rec-list").innerHTML = rec.map((o) => `<button type="button" class="rel" data-r="${o.j}"><img src="${photoOf(o.j + 1)}" alt="" loading="lazy" onerror="this.style.visibility='hidden'"><b>${esc(o.q.name)}</b><span>${formatRiel(finalPrice(itemAt(o.j)))}</span></button>`).join("");
+}
+// ទំនិញគួរទិញបន្ថែម: មិនទាន់នៅក្នុងកន្ត្រក មិនលាក់ មិនអស់ស្តុក · ប្រភេទដូចទំនិញក្នុងកន្ត្រកមកមុន
+function cartRecs(T) {
+  const inCart = new Set(T.L.map((l) => l.n)), hid = hiddenSet();
+  const cats = new Set(T.L.map((l) => catOf(PRODUCTS[l.n - 1])));
+  const all = PRODUCTS.map((q, j) => ({ q, j })).filter((o) => !inCart.has(o.j + 1) && !hid.has(o.j + 1) && stockOf(o.j) !== 0);
+  return all.filter((o) => cats.has(catOf(o.q))).concat(all.filter((o) => !cats.has(catOf(o.q)))).slice(0, 8);
 }
 function openCart() { $c("cartsheet").classList.add("open"); renderCartUI(); }
 $c("tb-cart").addEventListener("click", (e) => { e.preventDefault(); openCart(); });
 $c("cart-close").onclick = () => $c("cartsheet").classList.remove("open");
+$c("cart-rec-list").addEventListener("click", (e) => { const b = e.target.closest("[data-r]"); if (!b) return; $c("cartsheet").classList.remove("open"); openDetail(+b.dataset.r); });
 $c("cartsheet").addEventListener("click", (e) => { if (e.target.id === "cartsheet") e.target.classList.remove("open"); });
 $c("cart-clear").onclick = () => { cart = []; saveCart(); cartCoupon = null; $c("cp-msg").textContent = ""; renderCartUI(); };
 $c("cart-list").addEventListener("click", (e) => {
@@ -4348,7 +4361,7 @@ document.addEventListener("keydown", (e) => {
     const r = await fetch(`${SB_URL}/rest/v1/shop?select=id,data&order=id`, { headers: { apikey: SB_KEY, Authorization: "Bearer " + SB_KEY }, cache: "no-store" });
     const j = await r.json(), rows = Array.isArray(j) ? j : [], d = (rows.find((x) => x.id === 1) || {}).data;
     if (!d) return;
-    const o = rows.filter((x) => x.id !== 1 && x.data && (x.data.added || []).length).map((x) => ({ id: x.id, data: { settings: x.data.settings, added: x.data.added, hidden: x.data.hidden, deleted: x.data.deleted, sale: x.data.sale, stock: x.data.stock, imgs: x.data.imgs } }));
+    const o = rows.filter((x) => !ONLY_MAIN_SHOP && x.id !== 1 && x.data && (x.data.added || []).length).map((x) => ({ id: x.id, data: { settings: x.data.settings, added: x.data.added, hidden: x.data.hidden, deleted: x.data.deleted, sale: x.data.sale, stock: x.data.stock, imgs: x.data.imgs } }));
     const s = JSON.stringify({ d, o });
     if (localStorage.getItem("sharedAll") === s) return;      // គ្មានអ្វីថ្មី
     try { localStorage.setItem("sharedAll", s); } catch (e) {}
