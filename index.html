@@ -3585,6 +3585,55 @@ $c("authsheet").addEventListener("click", (e) => { if (e.target.id === "authshee
 let mineF = "", MINE_ALL = [];
 // បានបង់រួច: KHQR មាន paid_at · ឬបង់ពេលទទួលទំនិញ ហើយដឹកដល់ (done)
 const isPaid = (o) => o.status !== "cancel" && (!!o.paid_at || (o.pay_method !== "qr" && o.status === "done"));
+// ចុច "វិក្កយបត្រ" → ចេញជារូបភាពភ្លាម (មិនបើកទំព័រថ្មី)
+function loadH2C() {
+  return new Promise((ok, no) => {
+    if (window.html2canvas) return ok();
+    const sc = document.createElement("script");
+    sc.src = "https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js";
+    sc.onload = () => ok(); sc.onerror = () => no(new Error("load"));
+    document.head.appendChild(sc);
+  });
+}
+async function invoiceImage(o) {
+  toast("កំពុងបង្កើតរូបវិក្កយបត្រ…");
+  const its = Array.isArray(o.items) && o.items.length ? o.items : [{ name: o.product, size: o.size, qty: 1, price: o.price }];
+  const sub = its.reduce((t, i) => t + (Number(i.price) || 0) * (Number(i.qty) || 0), 0), disc = Number(o.discount) || 0;
+  const pay = o.pay_method === "qr" ? "KHQR" : "បង់ពេលទទួលទំនិញ";
+  const when = new Date(o.paid_at || o.created_at).toLocaleString("en-GB", { timeZone: "Asia/Phnom_Penh", day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" });
+  const rows = its.map((i, k) => `<tr><td>${k + 1}</td><td>${esc(i.name || "")}${i.size ? `<br><small>${esc(i.size)}</small>` : ""}</td><td class="r">${Number(i.qty) || 0}</td><td class="r">${formatRiel(Number(i.price) || 0)}</td><td class="r">${formatRiel((Number(i.price) || 0) * (Number(i.qty) || 0))}</td></tr>`).join("");
+  const box = document.createElement("div");
+  box.style.cssText = "position:fixed;left:-9999px;top:0;width:720px;background:#fff;padding:28px;box-sizing:border-box;color:#222;font-family:inherit";
+  box.innerHTML = `<style>.invx h1{margin:0;font-size:24px}.invx .top{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid #222;padding-bottom:12px;margin-bottom:14px}.invx .m{font-size:14px;line-height:1.8}.invx .ok{display:inline-block;margin-top:6px;padding:3px 12px;border:2px solid #3F7D5C;color:#3F7D5C;border-radius:8px;font-weight:700}.invx table{width:100%;border-collapse:collapse;margin-top:14px;font-size:15px}.invx th,.invx td{padding:8px 6px;border-bottom:1px solid #ddd;text-align:left;vertical-align:top}.invx th{background:#f5f1ea}.invx .r{text-align:right}.invx small{color:#777}.invx .t{margin-top:12px;margin-left:auto;width:280px;font-size:15px}.invx .t div{display:flex;justify-content:space-between;padding:4px 0}.invx .t .g{font-weight:700;font-size:18px;border-top:2px solid #222;margin-top:4px;padding-top:8px}.invx .f{text-align:center;margin-top:26px;color:#777;font-size:13px}</style>
+<div class="invx"><div class="top"><div><h1>Thea Fashion</h1><div class="m">វិក្កយបត្រ</div><div class="ok">បានបង់រួច ✓</div></div><div class="m" style="text-align:right">លេខកូដ៖ <b>${esc(o.order_code || o.id)}</b><br>កាលបរិច្ឆេទ៖ ${esc(when)}</div></div>
+<div class="m">អតិថិជន៖ <b>${esc(o.customer_name || "-")}</b><br>ទូរស័ព្ទ៖ ${esc(o.phone || "-")}<br>ទីតាំង៖ ${esc(o.location || "-")}<br>វិធីបង់ប្រាក់៖ ${pay}</div>
+<table><thead><tr><th>#</th><th>ទំនិញ</th><th class="r">ចំនួន</th><th class="r">តម្លៃ</th><th class="r">សរុប</th></tr></thead><tbody>${rows}</tbody></table>
+<div class="t"><div><span>តម្លៃសរុប</span><span>${formatRiel(sub)}</span></div>${disc ? `<div><span>បញ្ចុះ${o.coupon ? " (" + esc(o.coupon) + ")" : ""}</span><span>−${formatRiel(disc)}</span></div>` : ""}<div class="g"><span>បានបង់</span><span>${formatRiel(o.price || 0)}</span></div></div>
+<div class="f">សូមអរគុណដែលបានគាំទ្រ Thea Fashion</div></div>`;
+  document.body.appendChild(box);
+  try {
+    await loadH2C();
+    if (document.fonts && document.fonts.ready) await document.fonts.ready;
+    const c = await window.html2canvas(box, { scale: 2, backgroundColor: "#ffffff", useCORS: true });
+    const url = c.toDataURL("image/png"), code = String(o.order_code || o.id).replace(/[^A-Za-z0-9-]/g, "");
+    const ov = document.createElement("div");
+    ov.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:99999;overflow:auto;padding:16px;text-align:center";
+    ov.innerHTML = `<div style="color:#fff;font-size:14px;margin-bottom:10px">ចុចសង្កត់លើរូប ហើយជ្រើស "Save Image / រក្សាទុករូបភាព"</div><img src="${url}" alt="" style="max-width:100%;background:#fff;border-radius:10px"><div style="margin:14px 0 24px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap"><button type="button" data-a="shr" style="padding:10px 18px;font:inherit;border:0;border-radius:12px;background:#fff">ចែករំលែក / រក្សាទុក</button><button type="button" data-a="pdf" style="padding:10px 18px;font:inherit;border:0;border-radius:12px;background:#fff">PDF</button><button type="button" data-a="cls" style="padding:10px 18px;font:inherit;border:0;border-radius:12px;background:#555;color:#fff">បិទ</button></div>`;
+    document.body.appendChild(ov);
+    ov.addEventListener("click", (e) => {
+      const a = e.target.closest("[data-a]"); if (!a) return;
+      if (a.dataset.a === "cls") ov.remove();
+      else if (a.dataset.a === "pdf") openInvoice(o);
+      else c.toBlob((b) => {
+        const f = new File([b], "invoice-" + code + ".png", { type: "image/png" });
+        if (navigator.canShare && navigator.canShare({ files: [f] })) navigator.share({ files: [f] }).catch(() => {});
+        else { const l = document.createElement("a"); l.href = URL.createObjectURL(b); l.download = f.name; document.body.appendChild(l); l.click(); l.remove(); }
+      });
+    });
+  } catch (err) {
+    toast("បង្កើតរូបមិនបាន សូមពិនិត្យអ៊ីនធឺណិត ហើយសាកល្បងម្តងទៀត");
+  } finally { box.remove(); }
+}
 function openInvoice(o) {
   const w = window.open("", "_blank");
   if (!w) { toast("សូមអនុញ្ញាតឲ្យបើកទំព័រថ្មី (pop-up)"); return; }
@@ -3664,7 +3713,7 @@ $c("os-card").addEventListener("click", (ev) => {
   mineF = it ? (mineF === it.dataset.st ? "" : it.dataset.st) : "";
   osRender(MINE_ALL); loadMine();
 });
-$c("ordsheet").addEventListener("click", (e) => { const iv = e.target.closest("[data-inv]"); if (iv) { const o = MINE_ALL.find((x) => String(x.id) === iv.dataset.inv); if (o) openInvoice(o); return; } if (e.target.id === "ordsheet") closeOrd(); const c = e.target.closest("[data-copy]"); if (c) copyText(c.dataset.copy, c); });
+$c("ordsheet").addEventListener("click", (e) => { const iv = e.target.closest("[data-inv]"); if (iv) { const o = MINE_ALL.find((x) => String(x.id) === iv.dataset.inv); if (o) invoiceImage(o); return; } if (e.target.id === "ordsheet") closeOrd(); const c = e.target.closest("[data-copy]"); if (c) copyText(c.dataset.copy, c); });
 $c("tb-acc").addEventListener("click", (e) => {
   e.preventDefault();
   if (!sbReady()) return;
