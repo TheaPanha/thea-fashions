@@ -266,13 +266,13 @@
   .ad-cchip { display: inline-flex; align-items: center; gap: 6px; padding: 5px 6px 5px 10px; border: 1px solid var(--border); border-radius: 999px; background: #fff; font-size: 13px; }
   .ad-cchip i { width: 16px; height: 16px; border-radius: 50%; border: 1px solid rgba(0,0,0,.2); }
   .ad-cx { border: none; background: rgba(0,0,0,.08); width: 20px; height: 20px; border-radius: 50%; line-height: 1; cursor: pointer; font-size: 14px; padding: 0; }
-  .ad-cadd { display: flex; gap: 8px; align-items: center; }
+  .ad-cadd { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
   .ad-cpick { width: 46px; height: 42px; padding: 2px; border: 1px solid var(--border); border-radius: 10px; background: #fff; flex: none; }
-  .ad-cname { flex: 1; min-width: 0; }
+  .ad-cname { flex: 1 1 120px; min-width: 0; }
   .ad-cqty { width: 74px; flex: none; text-align: center; }
   .ad-cq { width: 52px; height: 24px; padding: 0 4px; border: 1px solid var(--border); border-radius: 8px; background: #FBF8F4; font: 600 12px inherit; text-align: center; }
   .ad-cq:focus { outline: none; border-color: var(--clay); }
-  .ad-cbtn { flex: none; white-space: nowrap; padding: 10px 12px; }
+  .ad-cbtn { flex: 1 1 100%; white-space: nowrap; padding: 10px 12px; }
   .ad-sizes { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted, #8A7468); }
   .ad-sizes select.ad-input { flex: 1; min-width: 0; height: 40px; padding: 0 8px; }
 
@@ -1215,7 +1215,8 @@ function flashSaved() {
         ${Array.isArray(o.items) && o.items.length ? o.items.map((it) => "• " + e2(it.name) + (it.size ? " · " + e2(it.size) : "") + " ×" + (Number(it.qty) || 0) + " — " + money((Number(it.price) || 0) * (Number(it.qty) || 0))).join("<br>") + "<br>" : ""}${o.coupon ? "" + e2(o.coupon) + " −" + money(o.discount) + "<br>" : ""}${o.customer_name ? "" + e2(o.customer_name) + " (គណនី)<br>" : ""}<a href="tel:${e2(String(o.phone).replace(/[^\d+]/g, ""))}">${e2(o.phone)}</a><br>${o.location ? "" + e2(o.location) + "<br>" : ""}${/^https?:\/\//.test(o.map_link || "") ? `<a href="${e2(o.map_link)}" target="_blank" rel="noopener">បើក Google Map</a>` : ""}</div>
       ${payBox(o)}
       <div class="od-box"><div class="od-row"><input data-courier value="${e2(o.courier)}" placeholder="ក្រុមហ៊ុនដឹក"><input data-trackno value="${e2(o.courier_no)}" placeholder="លេខតាមដាន"></div>
-        <div class="od-row" style="margin-top:6px"><input data-note value="${e2(o.tracking_note)}" placeholder="ដឹកដល់ណាហើយ?"><button class="od-sm" data-savetrack="1" type="button">រក្សា</button></div></div>
+        <div class="od-row" style="margin-top:6px"><input data-note value="${e2(o.tracking_note)}" placeholder="ដឹកដល់ណាហើយ?"><button class="od-sm" data-savetrack="1" type="button">រក្សា</button></div>
+        <div class="od-row" style="margin-top:6px;align-items:center;gap:8px"><button class="od-sm" data-pp="1" type="button">📷 ផ្ញើរូបអីវ៉ាន់ទៅភ្ញៀវ</button><input type="file" accept="image/*" data-ppfile hidden>${o.parcel_photo ? `<img src="${e2(o.parcel_photo)}" alt="" style="width:40px;height:40px;object-fit:cover;border-radius:8px"><button class="od-sm" data-ppdel="1" type="button">លុប</button>` : ""}</div></div>
       <div class="od-acts"><button class="od-sm" data-inv="1" type="button">វិក្កយបត្រ</button>${o.receipt_url ? `<button class="od-sm" data-rc="${e2(o.receipt_url)}" type="button" style="border-color:#3F7D5C;color:#3F7D5C">មើលបង្កាន់ដៃ</button>` : ""}${Object.entries(ST).filter(([k]) => k !== o.status).map(([k, v]) => `<button class="od-sm" data-s="${k}" type="button">${v}</button>`).join("")}<button class="od-sm" data-del="1" type="button" style="color:#B8213F">លុប</button></div>
     </div>`).join("") : `<div class="od-empty">មិនទាន់មានការបញ្ជាទិញ</div>`;
   }
@@ -1318,6 +1319,24 @@ btn.disabled=false;btn.textContent=t;}).catch(function(e){alert("បង្កើ
     if (!sbOn()) { root.innerHTML = `<div class="od-empty">មិនទាន់ភ្ជាប់ Supabase</div>`; return; }
     root.innerHTML = `<div class="od-stats" id="od-stats"></div><div id="od-rev"></div><button type="button" class="ad-linkbtn" id="od-csv" style="margin:2px 0 10px">⬇ នាំចេញការកម្មង់ (Excel/CSV)</button><div class="od-chips" id="od-chips"></div><div id="od-list"><div class="od-empty">កំពុងទាញ...</div></div>`;
     ready = true; odLoad(); clearInterval(timer); timer = setInterval(() => { if (!document.hidden) odLoad(); }, 30000);
+    $("od-list").addEventListener("change", async (e) => {      // ផ្ញើរូបអីវ៉ាន់ទៅភ្ញៀវ
+      const f = e.target.closest("[data-ppfile]"); if (!f || !f.files[0]) return;
+      const card = f.closest(".od-card"), id = card.dataset.id, o = orders.find((x) => String(x.id) === id), btn = card.querySelector("[data-pp]");
+      try {
+        btn.disabled = true; btn.textContent = "កំពុងផ្ញើ…";
+        const d = await processImage(f.files[0], 1200);
+        const url = await sbUpload(`parcels/${id}-${Date.now()}.jpg`, d);
+        await api(`orders?id=eq.${id}`, { method: "PATCH", body: JSON.stringify({ parcel_photo: url }) });
+        o.parcel_photo = url;
+        let tg = false; try { await api("rpc/notify_parcel_photo", { method: "POST", body: JSON.stringify({ p_order: Number(id) }) }); tg = true; } catch (x) {}
+        draw();
+        const nb = $("od-list").querySelector(`.od-card[data-id="${id}"] [data-pp]`);
+        if (nb) { nb.textContent = tg ? "✓ ផ្ញើរួច (ក្នុងគេហទំព័រ + Telegram)" : "✓ ផ្ញើរួច (ក្នុងគេហទំព័រ)"; setTimeout(() => { nb.textContent = "📷 ផ្ញើរូបអីវ៉ាន់ទៅភ្ញៀវ"; }, 3000); }
+      } catch (err) {
+        alert("ផ្ញើរូបមិនបាន (" + (err && err.message) + ")។ សូម run parcel_photo.sql ក្នុង Supabase ជាមុនសិន ហើយពិនិត្យអ៊ីនធឺណិត");
+        btn.disabled = false; btn.textContent = "📷 ផ្ញើរូបអីវ៉ាន់ទៅភ្ញៀវ";
+      }
+    });
     $("od-csv").onclick = () => {
       if (!orders.length) { alert("មិនទាន់មានការកម្មង់ដើម្បីនាំចេញ"); return; }
       const cell = (v) => { v = v == null ? "" : String(v); return /[",\n\r]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; };
@@ -1342,6 +1361,11 @@ btn.disabled=false;btn.textContent=t;}).catch(function(e){alert("បង្កើ
       const id = card.dataset.id, o = orders.find((x) => String(x.id) === id), g = (s) => card.querySelector(s).value.trim();
       try {
         if (b.dataset.inv) { odInvoice(o); return; }
+        if (b.dataset.pp) { card.querySelector("[data-ppfile]").click(); return; }
+        if (b.dataset.ppdel) {
+          if (!confirm("លុបរូបអីវ៉ាន់ចេញពីការកម្មង់នេះ?")) return;
+          await api(`orders?id=eq.${id}`, { method: "PATCH", body: JSON.stringify({ parcel_photo: null }) }); o.parcel_photo = null; draw(); return;
+        }
         if (b.dataset.rc) {
           const v = $("rcv"), im = $("rcv-img"), msg = $("rcv-msg"), op = $("rcv-open");
           v.style.display = "flex"; im.style.display = "none"; op.style.display = "none"; msg.textContent = "កំពុងផ្ទុករូប...";

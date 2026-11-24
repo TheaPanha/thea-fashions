@@ -3654,7 +3654,7 @@ async function loadMine() {
       const k = STEPS.findIndex((s) => s[0] === o.status), d = new Date(o.created_at).toLocaleDateString("en-GB", { timeZone: "Asia/Phnom_Penh", day: "2-digit", month: "short" });
       const prog = o.status === "cancel" ? `<div style="color:#B8213F;font-weight:700">បានបោះបង់</div>` : `<div class="mo-prog">${STEPS.map((s, n) => `<span class="${n <= k ? "on" : ""}"><i></i>${s[1]}</span>`).join("")}</div>`;
       return `<div class="mo"><b>${esc(o.product)}${o.size ? " · " + esc(o.size) : ""}</b><div class="mo-s">${formatRiel(o.price || 0)} · ${d}${o.order_code ? " · " + esc(o.order_code) : ""}</div>${prog}
-        ${o.tracking_note ? `${esc(o.tracking_note)}<br>` : ""}${o.courier_no ? `${esc(o.courier || "")} <b>${esc(o.courier_no)}</b> <button type="button" class="of-btn" data-copy="${esc(o.courier_no)}" style="flex:none;padding:3px 9px">ចម្លង</button>` : ""}${isPaid(o) ? `<div style="margin-top:8px"><button type="button" class="of-btn" data-inv="${esc(o.id)}" style="flex:none;padding:6px 14px">🧾 វិក្កយបត្រ (បានបង់រួច)</button></div>` : ""}</div>`;
+        ${o.tracking_note ? `${esc(o.tracking_note)}<br>` : ""}${o.courier_no ? `${esc(o.courier || "")} <b>${esc(o.courier_no)}</b> <button type="button" class="of-btn" data-copy="${esc(o.courier_no)}" style="flex:none;padding:3px 9px">ចម្លង</button>` : ""}${o.parcel_photo ? `<div style="margin-top:8px;display:flex;align-items:center;gap:10px"><img src="${esc(o.parcel_photo)}" alt="" data-ppz="${esc(o.parcel_photo)}" style="width:72px;height:72px;object-fit:cover;border-radius:12px;cursor:pointer"><span style="font-size:13px">📦 រូបអីវ៉ាន់ពីហាង<br><small style="color:#8a8a8a">ចុចលើរូបដើម្បីពង្រីក</small></span></div>` : ""}${isPaid(o) ? `<div style="margin-top:8px"><button type="button" class="of-btn" data-inv="${esc(o.id)}" style="flex:none;padding:6px 14px">🧾 វិក្កយបត្រ (បានបង់រួច)</button></div>` : ""}</div>`;
     }).join("") : `<div class="of-hint">${mineF ? "គ្មានការកម្មង់ក្នុងស្ថានភាពនេះ" : "មិនទាន់មានការកម្មង់"}</div>`;
   } catch (e) { box.innerHTML = `<div class="of-hint">ទាញទិន្នន័យមិនបាន សូមចូលម្តងទៀត</div>`; }
 }
@@ -3678,7 +3678,7 @@ $c("os-card").addEventListener("click", (ev) => {
   mineF = it ? (mineF === it.dataset.st ? "" : it.dataset.st) : "";
   osRender(MINE_ALL); loadMine();
 });
-$c("ordsheet").addEventListener("click", (e) => { const iv = e.target.closest("[data-inv]"); if (iv) { const o = MINE_ALL.find((x) => String(x.id) === iv.dataset.inv); if (o) invoiceImage(o); return; } if (e.target.id === "ordsheet") closeOrd(); const c = e.target.closest("[data-copy]"); if (c) copyText(c.dataset.copy, c); });
+$c("ordsheet").addEventListener("click", (e) => { const pz = e.target.closest("[data-ppz]"); if (pz) { openLightbox([{ idx: 0, src: pz.dataset.ppz, name: "រូបអីវ៉ាន់" }], 0); return; } const iv = e.target.closest("[data-inv]"); if (iv) { const o = MINE_ALL.find((x) => String(x.id) === iv.dataset.inv); if (o) invoiceImage(o); return; } if (e.target.id === "ordsheet") closeOrd(); const c = e.target.closest("[data-copy]"); if (c) copyText(c.dataset.copy, c); });
 $c("tb-acc").addEventListener("click", (e) => {
   e.preventDefault();
   if (!sbReady()) return;
