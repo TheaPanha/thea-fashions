@@ -1289,12 +1289,28 @@ function flashSaved() {
     w.document.write(`<!doctype html><html lang="km"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>វិក្កយបត្រ ${e2(o.order_code || o.id)}</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Khmer:wght@400;700&display=swap" rel="stylesheet">
 <style>body{font-family:"Noto Sans Khmer",system-ui,sans-serif;color:#222;margin:0;padding:24px;max-width:720px;margin:auto}h1{margin:0;font-size:22px}.top{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid #222;padding-bottom:12px;margin-bottom:14px}.m{font-size:13px;line-height:1.8}table{width:100%;border-collapse:collapse;margin-top:14px;font-size:14px}th,td{padding:8px 6px;border-bottom:1px solid #ddd;text-align:left;vertical-align:top}th{background:#f5f1ea}.r{text-align:right}small{color:#777}.t{margin-top:12px;margin-left:auto;width:260px;font-size:14px}.t div{display:flex;justify-content:space-between;padding:4px 0}.t .g{font-weight:700;font-size:17px;border-top:2px solid #222;margin-top:4px;padding-top:8px}.f{text-align:center;margin-top:30px;color:#777;font-size:13px}.ok{display:inline-block;margin-top:6px;padding:3px 12px;border:2px solid #3F7D5C;color:#3F7D5C;border-radius:8px;font-weight:700;transform:rotate(-4deg)}.b{margin:0 0 16px}.b button{padding:10px 18px;font:inherit;border:0;border-radius:10px;background:#222;color:#fff}@media print{.b{display:none}body{padding:0}}</style></head><body>
-<div class="b"><button onclick="window.print()">បោះពុម្ព / រក្សាទុក PDF</button></div>
+<div class="b"><button onclick="window.print()">បោះពុម្ព / PDF</button> <button onclick="saveImg(this)" style="background:#3F7D5C">រក្សាទុកជារូបភាព</button></div>
+<div id="inv" style="background:#fff;padding:4px">
 <div class="top"><div><h1>Thea Fashion</h1><div class="m">វិក្កយបត្រ</div>${paid ? '<div class="ok">បានបង់រួច ✓</div>' : ""}</div><div class="m" style="text-align:right">លេខកូដ៖ <b>${e2(o.order_code || o.id)}</b><br>កាលបរិច្ឆេទ៖ ${e2(new Date(o.created_at).toLocaleString("en-GB", { timeZone: "Asia/Phnom_Penh", day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }))}</div></div>
 <div class="m">អតិថិជន៖ <b>${e2(o.customer_name || "-")}</b><br>ទូរស័ព្ទ៖ ${e2(o.phone || "-")}<br>ទីតាំង៖ ${e2(o.location || "-")}<br>វិធីបង់ប្រាក់៖ ${pay}</div>
 <table><thead><tr><th>#</th><th>ទំនិញ</th><th class="r">ចំនួន</th><th class="r">តម្លៃ</th><th class="r">សរុប</th></tr></thead><tbody>${rows}</tbody></table>
 <div class="t"><div><span>តម្លៃសរុប</span><span>${money(sub)}</span></div>${disc ? `<div><span>បញ្ចុះ${o.coupon ? " (" + e2(o.coupon) + ")" : ""}</span><span>−${money(disc)}</span></div>` : ""}<div class="g"><span>${paid ? "បានបង់" : "ត្រូវបង់"}</span><span>${money(o.price)}</span></div></div>
-<div class="f">សូមអរគុណដែលបានគាំទ្រ Thea Fashion</div></body></html>`);
+<div class="f">សូមអរគុណដែលបានគាំទ្រ Thea Fashion</div></div><script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"><\/script>
+<script>var CODE=${JSON.stringify(String(o.order_code || o.id).replace(/[^A-Za-z0-9-]/g,""))};
+function saveImg(btn){btn.disabled=true;var t=btn.textContent;btn.textContent="កំពុងបង្កើតរូប…";
+if(typeof html2canvas==="undefined"){alert("មិនអាចទាញ library បានទេ សូមពិនិត្យអ៊ីនធឺណិត");btn.disabled=false;btn.textContent=t;return;}
+var go=function(){html2canvas(document.getElementById("inv"),{scale:2,backgroundColor:"#ffffff",useCORS:true}).then(function(c){
+var url=c.toDataURL("image/png"),o=document.createElement("div");
+o.style.cssText="position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:99;overflow:auto;padding:16px;text-align:center;font-family:inherit";
+o.innerHTML='<div style="color:#fff;font-size:14px;margin-bottom:10px">ចុចសង្កត់លើរូប ហើយជ្រើស “Save Image / រក្សាទុករូបភាព”</div><img src="'+url+'" style="max-width:100%;background:#fff;border-radius:8px"><div style="margin-top:12px"><button id="shr" style="padding:10px 18px;font:inherit;border:0;border-radius:10px;background:#fff;margin-right:8px">ចែករំលែក / រក្សាទុក</button><button id="cls" style="padding:10px 18px;font:inherit;border:0;border-radius:10px;background:#555;color:#fff">បិទ</button></div>';
+document.body.appendChild(o);
+o.querySelector("#cls").onclick=function(){o.remove()};
+o.querySelector("#shr").onclick=function(){c.toBlob(function(b){var f=new File([b],"invoice-"+CODE+".png",{type:"image/png"});
+if(navigator.canShare&&navigator.canShare({files:[f]})){navigator.share({files:[f]}).catch(function(){})}
+else{var a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=f.name;document.body.appendChild(a);a.click();a.remove();}})};
+btn.disabled=false;btn.textContent=t;}).catch(function(e){alert("បង្កើតរូបមិនបាន: "+e);btn.disabled=false;btn.textContent=t;});};
+(document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve()).then(go);}
+<\/script></body></html>`);
     w.document.close();
   }
   window.odInit = function () {
