@@ -2482,7 +2482,6 @@ html body .shopstrip, html body .dt-seller { display: none !important; }</style>
       </div>
       <p class="of-hint" id="qr-amt" style="margin:10px 0 0"></p>
       <p class="of-hint" id="qr-msg" style="margin:10px 0"></p>
-      <button class="sheet-confirm" id="qr-retry" type="button" style="display:none">បង្កើត QR ថ្មី</button>
       <button class="sheet-confirm" id="qr-paid" type="button" style="display:none">ខ្ញុំបានបង់ហើយ</button>
     </div>
   </div>
@@ -3323,18 +3322,22 @@ async function showQr(code, P) {
   box.style.flexDirection = "column"; box.style.alignItems = "center"; box.innerHTML = "";
   msg.style.color = ""; msg.textContent = "កំពុងបង្កើត QR..."; paidBtn.style.display = "none"; amt.textContent = "";
   $c("kq-card").style.display = ""; $c("kq-name").textContent = ""; $c("kq-amt").textContent = "";
-  $c("kq-cd").textContent = ""; $c("qr-retry").style.display = "none"; stopCd();
+  $c("kq-cd").textContent = ""; stopCd();
   sheetEl.classList.add("open"); closeSizeSheet();
   lastOrder = { code, phone: P.contact.phone }; try { localStorage.setItem("lastOrder", JSON.stringify(lastOrder)); } catch (e) {}
   const finish = () => { stopQr(); sheetEl.classList.remove("open"); orderDone(null, code, P.contact.phone); };
   paidBtn.onclick = async () => { try { await kqPost({ action: "claim", order_code: code }); } catch (e) {} finish(); };
+  // បោះបង់ការកម្មង់ដែលមិនទាន់បង់ ហើយសងស្តុក (server ពិនិត្យថាមិនទាន់បង់ពិតមុននឹងបោះបង់) · ត្រឡប់ true បើបានបោះបង់
+  const cancelUnpaid = async () => {
+    try {
+      const r = await fetch(`${SB_URL}/rest/v1/rpc/cancel_unpaid_order`, { method: "POST", headers: { apikey: SB_KEY, Authorization: "Bearer " + SB_KEY, "Content-Type": "application/json" }, body: JSON.stringify({ p_code: code }) });
+      return (await r.json()) === "ok";
+    } catch (e) { return false; }
+  };
   $c("qr-close").onclick = async () => {   // ✕ ចេញពី QR៖ បើមិនទាន់បង់ → បោះបង់ការកម្មង់ ហើយសងស្តុកភ្លាមៗ
     if ((qrCd || qrTimer) && !confirm("ចាកចេញពីការបង់ប្រាក់? ការកម្មង់នេះនឹងត្រូវបោះបង់ ប្រសិនបើមិនទាន់បានបង់។")) return;
     stopQr(); sheetEl.classList.remove("open");
-    try {
-      const r = await fetch(`${SB_URL}/rest/v1/rpc/cancel_unpaid_order`, { method: "POST", headers: { apikey: SB_KEY, Authorization: "Bearer " + SB_KEY, "Content-Type": "application/json" }, body: JSON.stringify({ p_code: code }) });
-      if ((await r.json()) === "ok") toast("ការកម្មង់ត្រូវបានបោះបង់ (មិនទាន់បានបង់ប្រាក់)");
-    } catch (e) {}
+    if (await cancelUnpaid()) toast("ការកម្មង់ត្រូវបានបោះបង់ (មិនទាន់បានបង់ប្រាក់)");
   };
   try {
     await loadQrLib();
@@ -3380,12 +3383,11 @@ async function showQr(code, P) {
         msg.textContent = "QR ផុតកំណត់។ បើបានបង់រួច សូមចុច 'ខ្ញុំបានបង់ហើយ' ហើយហាងនឹងផ្ទៀងផ្ទាត់ ឬទាក់ទងអ្នក។";
       }
     }, 4000);
-    // រាប់ថយក្រោយ 0:30 · បើមិនស្កេន/មិនបង់ក្នុងរយៈពេលនេះ = មិនបានបង់ប្រាក់
-    const cdEl = $c("kq-cd"), retry = $c("qr-retry"), deadline = Date.now() + 30000;
-    retry.onclick = () => showQr(code, P);
+    // រាប់ថយក្រោយ 1:00 · បើមិនស្កេន/មិនបង់ក្នុងរយៈពេលនេះ = មិនបានបង់ប្រាក់
+    const cdEl = $c("kq-cd"), deadline = Date.now() + 60000;
     const tick = async () => {
       const left = Math.max(0, Math.ceil((deadline - Date.now()) / 1000));
-      cdEl.textContent = "⏱ 0:" + String(left).padStart(2, "0"); cdEl.style.color = left <= 10 ? "#C62828" : "#555";
+      cdEl.textContent = "⏱ " + Math.floor(left / 60) + ":" + String(left % 60).padStart(2, "0"); cdEl.style.color = left <= 10 ? "#C62828" : "#555";
       if (left > 0) return;
       stopQr();
       try { const st = await kqPost({ action: "status", order_code: code }); if (st.paid) { finish(); return; } } catch (e) {}
@@ -3393,8 +3395,8 @@ async function showQr(code, P) {
       box.innerHTML = '<div style="padding:44px 12px;text-align:center;color:#B8213F;font-weight:700;line-height:1.7">QR ផុតកំណត់<br><small style="font-weight:400">មិនទាន់ឃើញការបង់ប្រាក់</small></div>';
       cdEl.textContent = ""; paidBtn.style.display = "none";
       msg.style.color = "#B8213F";
-      msg.textContent = "មិនបានស្កេន QR ក្នុងរយៈពេល 0:30 ដូច្នេះការកម្មង់នេះមិនទាន់បានបង់ប្រាក់ទេ។ ចុច 'បង្កើត QR ថ្មី' ដើម្បីបង់ម្តងទៀត។ បើមិនបង់ក្នុង 3 នាទី ការកម្មង់នឹងត្រូវបោះបង់ ហើយស្តុកត្រូវសងវិញ។";
-      retry.style.display = "";
+      const gone = await cancelUnpaid();   // មិនបង់ក្នុង 1:00 → បោះបង់ ហើយសងស្តុកភ្លាមៗ
+      msg.textContent = "មិនបានស្កេន QR ក្នុងរយៈពេល 1:00 ដូច្នេះការកម្មង់នេះមិនទាន់បានបង់ប្រាក់ទេ" + (gone ? " ហើយត្រូវបានបោះបង់។ ស្តុកត្រូវបានសងវិញ។" : "។") + " សូមកម្មង់ម្តងទៀត បើនៅចង់បាន។";
     };
     qrCd = setInterval(tick, 1000); tick();
   } catch (e) {
@@ -3461,19 +3463,34 @@ function cartTotals() {
   const L = cartLines(), sub = L.reduce((s, l) => s + l.price * l.qty, 0), disc = cartCoupon ? Math.min(cartCoupon.discount, sub) : 0;
   return { L, sub, disc, total: sub - disc, qty: L.reduce((s, l) => s + l.qty, 0) };
 }
-function addToCart(n, size) {
+function addToCart(n, size, quiet) {   // quiet = មិនបង្ហាញ toast · ត្រឡប់ true បើបានដាក់ក្នុងកន្ត្រក
+  const say = (m) => { if (!quiet) toast(m); };
   const st = stockOf(n - 1), ex = cart.find((c) => c.n === n && (c.size || "") === (size || ""));
   const have = cart.filter((c) => c.n === n).reduce((s, c) => s + c.qty, 0);
-  if (st !== null && have + 1 > st) { toast("ស្តុកមិនគ្រប់"); return; }
+  if (st !== null && have + 1 > st) { say("ស្តុកមិនគ្រប់"); return false; }
   if (matrixOn(n) && String(size || "").includes(" · ")) {   // ចំនួនតាមគូ ទំហំ × ពណ៌
     const cap = Number(stockMap()[n + ":" + size] ?? 0) || 0, have = cart.filter((c) => c.n === n && c.size === size).reduce((t, c) => t + c.qty, 0);
-    if (have + 1 > cap) { toast(cap <= 0 ? `${size} អស់ស្តុក` : `${size} នៅសល់ ${cap} ប៉ុណ្ណោះ`); return; }
+    if (have + 1 > cap) { say(cap <= 0 ? `${size} អស់ស្តុក` : `${size} នៅសល់ ${cap} ប៉ុណ្ណោះ`); return false; }
   } else for (const seg of String(size || "").split(" · ")) {   // ទំហំ និងពណ៌ ម្នាក់ៗមានចំនួនរបស់ខ្លួន
     const cq = cqOf(n, seg);
-    if (cq !== null && colorHave(n, seg) + 1 > cq) { toast(cq === 0 ? `${seg} អស់ស្តុក` : `${seg} នៅសល់ ${cq} ប៉ុណ្ណោះ`); return; }
+    if (cq !== null && colorHave(n, seg) + 1 > cq) { say(cq === 0 ? `${seg} អស់ស្តុក` : `${seg} នៅសល់ ${cq} ប៉ុណ្ណោះ`); return false; }
   }
   if (ex) ex.qty++; else cart.push({ n, size: size || "", qty: 1 });
-  saveCart(); cartCoupon = null; renderCartUI(); toast("✓ បានដាក់ក្នុងកន្ត្រក");
+  saveCart(); cartCoupon = null; renderCartUI(); say("✓ បានដាក់ក្នុងកន្ត្រក");
+  return true;
+}
+// កម្មង់ម្តងទៀត៖ ដាក់ទំនិញពីការកម្មង់ចាស់ចូលកន្ត្រក (គោរពស្តុកបច្ចុប្បន្ន)
+function reorder(o) {
+  const its = Array.isArray(o.items) ? o.items : [], hid = hiddenSet();
+  let added = 0, skipped = 0;
+  its.forEach((it) => {
+    const n = Number(it.n), q = Number(it.qty) || 1;
+    if (!n || !PRODUCTS[n - 1] || hid.has(n)) { skipped += q; return; }
+    for (let k = 0; k < q; k++) { if (addToCart(n, it.size || "", true)) added++; else skipped++; }
+  });
+  if (!added) { toast("មិនអាចដាក់ចូលកន្ត្រកបាន (អស់ស្តុក ឬលែងមាន)"); return; }
+  closeOrd(); openCart();
+  toast(`✓ បានដាក់ ${added} ក្នុងកន្ត្រក` + (skipped ? ` · ${skipped} មិនអាច (អស់ស្តុក)` : ""));
 }
 function renderCartUI() {
   const T = cartTotals(), b = $c("cart-badge");
@@ -3757,7 +3774,7 @@ async function loadMine() {
       const k = STEPS.findIndex((s) => s[0] === o.status), d = new Date(o.created_at).toLocaleDateString("en-GB", { timeZone: "Asia/Phnom_Penh", day: "2-digit", month: "short" });
       const prog = o.status === "cancel" ? `<div style="color:#B8213F;font-weight:700">បានបោះបង់</div>` : `<div class="mo-prog">${STEPS.map((s, n) => `<span class="${n <= k ? "on" : ""}"><i></i>${s[1]}</span>`).join("")}</div>`;
       return `<div class="mo"><b>${esc(o.product)}${o.size ? " · " + esc(o.size) : ""}</b><div class="mo-s">${formatRiel(o.price || 0)} · ${d}${o.order_code ? " · " + esc(o.order_code) : ""}</div>${prog}
-        ${o.tracking_note ? `${esc(o.tracking_note)}<br>` : ""}${o.courier_no ? `${esc(o.courier || "")} <b>${esc(o.courier_no)}</b> <button type="button" class="of-btn" data-copy="${esc(o.courier_no)}" style="flex:none;padding:3px 9px">ចម្លង</button>` : ""}${o.parcel_photo ? `<div style="margin-top:8px;display:flex;align-items:center;gap:10px"><img src="${esc(o.parcel_photo)}" alt="" data-ppz="${esc(o.parcel_photo)}" style="width:72px;height:72px;object-fit:cover;border-radius:12px;cursor:pointer"><span style="font-size:13px">📦 រូបអីវ៉ាន់ពីហាង<br><small style="color:#8a8a8a">ចុចលើរូបដើម្បីពង្រីក</small></span></div>` : ""}${isPaid(o) ? `<div style="margin-top:8px"><button type="button" class="of-btn" data-inv="${esc(o.id)}" style="flex:none;padding:6px 14px">🧾 វិក្កយបត្រ (បានបង់រួច)</button></div>` : ""}</div>`;
+        ${o.tracking_note ? `${esc(o.tracking_note)}<br>` : ""}${o.courier_no ? `${esc(o.courier || "")} <b>${esc(o.courier_no)}</b> <button type="button" class="of-btn" data-copy="${esc(o.courier_no)}" style="flex:none;padding:3px 9px">ចម្លង</button>` : ""}${o.status === "done" ? `<div style="margin-top:8px"><button type="button" class="of-btn" data-re="${esc(o.id)}" style="flex:none;padding:6px 14px">🔁 កម្មង់ម្តងទៀត</button></div>` : ""}${o.parcel_photo ? `<div style="margin-top:8px;display:flex;align-items:center;gap:10px"><img src="${esc(o.parcel_photo)}" alt="" data-ppz="${esc(o.parcel_photo)}" style="width:72px;height:72px;object-fit:cover;border-radius:12px;cursor:pointer"><span style="font-size:13px">📦 រូបអីវ៉ាន់ពីហាង<br><small style="color:#8a8a8a">ចុចលើរូបដើម្បីពង្រីក</small></span></div>` : ""}${isPaid(o) ? `<div style="margin-top:8px"><button type="button" class="of-btn" data-inv="${esc(o.id)}" style="flex:none;padding:6px 14px">🧾 វិក្កយបត្រ (បានបង់រួច)</button></div>` : ""}</div>`;
     }).join("") : `<div class="of-hint">${mineF ? "គ្មានការកម្មង់ក្នុងស្ថានភាពនេះ" : "មិនទាន់មានការកម្មង់"}</div>`;
   } catch (e) { box.innerHTML = `<div class="of-hint">ទាញទិន្នន័យមិនបាន សូមចូលម្តងទៀត</div>`; }
 }
@@ -3781,7 +3798,7 @@ $c("os-card").addEventListener("click", (ev) => {
   mineF = it ? (mineF === it.dataset.st ? "" : it.dataset.st) : "";
   osRender(MINE_ALL); loadMine();
 });
-$c("ordsheet").addEventListener("click", (e) => { const pz = e.target.closest("[data-ppz]"); if (pz) { openLightbox([{ idx: 0, src: pz.dataset.ppz, name: "រូបអីវ៉ាន់" }], 0); return; } const iv = e.target.closest("[data-inv]"); if (iv) { const o = MINE_ALL.find((x) => String(x.id) === iv.dataset.inv); if (o) invoiceImage(o); return; } if (e.target.id === "ordsheet") closeOrd(); const c = e.target.closest("[data-copy]"); if (c) copyText(c.dataset.copy, c); });
+$c("ordsheet").addEventListener("click", (e) => { const re = e.target.closest("[data-re]"); if (re) { const o = MINE_ALL.find((x) => String(x.id) === re.dataset.re); if (o) reorder(o); return; } const pz = e.target.closest("[data-ppz]"); if (pz) { openLightbox([{ idx: 0, src: pz.dataset.ppz, name: "រូបអីវ៉ាន់" }], 0); return; } const iv = e.target.closest("[data-inv]"); if (iv) { const o = MINE_ALL.find((x) => String(x.id) === iv.dataset.inv); if (o) invoiceImage(o); return; } if (e.target.id === "ordsheet") closeOrd(); const c = e.target.closest("[data-copy]"); if (c) copyText(c.dataset.copy, c); });
 $c("tb-acc").addEventListener("click", (e) => {
   e.preventDefault();
   if (!sbReady()) return;
