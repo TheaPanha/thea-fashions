@@ -265,6 +265,14 @@
   .ad-cchips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
   .ad-cchip { display: inline-flex; align-items: center; gap: 6px; padding: 5px 6px 5px 10px; border: 1px solid var(--border); border-radius: 999px; background: #fff; font-size: 13px; }
   .ad-cchip i { width: 16px; height: 16px; border-radius: 50%; border: 1px solid rgba(0,0,0,.2); }
+  .ad-row.mx .ad-cqty, .ad-row.mx .ad-cq, .ad-row.mx .ad-sq, .ad-row.mx .ad-szqty { display: none; }
+  .ad-mx .ad-lab { font-size: 13px; font-weight: 600; margin: 6px 0; }
+  .ad-mxw { overflow-x: auto; }
+  .ad-mxt { border-collapse: collapse; font-size: 13px; }
+  .ad-mxt th, .ad-mxt td { padding: 4px; text-align: center; }
+  .ad-mxn { white-space: nowrap; text-align: left !important; }
+  .ad-mxn i { display: inline-block; width: 12px; height: 12px; border-radius: 50%; margin-right: 6px; border: 1px solid rgba(0,0,0,.2); vertical-align: -1px; }
+  .ad-mq { width: 56px; height: 30px; padding: 0 4px; border: 1px solid var(--border); border-radius: 8px; background: #FBF8F4; font: 600 13px inherit; text-align: center; }
   .ad-sizes2 { margin-bottom: 10px; }
   .ad-sznew { flex: 1 1 110px; min-width: 0; }
   .ad-sizes2 .ad-lab { font-size: 13px; color: var(--muted, #8A7468); margin: 2px 0 6px; font-weight: 600; }
@@ -1019,11 +1027,20 @@ function adColorsApply(row, n, p, cs) {
   row.querySelector('[data-f="place"]').value = p.place;
   row.querySelector('[data-f="colors"]').value = cs.join(", ");
   row.querySelector(".ad-cchips").innerHTML = adClrChips(p.place, n);
+  adMxRender(row, n, p);
   adSyncTotal(row, n, p);
   saveAdmin(); refreshSite(); if (window.adStats) window.adStats(); flashSaved();
 }
 // ស្តុកសរុប = ផលបូកចំនួនតាមទំហំ (បើគ្រប់ទំហំមានចំនួន) បើមិនដូច្នោះ = ផលបូកចំនួនតាមពណ៌ (បើគ្រប់ពណ៌មានចំនួន)
 function adSyncTotal(row, n, p) {
+  if (adMxOn(p.place, n) && adMxActive(n)) {      // ស្តុកសរុប = ផលបូកគ្រប់គូ ទំហំ × ពណ៌ (ទទេ = 0)
+    let tot = 0;
+    adSizeList(p.place).forEach((z) => adColors(p.place).forEach((t) => { tot += Number(adminData.stock[n + ":" + z + " · " + adClrParse(t).name]) || 0; }));
+    const prev = adminData.stock[n]; adminData.stock[n] = tot; window.__sd.add(String(n));
+    const si = row.querySelector('[data-f="stock"]'); if (si) si.value = tot;
+    restockWatch(n, prev, tot, p && p.name);
+    return;
+  }
   const sz = adSizeList(p.place).map((z) => adCQ(n, z)), cl = adColors(p.place).map((t) => adCQ(n, adClrParse(t).name));
   const pick = sz.length && sz.every((q) => q !== null) ? sz : cl.length && cl.every((q) => q !== null) ? cl : null;
   if (!pick) return;
@@ -1032,10 +1049,35 @@ function adSyncTotal(row, n, p) {
   const si = row.querySelector('[data-f="stock"]'); if (si) si.value = tot;
   restockWatch(n, prev, tot, p && p.name);
 }
+// ចំនួនតាមគូ ទំហំ × ពណ៌៖ stock["លេខ:ទំហំ · ពណ៌"] (ប្រអប់ទទេ = 0 នៅពេលបើកមុខងារនេះ)
+const adMxOn = (place, n) => !adSizeIsOther(place) && adSizeList(place).length > 0 && adColors(place).length > 0;
+const adMxActive = (n) => Object.keys(adminData.stock).some((k) => k.startsWith(n + ":") && k.includes(" · "));
+function adMatrix(place, n) {
+  if (!adMxOn(place, n)) return "";
+  const zs = adSizeList(place), cs = adColors(place).map((t) => adClrParse(t)), on = adMxActive(n);
+  const head = zs.map((z) => `<th>${z}</th>`).join("");
+  const rows = cs.map((c) => `<tr><td class="ad-mxn"><i style="background:${esc(c.hex)}"></i>${esc(c.name)}</td>${zs.map((z) => {
+    const v = adminData.stock[n + ":" + z + " · " + c.name];
+    return `<td><input type="number" class="ad-mq" data-sz="${z}" data-cl="${esc(c.name)}" min="0" inputmode="numeric" value="${v === undefined || v === "" ? "" : v}" placeholder="${on ? 0 : "∞"}" aria-label="${z} ${esc(c.name)}" /></td>`;
+  }).join("")}</tr>`).join("");
+  return `<div class="ad-lab">ចំនួនតាមទំហំ × ពណ៌ (ឧ. S ពណ៌ក្រហម = 1)</div><div class="ad-mxw"><table class="ad-mxt"><thead><tr><th></th>${head}</tr></thead><tbody>${rows}</tbody></table></div><div class="ad-hint" style="font-size:12px;margin-top:4px">បំពេញយ៉ាងហោចណាស់មួយប្រអប់ ប្រអប់ដែលទុកទទេ = 0 (មិនមាន)</div>`;
+}
+function adMxRender(row, n, p) {
+  row.classList.toggle("mx", adMxOn(p.place, n));
+  const box = row.querySelector(".ad-mx"); if (box) box.innerHTML = adMatrix(p.place, n);
+}
+function adDropCombos(n, kind, name) {
+  Object.keys(adminData.stock).forEach((k) => {
+    if (!k.startsWith(n + ":") || !k.includes(" · ")) return;
+    const [z, c] = k.slice(String(n).length + 1).split(" · ");
+    if ((kind === "size" && z === name) || (kind === "color" && c === name)) { delete adminData.stock[k]; window.__sd.add(k); }
+  });
+}
 function adSizesApply(row, n, p, list) {
   const rest = adColorSuffix(p.place);
   p.place = list.length ? "ទំហំ " + list.join(", ") + rest : rest.replace(/^\s*·\s*/, "");
   row.querySelector('[data-f="place"]').value = p.place;
+  adMxRender(row, n, p);
   const box = row.querySelector(".ad-sizes2");
   if (box) { const t = document.createElement("div"); t.innerHTML = adSizeSel(p.place, n); if (t.firstElementChild) box.replaceWith(t.firstElementChild); }
   adSyncTotal(row, n, p);
@@ -1158,7 +1200,7 @@ function adminRows(q) {
     if (adFilter === "hidden" && !h) return "";
     if (adFilter === "out" && !out) return "";
     if (needle && !(p.name.toLowerCase().includes(needle) || String(p.place || "").toLowerCase().includes(needle) || String(n) === needle)) return "";
-    return `<div class="ad-row${h ? " is-hidden" : ""}" data-n="${n}">
+    return `<div class="ad-row${h ? " is-hidden" : ""}${adMxOn(p.place, n) ? " mx" : ""}" data-n="${n}">
       <div class="ad-side">
         <div class="ad-thumbwrap"><img class="ad-thumb" src="${photoOf(n)}" alt="" decoding="async" onerror="this.style.display='none'" /></div>
         <label class="ad-photo-btn">ប្តូររូប<input type="file" accept="image/*" data-img="${n}" hidden></label>
@@ -1172,6 +1214,7 @@ function adminRows(q) {
         <input class="ad-input" data-f="place" value="${esc(p.place)}" placeholder="ទំហំ" />
         ${adSizeSel(p.place, n)}
         ${adColorBox(p.place, n)}
+        <div class="ad-mx">${adMatrix(p.place, n)}</div>
         ${adGallery(n)}
         <textarea class="ad-input ad-desc" data-f="desc" rows="3" placeholder="ពិពណ៌នាទំនិញ (ក្រណាត់ ទ្រង់ទ្រាយ ពណ៌...) · ទុកទទេ = ប្រើអត្ថបទស្វ័យប្រវត្តិ">${esc(p.desc || "")}</textarea>
         <div class="ad-three">
@@ -1606,6 +1649,20 @@ function openAdminPanel() {
     const el = e.target, row = el.closest(".ad-row");
     if (!row) return;
     const n = Number(row.dataset.n), f = el.dataset.f, p = PRODUCTS[n - 1];
+    if (el.classList.contains("ad-mq")) {         // ចំនួនតាមគូ ទំហំ × ពណ៌
+      const key = n + ":" + el.dataset.sz + " · " + el.dataset.cl, v = el.value.trim();
+      if (v === "") delete adminData.stock[key];
+      else {
+        adminData.stock[key] = Math.max(0, Math.round(Number(v) || 0));
+        const drop = (k) => { delete adminData.stock[k]; window.__sd.add(k); };   // លុបចំនួនទំហំ/ពណ៌ទោល កុំឲ្យប៉ះទង្គិច
+        adSizeList(p.place).forEach((z) => drop(n + ":" + z)); adColors(p.place).forEach((t) => drop(n + ":" + adClrParse(t).name));
+      }
+      window.__sd.add(key);
+      const on = adMxActive(n); row.querySelectorAll(".ad-mq").forEach((i) => { i.placeholder = on ? "0" : "∞"; });
+      adSyncTotal(row, n, p);
+      saveAdmin(); refreshSite(); if (window.adStats) window.adStats(); flashSaved();
+      return;
+    }
     if (el.classList.contains("ad-sq")) {         // ចំនួនតាមទំហំនីមួយៗ
       const key = n + ":" + el.dataset.sz, v = el.value.trim();
       if (v === "") delete adminData.stock[key]; else adminData.stock[key] = Math.max(0, Math.round(Number(v) || 0));
@@ -1711,7 +1768,7 @@ function openAdminPanel() {
       let list2 = adSizeList(p.place);
       if (sb.classList.contains("ad-sx")) {
         const z = sb.dataset.sz; list2 = list2.filter((x) => x !== z);
-        delete adminData.stock[n + ":" + z]; window.__sd.add(n + ":" + z);
+        delete adminData.stock[n + ":" + z]; window.__sd.add(n + ":" + z); adDropCombos(n, "size", z);
       } else {
         const z = row.querySelector(".ad-sznew").value, qv = row.querySelector(".ad-szqty").value.trim();
         if (!z) return;
@@ -1730,7 +1787,7 @@ function openAdminPanel() {
       let cs = adColors(p.place);
       if (cb.classList.contains("ad-cx")) {
         const gone = cs.splice(Number(cb.dataset.ck), 1)[0];
-        if (gone !== undefined) { const key = n + ":" + adClrParse(gone).name; delete adminData.stock[key]; window.__sd.add(key); }
+        if (gone !== undefined) { const key = n + ":" + adClrParse(gone).name; delete adminData.stock[key]; window.__sd.add(key); adDropCombos(n, "color", adClrParse(gone).name); }
       } else {
         const hex = row.querySelector(".ad-cpick").value.toLowerCase(), nm = row.querySelector(".ad-cname"), qe = row.querySelector(".ad-cqty");
         const name = (nm.value.trim() || adClrNearest(hex)).replace(/[,،、\/~:]/g, " "), tok = name + "~" + hex;

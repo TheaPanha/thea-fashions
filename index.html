@@ -2985,7 +2985,31 @@ function colorDots(place) {
 }
 const cqOf = (n, name) => { const v = stockMap()[n + ":" + name]; return v === undefined || v === "" || v === null ? null : Number(v); };   // ចំនួនតាមពណ៌ (null = គ្មានកំណត់)
 const colorNameIn = (n, variant) => { const segs = String(variant || "").split(" · "), p = PRODUCTS[n - 1]; const t = p ? colorsOf(p.place).find((c) => segs.includes(cName(c))) : undefined; return t ? cName(t) : ""; };
+// ចំនួនតាមគូ ទំហំ × ពណ៌ (ឧ. "S · ក្រហម") ទទេ = 0 នៅពេលទំនិញនេះបើកមុខងារគូ
+const matrixOn = (n) => Object.keys(stockMap()).some((k) => k.startsWith(n + ":") && k.includes(" · "));
+const comboQ = (n, size, color) => { const v = stockMap()[n + ":" + size + " · " + cName(color)]; return v === undefined || v === "" || v === null ? 0 : Number(v); };
+let mxT = 0; const schedMx = () => { if (!mxT) mxT = setTimeout(() => { mxT = 0; matrixRefresh(); }, 0); };
+function matrixRefresh() {
+  const seen = new Set();
+  document.querySelectorAll(".size-chip[data-z][data-n]:not(.color-chip)").forEach((z0) => {
+    const n = Number(z0.dataset.n); if (!matrixOn(n)) return;
+    let sc = z0.parentElement; while (sc && !sc.querySelector('.color-chip[data-n="' + n + '"]')) sc = sc.parentElement;
+    if (!sc || seen.has(sc)) return; seen.add(sc);
+    const zs = [...sc.querySelectorAll(".size-chip[data-z]:not(.color-chip)")], cs = [...sc.querySelectorAll(".color-chip[data-c]")];
+    const selZ = (zs.find((x) => x.classList.contains("active")) || { dataset: {} }).dataset.z || "";
+    const selC = (cs.find((x) => x.classList.contains("active")) || { dataset: {} }).dataset.c || "";
+    const apply = (chip, q) => {
+      chip.disabled = q <= 0; chip.classList.toggle("c-out", q <= 0);
+      const old = chip.querySelector("small.cq"); if (old) old.remove();
+      if (q <= 5) chip.insertAdjacentHTML("beforeend", ` <small class="cq">${q <= 0 ? "អស់" : "សល់ " + q}</small>`);
+    };
+    zs.forEach((zc) => apply(zc, selC ? comboQ(n, zc.dataset.z, selC) : cs.reduce((t, cc) => t + comboQ(n, zc.dataset.z, cc.dataset.c), 0)));
+    cs.forEach((cc) => apply(cc, selZ ? comboQ(n, selZ, cc.dataset.c) : zs.reduce((t, zc) => t + comboQ(n, zc.dataset.z, cc.dataset.c), 0)));
+  });
+}
+document.addEventListener("click", (e) => { if (e.target.closest(".size-chip")) setTimeout(matrixRefresh, 0); });
 function sizeBadge(b, n, sz) {
+  b.dataset.n = n; if (matrixOn(n)) { b.dataset.z = sz; schedMx(); return; }
   const q = cqOf(n, sz); b.dataset.z = sz;
   if (q === 0) { b.disabled = true; b.classList.add("c-out"); }
   if (q !== null && q <= 5) b.insertAdjacentHTML("beforeend", ` <small class="cq">${q === 0 ? "អស់" : "សល់ " + q}</small>`);
@@ -2994,7 +3018,8 @@ const colorHave = (n, name, skip) => cart.filter((c) => c.n === n && c !== skip 
 const variantOf = (size, color) => [size, color ? cName(color) : ""].filter(Boolean).join(" · ");
 function colorChip(c, n) {
   const b = document.createElement("button"); b.type = "button"; b.className = "size-chip color-chip"; b.dataset.c = c;
-  const d = cHex(c), q = n ? cqOf(n, cName(c)) : null; b.innerHTML = (d ? `<i class="cdot" style="background:${d}"></i>` : "") + esc(cName(c)) + (q === 0 ? ` <small class="cq">អស់</small>` : q !== null && q <= 5 ? ` <small class="cq">នៅសល់ ${q}</small>` : "");
+  const mx = n && matrixOn(n); if (n) b.dataset.n = n; if (mx) schedMx();
+  const d = cHex(c), q = n && !mx ? cqOf(n, cName(c)) : null; b.innerHTML = (d ? `<i class="cdot" style="background:${d}"></i>` : "") + esc(cName(c)) + (q === 0 ? ` <small class="cq">អស់</small>` : q !== null && q <= 5 ? ` <small class="cq">នៅសល់ ${q}</small>` : "");
   if (q === 0) { b.disabled = true; b.classList.add("c-out"); }
   return b;
 }
@@ -3408,7 +3433,10 @@ function addToCart(n, size) {
   const st = stockOf(n - 1), ex = cart.find((c) => c.n === n && (c.size || "") === (size || ""));
   const have = cart.filter((c) => c.n === n).reduce((s, c) => s + c.qty, 0);
   if (st !== null && have + 1 > st) { toast("ស្តុកមិនគ្រប់"); return; }
-  for (const seg of String(size || "").split(" · ")) {   // ទំហំ និងពណ៌ ម្នាក់ៗមានចំនួនរបស់ខ្លួន
+  if (matrixOn(n) && String(size || "").includes(" · ")) {   // ចំនួនតាមគូ ទំហំ × ពណ៌
+    const cap = Number(stockMap()[n + ":" + size] ?? 0) || 0, have = cart.filter((c) => c.n === n && c.size === size).reduce((t, c) => t + c.qty, 0);
+    if (have + 1 > cap) { toast(cap <= 0 ? `${size} អស់ស្តុក` : `${size} នៅសល់ ${cap} ប៉ុណ្ណោះ`); return; }
+  } else for (const seg of String(size || "").split(" · ")) {   // ទំហំ និងពណ៌ ម្នាក់ៗមានចំនួនរបស់ខ្លួន
     const cq = cqOf(n, seg);
     if (cq !== null && colorHave(n, seg) + 1 > cq) { toast(cq === 0 ? `${seg} អស់ស្តុក` : `${seg} នៅសល់ ${cq} ប៉ុណ្ណោះ`); return; }
   }
@@ -3452,7 +3480,9 @@ $c("cart-list").addEventListener("click", (e) => {
     const q = c.qty + +b.dataset.q, others = cart.filter((x) => x.n === c.n && x !== c).reduce((s, x) => s + x.qty, 0);
     if (q <= 0) cart.splice(cart.indexOf(c), 1);
     else if (l.stock !== null && q + others > l.stock) { toast("ស្តុកមិនគ្រប់"); return; }
-    else if (b.dataset.q === "1" && String(c.size || "").split(" · ").some((seg) => { const cq = cqOf(c.n, seg); return cq !== null && colorHave(c.n, seg, c) + q > cq; })) { toast("ស្តុកមិនគ្រប់"); return; }
+    else if (b.dataset.q === "1" && (matrixOn(c.n) && String(c.size || "").includes(" · ")
+      ? q + cart.filter((x) => x !== c && x.n === c.n && x.size === c.size).reduce((t, x) => t + x.qty, 0) > (Number(stockMap()[c.n + ":" + c.size] ?? 0) || 0)
+      : String(c.size || "").split(" · ").some((seg) => { const cq = cqOf(c.n, seg); return cq !== null && colorHave(c.n, seg, c) + q > cq; }))) { toast("ស្តុកមិនគ្រប់"); return; }
     else c.qty = q;
   }
   saveCart(); if (cartCoupon) applyCoupon(cartCoupon.code, true); else renderCartUI();
