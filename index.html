@@ -2288,6 +2288,9 @@ html body .shopstrip, html body .dt-seller { display: none !important; }</style>
 .kq-amt{font-size:28px;font-weight:900;color:#111;margin-top:6px;min-height:34px}
 .kq-dash{border-top:2px dashed #bdbdbd;margin:0}
 .kq-body{padding:18px 16px 20px;background:#fff}
+#qrsheet .sheet{position:relative}
+.kq-x{position:absolute;top:14px;right:14px;width:36px;height:36px;border-radius:50%;border:none;background:rgba(0,0,0,.08);color:#444;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;z-index:3}
+.kq-x:active{background:rgba(0,0,0,.16)}
 .kq-cd{text-align:center;font-weight:800;font-size:18px;margin-top:10px;color:#555;font-variant-numeric:tabular-nums;min-height:24px}
 .kq-qrw{position:relative;width:240px;height:240px;margin:0 auto}
 .kq-qrw svg{width:240px;height:240px;display:block}
@@ -2469,6 +2472,7 @@ html body .shopstrip, html body .dt-seller { display: none !important; }</style>
   <div class="sheet-backdrop" id="qrsheet">
     <div class="sheet" role="dialog" aria-modal="true" style="text-align:center">
       <div class="sheet-handle"></div>
+      <button class="kq-x" id="qr-close" type="button" aria-label="បិទ"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M3 3l10 10M13 3L3 13"/></svg></button>
       <h3 style="margin:6px 0 4px">បង់ប្រាក់តាម QR</h3>
       <div class="kq-card" id="kq-card">
         <div class="kq-head"><span class="kq-logo-txt">KHQR</span></div>
@@ -2480,7 +2484,6 @@ html body .shopstrip, html body .dt-seller { display: none !important; }</style>
       <p class="of-hint" id="qr-msg" style="margin:10px 0"></p>
       <button class="sheet-confirm" id="qr-retry" type="button" style="display:none">បង្កើត QR ថ្មី</button>
       <button class="sheet-confirm" id="qr-paid" type="button" style="display:none">ខ្ញុំបានបង់ហើយ</button>
-      <button class="sheet-cancel" id="qr-close" type="button">បិទ</button>
     </div>
   </div>
 
