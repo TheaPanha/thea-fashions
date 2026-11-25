@@ -1550,6 +1550,10 @@
   select.of-input { height: 46px; padding: 0 12px; appearance: auto; background: #fff; }
 
   .color-chip { display: inline-flex; align-items: center; justify-content: center; gap: 0; }
+  .size-chip .cq { margin-left: 5px; font-size: 11px; color: #B26A00; }
+  .size-chip.c-out { opacity: .45; text-decoration: line-through; cursor: not-allowed; }
+  .size-chip.c-out .cq { color: #C62828; text-decoration: none; display: inline-block; }
+  .os-it[data-st="cancel"] { display: none !important; }
   .color-chip .cq { margin-left: 6px; font-size: 11px; color: #B26A00; }
   .color-chip.c-out { opacity: .45; text-decoration: line-through; cursor: not-allowed; }
   .color-chip.c-out .cq { color: #C62828; text-decoration: none; display: inline-block; }
@@ -2274,6 +2278,20 @@ html[lang="en"] body{letter-spacing:0}
 <style id="stock-colors">html body .dt-stock.out{background:#FDECEA!important;color:#C62828!important}html body .dt-stock.low{background:#FFF4E0!important;color:#B26A00!important}</style>
 <style id="hide-shopcards">/* លាក់ "ហាងទាំងអស់" និងកាតហាងក្នុងទំព័រលម្អិតទំនិញ */
 html body .shopstrip, html body .dt-seller { display: none !important; }</style>
+<style id="kq-style">
+.kq-card{max-width:320px;margin:8px auto 4px;background:#fff;border-radius:22px;overflow:hidden;box-shadow:0 10px 30px rgba(120,30,10,.18);text-align:left;position:relative}
+.kq-head{background:#D0342C;height:54px;display:flex;align-items:center;justify-content:center;position:relative;border-radius:22px 22px 0 0}
+.kq-head::after{content:"";position:absolute;right:0;bottom:-26px;border-top:26px solid #D0342C;border-left:26px solid transparent}
+.kq-logo-txt{color:#fff;font-weight:900;font-size:24px;letter-spacing:1.5px;font-family:Arial,Helvetica,sans-serif}
+.kq-top{padding:18px 22px 14px}
+.kq-name{font-size:14px;letter-spacing:.6px;text-transform:uppercase;color:#222;min-height:18px}
+.kq-amt{font-size:28px;font-weight:900;color:#111;margin-top:6px;min-height:34px}
+.kq-dash{border-top:2px dashed #bdbdbd;margin:0}
+.kq-body{padding:18px 16px 20px;background:#fff}
+.kq-qrw{position:relative;width:240px;height:240px;margin:0 auto}
+.kq-qrw svg{width:240px;height:240px;display:block}
+.kq-mark{position:absolute;left:50%;top:50%;width:46px;height:46px;margin:-23px 0 0 -23px;border-radius:50%;background:#D0342C;color:#fff;border:4px solid #fff;box-sizing:content-box;display:flex;align-items:center;justify-content:center;font:800 22px Arial,Helvetica,sans-serif}
+</style>
 </head>
 <body>
   <div class="announce" id="announce"><span id="announce-text"></span></div>
@@ -2450,8 +2468,13 @@ html body .shopstrip, html body .dt-seller { display: none !important; }</style>
     <div class="sheet" role="dialog" aria-modal="true" style="text-align:center">
       <div class="sheet-handle"></div>
       <h3 style="margin:6px 0 4px">បង់ប្រាក់តាម QR</h3>
-      <p class="of-hint" id="qr-amt" style="margin:0 0 10px"></p>
-      <div id="qr-box" style="display:flex;justify-content:center;align-items:center;min-height:200px"></div>
+      <div class="kq-card" id="kq-card">
+        <div class="kq-head"><span class="kq-logo-txt">KHQR</span></div>
+        <div class="kq-top"><div class="kq-name" id="kq-name"></div><div class="kq-amt" id="kq-amt"></div></div>
+        <div class="kq-dash"></div>
+        <div class="kq-body"><div id="qr-box" style="display:flex;justify-content:center;align-items:center;min-height:200px"></div></div>
+      </div>
+      <p class="of-hint" id="qr-amt" style="margin:10px 0 0"></p>
       <p class="of-hint" id="qr-msg" style="margin:10px 0"></p>
       <button class="sheet-confirm" id="qr-paid" type="button" style="display:none">ខ្ញុំបានបង់ហើយ</button>
       <button class="sheet-cancel" id="qr-close" type="button">បិទ</button>
@@ -2961,6 +2984,11 @@ function colorDots(place) {
 }
 const cqOf = (n, name) => { const v = stockMap()[n + ":" + name]; return v === undefined || v === "" || v === null ? null : Number(v); };   // ចំនួនតាមពណ៌ (null = គ្មានកំណត់)
 const colorNameIn = (n, variant) => { const segs = String(variant || "").split(" · "), p = PRODUCTS[n - 1]; const t = p ? colorsOf(p.place).find((c) => segs.includes(cName(c))) : undefined; return t ? cName(t) : ""; };
+function sizeBadge(b, n, sz) {
+  const q = cqOf(n, sz); b.dataset.z = sz;
+  if (q === 0) { b.disabled = true; b.classList.add("c-out"); }
+  if (q !== null && q <= 5) b.insertAdjacentHTML("beforeend", ` <small class="cq">${q === 0 ? "អស់" : "សល់ " + q}</small>`);
+}
 const colorHave = (n, name, skip) => cart.filter((c) => c.n === n && c !== skip && String(c.size || "").split(" · ").includes(name)).reduce((s, c) => s + c.qty, 0);
 const variantOf = (size, color) => [size, color ? cName(color) : ""].filter(Boolean).join(" · ");
 function colorChip(c, n) {
@@ -2977,6 +3005,8 @@ function sizesOf(place) {
     const a = SIZE_ORDER.indexOf(L[1]), b = SIZE_ORDER.indexOf(L[2]);
     if (a >= 0 && b >= a) return SIZE_ORDER.slice(a, b + 1);
   }
+  const LST = place.match(/ទំហំ\s*[:：]?\s*((?:XXL|XL|XS|S|M|L)(?:\s*[,،\/]\s*(?:XXL|XL|XS|S|M|L))*)/);   // XS, S, XXL
+  if (LST) { const set = LST[1].split(/\s*[,،\/]\s*/); const out = SIZE_ORDER.filter((z) => set.includes(z)); if (out.length) return out; }
   const N = place.match(/(\d+)\s*-\s*(\d+)/);
   if (N) {
     const out = [];
@@ -3137,7 +3167,7 @@ function openSizeSheet(item, i, sizes, btn) {
     const b = document.createElement("button");
     b.type = "button";
     b.className = "size-chip";
-    b.textContent = sz;
+    b.textContent = sz; sizeBadge(b, i + 1, sz);
     b.addEventListener("click", () => {
       chosenSize = sz;
       sizesBox.querySelectorAll(".size-chip").forEach((x) => x.classList.toggle("active", x === b));
@@ -3257,6 +3287,7 @@ async function showQr(code, P) {
   const sheetEl = $c("qrsheet"), box = $c("qr-box"), msg = $c("qr-msg"), paidBtn = $c("qr-paid"), amt = $c("qr-amt");
   box.style.flexDirection = "column"; box.style.alignItems = "center"; box.innerHTML = "";
   msg.style.color = ""; msg.textContent = "កំពុងបង្កើត QR..."; paidBtn.style.display = "none"; amt.textContent = "";
+  $c("kq-card").style.display = ""; $c("kq-name").textContent = ""; $c("kq-amt").textContent = "";
   sheetEl.classList.add("open"); closeSizeSheet();
   lastOrder = { code, phone: P.contact.phone }; try { localStorage.setItem("lastOrder", JSON.stringify(lastOrder)); } catch (e) {}
   const finish = () => { stopQr(); sheetEl.classList.remove("open"); orderDone(null, code, P.contact.phone); };
@@ -3268,8 +3299,12 @@ async function showQr(code, P) {
     if (j.paid) { finish(); return; }
     if (!j.ok) throw new Error(j.error || "create");
     const q = window.qrcode(0, "M"); q.addData(j.qr); q.make();
-    box.innerHTML = q.createSvgTag(6, 2);
-    const sv = box.querySelector("svg"); if (sv) { sv.style.width = "240px"; sv.style.height = "240px"; }
+    box.innerHTML = "";
+    const wrap = document.createElement("div"); wrap.className = "kq-qrw";
+    wrap.innerHTML = q.createSvgTag(6, 2) + '<div class="kq-mark">T</div>';
+    box.appendChild(wrap);
+    $c("kq-name").textContent = String(j.merchant || j.merchant_name || "THEA FASHION");
+    $c("kq-amt").textContent = "៛ " + Number(j.amount || 0).toLocaleString("en-US");
     amt.textContent = "ចំនួនទឹកប្រាក់សរុប: " + formatRiel(j.amount) + " · លេខការកម្មង់ " + code;
     const parts = (j.parts || []).filter((p) => !p.paid);
     if (parts.length > 1) {
@@ -3303,6 +3338,7 @@ async function showQr(code, P) {
       }
     }, 4000);
   } catch (e) {
+    $c("kq-card").style.display = "none";
     msg.style.color = "#B8213F"; paidBtn.style.display = "";
     msg.textContent = "មិនអាចបង្កើត QR បានទេ (" + String((e && e.message) || "error").slice(0, 40) + ")។ ការកម្មង់របស់អ្នកត្រូវបានទទួលហើយ ហាងនឹងទាក់ទងអ្នកដើម្បីបង់ប្រាក់។";
   }
@@ -3369,8 +3405,10 @@ function addToCart(n, size) {
   const st = stockOf(n - 1), ex = cart.find((c) => c.n === n && (c.size || "") === (size || ""));
   const have = cart.filter((c) => c.n === n).reduce((s, c) => s + c.qty, 0);
   if (st !== null && have + 1 > st) { toast("ស្តុកមិនគ្រប់"); return; }
-  const cn = colorNameIn(n, size), cq = cn ? cqOf(n, cn) : null;
-  if (cq !== null && colorHave(n, cn) + 1 > cq) { toast(cq === 0 ? "ពណ៌នេះអស់ស្តុក" : `ពណ៌នេះនៅសល់ ${cq} ប៉ុណ្ណោះ`); return; }
+  for (const seg of String(size || "").split(" · ")) {   // ទំហំ និងពណ៌ ម្នាក់ៗមានចំនួនរបស់ខ្លួន
+    const cq = cqOf(n, seg);
+    if (cq !== null && colorHave(n, seg) + 1 > cq) { toast(cq === 0 ? `${seg} អស់ស្តុក` : `${seg} នៅសល់ ${cq} ប៉ុណ្ណោះ`); return; }
+  }
   if (ex) ex.qty++; else cart.push({ n, size: size || "", qty: 1 });
   saveCart(); cartCoupon = null; renderCartUI(); toast("✓ បានដាក់ក្នុងកន្ត្រក");
 }
@@ -3411,7 +3449,7 @@ $c("cart-list").addEventListener("click", (e) => {
     const q = c.qty + +b.dataset.q, others = cart.filter((x) => x.n === c.n && x !== c).reduce((s, x) => s + x.qty, 0);
     if (q <= 0) cart.splice(cart.indexOf(c), 1);
     else if (l.stock !== null && q + others > l.stock) { toast("ស្តុកមិនគ្រប់"); return; }
-    else if (b.dataset.q === "1" && (() => { const cn = colorNameIn(c.n, c.size), cq = cn ? cqOf(c.n, cn) : null; return cq !== null && colorHave(c.n, cn, c) + q > cq; })()) { toast("ពណ៌នេះស្តុកមិនគ្រប់"); return; }
+    else if (b.dataset.q === "1" && String(c.size || "").split(" · ").some((seg) => { const cq = cqOf(c.n, seg); return cq !== null && colorHave(c.n, seg, c) + q > cq; })) { toast("ស្តុកមិនគ្រប់"); return; }
     else c.qty = q;
   }
   saveCart(); if (cartCoupon) applyCoupon(cartCoupon.code, true); else renderCartUI();
@@ -3454,7 +3492,7 @@ function openAddSheet(item, i, sizes) {
   $c("add-size-hint").style.display = sizes.length ? "" : "none";
   sbox.innerHTML = "";
   sizes.forEach((z) => {
-    const b = document.createElement("button"); b.type = "button"; b.className = "size-chip"; b.textContent = z;
+    const b = document.createElement("button"); b.type = "button"; b.className = "size-chip"; b.textContent = z; sizeBadge(b, i + 1, z);
     b.onclick = () => {
       if (!colors.length) { close(); addToCart(i + 1, z); return; }
       sz = z; sbox.querySelectorAll(".size-chip").forEach((x) => x.classList.toggle("active", x === b)); sync();
@@ -3648,7 +3686,7 @@ async function loadMine() {
     const t = await cToken();
     const r = await fetch(`${SB_URL}/rest/v1/orders?select=*&user_id=eq.${CU.sess.uid}&order=created_at.desc&limit=30`, { headers: { apikey: SB_KEY, Authorization: "Bearer " + t }, cache: "no-store" });
     if (!r.ok) throw new Error(r.status);
-    const allRows = await r.json(); MINE_ALL = allRows; osRender(allRows);
+    const allRows = (await r.json()).filter((o) => o.status !== "cancel"); MINE_ALL = allRows; osRender(allRows);   // មិនបង្ហាញការកម្មង់ដែលបានបោះបង់
     const rows = mineF ? allRows.filter((o) => o.status === mineF) : allRows;
     box.innerHTML = rows.length ? rows.map((o) => {
       const k = STEPS.findIndex((s) => s[0] === o.status), d = new Date(o.created_at).toLocaleDateString("en-GB", { timeZone: "Asia/Phnom_Penh", day: "2-digit", month: "short" });
@@ -4103,10 +4141,10 @@ function openDetail(i) {
   dt$("dt-size-sec").style.display = sizes.length ? "" : "none";
   const box = dt$("dt-sizes"); box.innerHTML = "";
   sizes.forEach((sz) => {
-    const b = document.createElement("button"); b.type = "button"; b.className = "size-chip"; b.textContent = sz;
+    const b = document.createElement("button"); b.type = "button"; b.className = "size-chip"; b.textContent = sz; sizeBadge(b, i + 1, sz);
     b.addEventListener("click", () => {
       dtSize = dtSize === sz ? "" : sz;
-      box.querySelectorAll(".size-chip").forEach((x) => x.classList.toggle("active", x.textContent === dtSize));
+      box.querySelectorAll(".size-chip").forEach((x) => x.classList.toggle("active", x.dataset.z === dtSize));
       updateDtBuy();
     });
     box.appendChild(b);

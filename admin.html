@@ -265,6 +265,12 @@
   .ad-cchips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
   .ad-cchip { display: inline-flex; align-items: center; gap: 6px; padding: 5px 6px 5px 10px; border: 1px solid var(--border); border-radius: 999px; background: #fff; font-size: 13px; }
   .ad-cchip i { width: 16px; height: 16px; border-radius: 50%; border: 1px solid rgba(0,0,0,.2); }
+  .ad-sizes2 { margin-bottom: 10px; }
+  .ad-sznew { flex: 1 1 110px; min-width: 0; }
+  .ad-sizes2 .ad-lab { font-size: 13px; color: var(--muted, #8A7468); margin: 2px 0 6px; font-weight: 600; }
+  .ad-szchips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+  .ad-sx { border: none; background: rgba(0,0,0,.08); width: 20px; height: 20px; border-radius: 50%; line-height: 1; cursor: pointer; font-size: 14px; padding: 0; }
+  .ad-sq { width: 52px; height: 24px; padding: 0 4px; border: 1px solid var(--border); border-radius: 8px; background: #FBF8F4; font: 600 12px inherit; text-align: center; }
   .ad-cx { border: none; background: rgba(0,0,0,.08); width: 20px; height: 20px; border-radius: 50%; line-height: 1; cursor: pointer; font-size: 14px; padding: 0; }
   .ad-cadd { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
   .ad-cpick { width: 46px; height: 42px; padding: 2px; border: 1px solid var(--border); border-radius: 10px; background: #fff; flex: none; }
@@ -1013,14 +1019,27 @@ function adColorsApply(row, n, p, cs) {
   row.querySelector('[data-f="place"]').value = p.place;
   row.querySelector('[data-f="colors"]').value = cs.join(", ");
   row.querySelector(".ad-cchips").innerHTML = adClrChips(p.place, n);
-  const qs = cs.map((t) => adCQ(n, adClrParse(t).name));
-  if (cs.length && qs.every((q) => q !== null)) {
-    const prev = adminData.stock[n], tot = qs.reduce((a, b) => a + b, 0);
-    adminData.stock[n] = tot; window.__sd.add(String(n));
-    const si = row.querySelector('[data-f="stock"]'); if (si) si.value = tot;
-    restockWatch(n, prev, tot, p && p.name);
-  }
-  saveAdmin(); refreshSite(); stats(); flashSaved();
+  adSyncTotal(row, n, p);
+  saveAdmin(); refreshSite(); if (window.adStats) window.adStats(); flashSaved();
+}
+// ស្តុកសរុប = ផលបូកចំនួនតាមទំហំ (បើគ្រប់ទំហំមានចំនួន) បើមិនដូច្នោះ = ផលបូកចំនួនតាមពណ៌ (បើគ្រប់ពណ៌មានចំនួន)
+function adSyncTotal(row, n, p) {
+  const sz = adSizeList(p.place).map((z) => adCQ(n, z)), cl = adColors(p.place).map((t) => adCQ(n, adClrParse(t).name));
+  const pick = sz.length && sz.every((q) => q !== null) ? sz : cl.length && cl.every((q) => q !== null) ? cl : null;
+  if (!pick) return;
+  const prev = adminData.stock[n], tot = pick.reduce((a, b) => a + b, 0);
+  adminData.stock[n] = tot; window.__sd.add(String(n));
+  const si = row.querySelector('[data-f="stock"]'); if (si) si.value = tot;
+  restockWatch(n, prev, tot, p && p.name);
+}
+function adSizesApply(row, n, p, list) {
+  const rest = adColorSuffix(p.place);
+  p.place = list.length ? "ទំហំ " + list.join(", ") + rest : rest.replace(/^\s*·\s*/, "");
+  row.querySelector('[data-f="place"]').value = p.place;
+  const box = row.querySelector(".ad-sizes2");
+  if (box) { const t = document.createElement("div"); t.innerHTML = adSizeSel(p.place, n); if (t.firstElementChild) box.replaceWith(t.firstElementChild); }
+  adSyncTotal(row, n, p);
+  saveAdmin(); refreshSite(); if (window.adStats) window.adStats(); flashSaved();
 }
 // ពណ៌ទំនិញ៖ រក្សាទុកក្នុង place ជា "ទំហំ S - XL · ពណ៌: ខ្មៅ, ស"
 function adColors(place) {
@@ -1033,7 +1052,23 @@ function adSizeRange(place) {
   const m = String(place || "").match(/\b(XXL|XL|XS|S|M|L)\s*-\s*(XXL|XL|XS|S|M|L)\b/);
   return m ? [m[1], m[2]] : ["", ""];
 }
-function adSizeSel(place) {
+// ទំហំជាបញ្ជី (XS, S, XXL...) ជាមួយចំនួនតាមទំហំ · stock["លេខ:ទំហំ"]
+function adSizeList(place) {
+  const p = adStripColors(place), r = adSizeRange(p);
+  if (r[0] && r[1]) { const a = AD_SIZES.indexOf(r[0]), b = AD_SIZES.indexOf(r[1]); return AD_SIZES.slice(Math.min(a, b), Math.max(a, b) + 1); }
+  const m = p.match(/ទំហំ\s*[:：]?\s*((?:XXL|XL|XS|S|M|L)(?:\s*[,،\/]\s*(?:XXL|XL|XS|S|M|L))*)/);
+  if (m) { const set = m[1].split(/\s*[,،\/]\s*/); return AD_SIZES.filter((z) => set.includes(z)); }
+  return [];
+}
+const adSizeIsOther = (place) => /ឆ្នាំ|free/i.test(place) || /\d+\s*-\s*\d+/.test(adStripColors(place));
+function adSizeSel(place, n) {
+  if (adSizeIsOther(place)) return "";
+  const list = adSizeList(place);
+  const chips = list.map((z) => { const q = adCQ(n, z); return `<span class="ad-cchip"><b>${z}</b><input type="number" class="ad-sq" data-sz="${z}" min="0" inputmode="numeric" value="${q === null ? "" : q}" placeholder="∞" aria-label="ចំនួន ${z}" /><button type="button" class="ad-sx" data-sz="${z}" aria-label="លុប ${z}">×</button></span>`; }).join("");
+  const opts = AD_SIZES.filter((z) => !list.includes(z)).map((z) => `<option value="${z}">${z}</option>`).join("");
+  return `<div class="ad-sizes2"><div class="ad-lab">ទំហំ និងចំនួនតាមទំហំ</div><div class="ad-szchips">${chips || '<span class="ad-hint">មិនទាន់មានទំហំ</span>'}</div>${opts ? `<div class="ad-cadd"><select class="ad-input ad-sznew" aria-label="ជ្រើសទំហំ">${opts}</select><input type="number" class="ad-input ad-cqty ad-szqty" min="0" inputmode="numeric" placeholder="ចំនួន" aria-label="ចំនួនទំហំ" /><button type="button" class="ad-btn ad-szadd" style="flex:1 1 100%">+ បន្ថែមទំហំ</button></div>` : ""}</div>`;
+}
+function adSizeSelOld(place) {
   const [a, b] = adSizeRange(place);
   const opts = (v) => `<option value="">—</option>` + AD_SIZES.map((z) => `<option value="${z}"${z === v ? " selected" : ""}>${z}</option>`).join("");
   return `<div class="ad-sizes"><span>ទំហំអក្សរ៖</span><select class="ad-input" data-f="sizeFrom" aria-label="ពីទំហំ">${opts(a)}</select><span>ដល់</span><select class="ad-input" data-f="sizeTo" aria-label="ដល់ទំហំ">${opts(b)}</select></div>`;
@@ -1135,7 +1170,7 @@ function adminRows(q) {
           <label class="ad-hide"><input type="checkbox" data-f="hide" ${h ? "checked" : ""}> លាក់</label></div>
         <input class="ad-input" data-f="name" value="${esc(p.name)}" placeholder="ឈ្មោះ" />
         <input class="ad-input" data-f="place" value="${esc(p.place)}" placeholder="ទំហំ" />
-        ${adSizeSel(p.place)}
+        ${adSizeSel(p.place, n)}
         ${adColorBox(p.place, n)}
         ${adGallery(n)}
         <textarea class="ad-input ad-desc" data-f="desc" rows="3" placeholder="ពិពណ៌នាទំនិញ (ក្រណាត់ ទ្រង់ទ្រាយ ពណ៌...) · ទុកទទេ = ប្រើអត្ថបទស្វ័យប្រវត្តិ">${esc(p.desc || "")}</textarea>
@@ -1207,8 +1242,8 @@ function flashSaved() {
     if (bd) { bd.hidden = !nNew; bd.textContent = nNew; }
     $("od-stats").innerHTML = `<div class="od-stat"><b>${nNew}</b><span>ថ្មី</span></div><div class="od-stat"><b>${td.length}</b><span>ថ្ងៃនេះ</span></div><div class="od-stat"><b>${money(td.reduce((s, o) => s + (o.price || 0), 0))}</b><span>សរុបថ្ងៃនេះ</span></div>`;
     $("od-rev").innerHTML = revBox();
-    $("od-chips").innerHTML = [["all", "ទាំងអស់", orders.length], ...Object.entries(ST).map(([k, v]) => [k, v, orders.filter((o) => o.status === k).length])].map(([k, v, c]) => `<button class="od-sm${flt === k ? " on" : ""}" data-f="${k}" type="button">${v} (${c})</button>`).join("");
-    const rows = orders.filter((o) => flt === "all" || o.status === flt);
+    $("od-chips").innerHTML = [["all", "ទាំងអស់", orders.filter((o) => o.status !== "cancel").length], ...Object.entries(ST).map(([k, v]) => [k, v, orders.filter((o) => o.status === k).length])].map(([k, v, c]) => `<button class="od-sm${flt === k ? " on" : ""}" data-f="${k}" type="button">${v} (${c})</button>`).join("");
+    const rows = orders.filter((o) => flt === "all" ? o.status !== "cancel" : o.status === flt);
     $("od-list").innerHTML = rows.length ? rows.map((o) => `<div class="od-card ${e2(o.status)}" data-id="${o.id}">
       <div class="od-top"><div class="od-name">${e2(o.product)}${o.size ? " · " + e2(o.size) : ""}</div><div class="od-time">${when(o.created_at)}</div></div>
       <div class="od-meta"><span class="od-price">${money(o.price)}</span> · #${e2(o.product_no)}${o.order_code ? " · <b>" + e2(o.order_code) + "</b>" : ""}${o.received_at ? ' <b style="color:#3F7D5C">· អតិថិជនបានទទួលទំនិញហើយ</b>' : ""}${o.paid_at ? ' <b style="color:#3F7D5C">· បានបង់ប្រាក់រួច (KHQR)</b>' : (o.pay_method === "qr" ? ' <b style="color:#B8213F">· រង់ចាំការបង់ប្រាក់</b>' : "")}${o.pay_method ? " · " + (o.pay_method === "qr" ? "បង់ឥឡូវ" : "បង់ពេលទទួល") : ""}<br>
@@ -1564,12 +1599,20 @@ function openAdminPanel() {
     document.getElementById("ad-stats").textContent =
       `${PRODUCTS.length} ទំនិញ · លាក់ ${adminData.hidden.length} · អស់ស្តុក ${Object.keys(adminData.stock).filter((k) => !k.includes(":") && adminData.stock[k] !== "" && Number(adminData.stock[k]) === 0).length} · បញ្ចុះដោយដៃ ${Object.keys(adminData.sale).length}`;
   };
+  window.adStats = stats;   // ឲ្យអនុគមន៍ខាងក្រៅ (ចំនួនពណ៌/ទំហំ) អាចហៅបាន
   stats();
 
   list.onchange = (e) => {
     const el = e.target, row = el.closest(".ad-row");
     if (!row) return;
     const n = Number(row.dataset.n), f = el.dataset.f, p = PRODUCTS[n - 1];
+    if (el.classList.contains("ad-sq")) {         // ចំនួនតាមទំហំនីមួយៗ
+      const key = n + ":" + el.dataset.sz, v = el.value.trim();
+      if (v === "") delete adminData.stock[key]; else adminData.stock[key] = Math.max(0, Math.round(Number(v) || 0));
+      window.__sd.add(key);
+      adSizesApply(row, n, p, adSizeList(p.place));
+      return;
+    }
     if (el.classList.contains("ad-cq")) {         // ចំនួនតាមពណ៌នីមួយៗ
       const cs = adColors(p.place), t = cs[Number(el.dataset.ck)];
       if (t === undefined) return;
@@ -1662,6 +1705,25 @@ function openAdminPanel() {
   }));
   // បញ្ចុះតម្លៃលឿន (-10% / -20% / -30% / លុប)
   list.addEventListener("click", (e) => {
+    const sb = e.target.closest(".ad-szadd, .ad-sx");
+    if (sb) {                                   // ទំហំ៖ បន្ថែម / លុប
+      const row = sb.closest(".ad-row"), n = Number(row.dataset.n), p = PRODUCTS[n - 1];
+      let list2 = adSizeList(p.place);
+      if (sb.classList.contains("ad-sx")) {
+        const z = sb.dataset.sz; list2 = list2.filter((x) => x !== z);
+        delete adminData.stock[n + ":" + z]; window.__sd.add(n + ":" + z);
+      } else {
+        const z = row.querySelector(".ad-sznew").value, qv = row.querySelector(".ad-szqty").value.trim();
+        if (!z) return;
+        if (!list2.includes(z)) list2.push(z);
+        list2 = AD_SIZES.filter((x) => list2.includes(x));
+        const key = n + ":" + z;
+        if (qv !== "") adminData.stock[key] = Math.max(0, Math.round(Number(qv) || 0));
+        window.__sd.add(key);
+      }
+      adSizesApply(row, n, p, list2);
+      return;
+    }
     const cb = e.target.closest(".ad-cbtn, .ad-cx");
     if (cb) {                                   // ពណ៌៖ បន្ថែម / លុប
       const row = cb.closest(".ad-row"), n = Number(row.dataset.n), p = PRODUCTS[n - 1];
