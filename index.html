@@ -3328,7 +3328,14 @@ async function showQr(code, P) {
   lastOrder = { code, phone: P.contact.phone }; try { localStorage.setItem("lastOrder", JSON.stringify(lastOrder)); } catch (e) {}
   const finish = () => { stopQr(); sheetEl.classList.remove("open"); orderDone(null, code, P.contact.phone); };
   paidBtn.onclick = async () => { try { await kqPost({ action: "claim", order_code: code }); } catch (e) {} finish(); };
-  $c("qr-close").onclick = () => { stopQr(); sheetEl.classList.remove("open"); };
+  $c("qr-close").onclick = async () => {   // ✕ ចេញពី QR៖ បើមិនទាន់បង់ → បោះបង់ការកម្មង់ ហើយសងស្តុកភ្លាមៗ
+    if ((qrCd || qrTimer) && !confirm("ចាកចេញពីការបង់ប្រាក់? ការកម្មង់នេះនឹងត្រូវបោះបង់ ប្រសិនបើមិនទាន់បានបង់។")) return;
+    stopQr(); sheetEl.classList.remove("open");
+    try {
+      const r = await fetch(`${SB_URL}/rest/v1/rpc/cancel_unpaid_order`, { method: "POST", headers: { apikey: SB_KEY, Authorization: "Bearer " + SB_KEY, "Content-Type": "application/json" }, body: JSON.stringify({ p_code: code }) });
+      if ((await r.json()) === "ok") toast("ការកម្មង់ត្រូវបានបោះបង់ (មិនទាន់បានបង់ប្រាក់)");
+    } catch (e) {}
+  };
   try {
     await loadQrLib();
     const j = await kqPost({ action: "create", order_code: code });
@@ -3386,7 +3393,7 @@ async function showQr(code, P) {
       box.innerHTML = '<div style="padding:44px 12px;text-align:center;color:#B8213F;font-weight:700;line-height:1.7">QR ផុតកំណត់<br><small style="font-weight:400">មិនទាន់ឃើញការបង់ប្រាក់</small></div>';
       cdEl.textContent = ""; paidBtn.style.display = "none";
       msg.style.color = "#B8213F";
-      msg.textContent = "មិនបានស្កេន QR ក្នុងរយៈពេល 0:30 ដូច្នេះការកម្មង់នេះមិនទាន់បានបង់ប្រាក់ទេ។ ចុច 'បង្កើត QR ថ្មី' ដើម្បីបង់ម្តងទៀត។";
+      msg.textContent = "មិនបានស្កេន QR ក្នុងរយៈពេល 0:30 ដូច្នេះការកម្មង់នេះមិនទាន់បានបង់ប្រាក់ទេ។ ចុច 'បង្កើត QR ថ្មី' ដើម្បីបង់ម្តងទៀត។ បើមិនបង់ក្នុង 3 នាទី ការកម្មង់នឹងត្រូវបោះបង់ ហើយស្តុកត្រូវសងវិញ។";
       retry.style.display = "";
     };
     qrCd = setInterval(tick, 1000); tick();
