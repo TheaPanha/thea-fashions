@@ -2290,7 +2290,8 @@ html body .shopstrip, html body .dt-seller { display: none !important; }</style>
 .kq-body{padding:18px 16px 20px;background:#fff}
 .kq-qrw{position:relative;width:240px;height:240px;margin:0 auto}
 .kq-qrw svg{width:240px;height:240px;display:block}
-.kq-mark{position:absolute;left:50%;top:50%;width:46px;height:46px;margin:-23px 0 0 -23px;border-radius:50%;background:#D0342C;color:#fff;border:4px solid #fff;box-sizing:content-box;display:flex;align-items:center;justify-content:center;font:800 22px Arial,Helvetica,sans-serif}
+.kq-mark{position:absolute;left:50%;top:50%;width:46px;height:46px;margin:-27px 0 0 -27px;border-radius:50%;background:#fff;border:4px solid #fff;box-sizing:content-box;overflow:hidden}
+.kq-mark svg,.kq-mark img{width:100%;height:100%;display:block}
 </style>
 </head>
 <body>
@@ -3283,6 +3284,8 @@ function loadQrLib() {
   });
 }
 function stopQr() { if (qrTimer) { clearInterval(qrTimer); qrTimer = null; } }
+// រូបសញ្ញាកណ្តាល QR (ក្រហម មានផ្កាយ ៨ ជ្រុង និងអក្សរ C)។ ចង់ប្រើរូបផ្លូវការ៖ ជំនួសតម្លៃនេះដោយ '<img src="data:image/png;base64,..." style="width:100%;height:100%;border-radius:50%">'
+const QR_LOGO = '<svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><circle cx="24" cy="24" r="24" fill="#D0342C"/><g fill="none" stroke="#fff" stroke-linejoin="round"><rect x="12.5" y="12.5" width="23" height="23" stroke-width="1.6"/><rect x="12.5" y="12.5" width="23" height="23" stroke-width="1.6" transform="rotate(45 24 24)"/><path d="M28.6 19.6A6.4 6.4 0 1 0 28.6 28.4" stroke-width="2.6" stroke-linecap="round"/></g></svg>';
 async function showQr(code, P) {
   const sheetEl = $c("qrsheet"), box = $c("qr-box"), msg = $c("qr-msg"), paidBtn = $c("qr-paid"), amt = $c("qr-amt");
   box.style.flexDirection = "column"; box.style.alignItems = "center"; box.innerHTML = "";
@@ -3301,7 +3304,7 @@ async function showQr(code, P) {
     const q = window.qrcode(0, "M"); q.addData(j.qr); q.make();
     box.innerHTML = "";
     const wrap = document.createElement("div"); wrap.className = "kq-qrw";
-    wrap.innerHTML = q.createSvgTag(6, 2) + '<div class="kq-mark">T</div>';
+    wrap.innerHTML = q.createSvgTag(6, 2) + '<div class="kq-mark">' + QR_LOGO + '</div>';
     box.appendChild(wrap);
     $c("kq-name").textContent = String(j.merchant || j.merchant_name || "THEA FASHION");
     $c("kq-amt").textContent = "៛ " + Number(j.amount || 0).toLocaleString("en-US");
